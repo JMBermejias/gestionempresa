@@ -28,49 +28,37 @@ jobs:
           $html = Get-Content -Raw mediotec.html
           $v = "1"
           if ($html -match "APP_VERSION='(\d+)'") { $v = $matches[1] }
-          Write-Output ("tag=v" + $v)
+          Write-Output "tag=v$v" >> $env:GITHUB_OUTPUT
 
       - name: Build EXE
         run: python tools/build_windows.py
 
-      - name: Verificar si el tag ya existe
-        id: checktag
+      - name: Publicar tag y release
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $v = "${{ steps.version.outputs.tag }}"
-          $exists = git ls-remote --tags origin refs/tags/$v
-          if ($exists -match $v) {
-            Write-Output "exists=true"
-          } else {
-            Write-Output "exists=false"
+          $tag = "${{ steps.version.outputs.tag }}"
+          Write-Output "Tag a publicar: $tag"
+          $existing = git ls-remote --tags origin "refs/tags/$tag"
+          if ($existing) {
+            Write-Output "El tag $tag ya existe; se elimina antes de recrearlo."
+            gh release delete "$tag" --yes --cleanup-tag
           }
+          gh release create "$tag" dist/MedicionObra.exe `
+            --title "Medicion Obra $tag" `
+            --notes-file "$env:RUNNER_TEMP/notas.md"
 
-      - name: Crear tag si no existe
-        if: steps.checktag.outputs.exists == 'false'
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
-          git push origin "${{ steps.version.outputs.tag }}"
+          @"
+## Medicion Obra $tag
 
-      - name: Subir EXE a la release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: "Medicion Obra ${{ steps.version.outputs.tag }}"
-          body: |
-            ## Medicion Obra ${{ steps.version.outputs.tag }}
+Version generada automaticamente desde el push a main.
 
-            Version generada automaticamente desde el push a `main`.
+**Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
 
-            **Escritorio (Windows):** descarga `MedicionObra.exe` y ejecutalo.
+**Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
 
-            **Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
-
-            ### Notas
-            - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
-            - El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
-          files: dist/MedicionObra.exe
-          fail_on_unmatched_files: true
-          update_if_release_exists: true
+### Notas
+- Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
+- El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
+"@ | Set-Content -Path "$env:RUNNER_TEMP/notas.md" -Encoding UTF8
