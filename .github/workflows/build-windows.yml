@@ -45,20 +45,21 @@ jobs:
             Write-Output "El tag $tag ya existe; se elimina antes de recrearlo."
             gh release delete "$tag" --yes --cleanup-tag
           }
+          $notes = @'
+          ## Medicion Obra AUTOVERSION
+
+          Version generada automaticamente desde el push a main.
+
+          **Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
+
+          **Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
+
+          ### Notas
+          - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
+          - El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
+          '@
+          $notes = $notes.Replace('AUTOVERSION', $tag)
+          Set-Content -Path "$env:RUNNER_TEMP/notas.md" -Value $notes -Encoding UTF8
           gh release create "$tag" dist/MedicionObra.exe `
             --title "Medicion Obra $tag" `
             --notes-file "$env:RUNNER_TEMP/notas.md"
-
-          @"
-## Medicion Obra $tag
-
-Version generada automaticamente desde el push a main.
-
-**Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
-
-**Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
-
-### Notas
-- Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
-- El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
-"@ | Set-Content -Path "$env:RUNNER_TEMP/notas.md" -Encoding UTF8
