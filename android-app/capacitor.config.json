@@ -1,0 +1,8 @@
+{
+  "appId": "com.medicionobra.app",
+  "appName": "Medicion Obra",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

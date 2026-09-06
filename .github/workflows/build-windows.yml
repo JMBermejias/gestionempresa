@@ -1,4 +1,4 @@
-name: Build EXE + Release Automatica
+name: Build + Release Automatica
 
 on:
   push:
@@ -21,45 +21,119 @@ jobs:
       - name: Install PyInstaller and Pillow
         run: pip install pyinstaller pillow
 
-      - name: Leer version del HTML
-        id: version
-        shell: pwsh
-        run: |
-          $html = Get-Content -Raw mediotec.html
-          $v = "1"
-          if ($html -match "APP_VERSION='(\d+)'") { $v = $matches[1] }
-          Write-Output "tag=v$v" >> $env:GITHUB_OUTPUT
-
       - name: Build EXE
         run: python tools/build_windows.py
 
-      - name: Publicar tag y release
-        shell: pwsh
+      - name: Subir EXE como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe-artifact
+          path: dist/MedicionObra.exe
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Preparar web y resources
+        shell: bash
+        run: |
+          mkdir -p android-app/www
+          cp mediotec.html android-app/www/index.html
+          cp mediotec.html android-app/www/mediotec.html
+          cp sw.js android-app/www/sw.js
+          cp manifest.json android-app/www/manifest.json
+          cp icon-192.png android-app/www/icon-192.png
+          cp icon-512.png android-app/www/icon-512.png
+          mkdir -p android-app/resources/icon android-app/resources/icon-only android-app/resources/splash
+          cp icon-512.png android-app/resources/icon-only.png
+          cp icon-512.png android-app/resources/icon.png
+
+      - name: Instalar Capacitor
+        working-directory: android-app
+        shell: bash
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap add android
+
+      - name: Generar iconos
+        working-directory: android-app
+        shell: bash
+        run: npx capacitor-assets generate --android || echo "iconos opcionales"
+
+      - name: Build APK
+        working-directory: android-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-artifact
+          path: android-app/android/app/build/outputs/apk/debug/app-debug.apk
+
+  release:
+    needs: [build-windows, build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: version
+        shell: bash
+        run: |
+          v=$(grep -oP "APP_VERSION='\K[0-9]+" mediotec.html || echo "1")
+          echo "tag=v$v" >> "$GITHUB_OUTPUT"
+
+      - name: Descargar artefactos
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publicar release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = "${{ steps.version.outputs.tag }}"
-          Write-Output "Tag a publicar: $tag"
-          $existing = git ls-remote --tags origin "refs/tags/$tag"
-          if ($existing) {
-            Write-Output "El tag $tag ya existe; se elimina antes de recrearlo."
+          set -e
+          tag="${{ steps.version.outputs.tag }}"
+          echo "Tag: $tag"
+          ls -la artifacts/exe-artifact artifacts/apk-artifact
+          if [ "$tag" = "v1" ]; then
+            echo "No se detecto version valida, abortando"
+            exit 1
+          fi
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q .; then
+            echo "El tag $tag ya existe; se elimina antes de recrearlo."
             gh release delete "$tag" --yes --cleanup-tag
-          }
-          $notes = @'
+          fi
+          cat > notas.md << 'NOTE'
           ## Medicion Obra AUTOVERSION
 
           Version generada automaticamente desde el push a main.
 
           **Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
 
-          **Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
+          **Android:** descarga **app-debug.apk** e instalalo (permite origenes desconocidos).
 
           ### Notas
           - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
+          - El APK funciona standalone con Firebase (no necesita el PC encendido).
           - El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
-          '@
-          $notes = $notes.Replace('AUTOVERSION', $tag)
-          Set-Content -Path "$env:RUNNER_TEMP/notas.md" -Value $notes -Encoding UTF8
-          gh release create "$tag" dist/MedicionObra.exe `
-            --title "Medicion Obra $tag" `
-            --notes-file "$env:RUNNER_TEMP/notas.md"
+          NOTE
+          sed -i "s/AUTOVERSION/$tag/g" notas.md
+          gh release create "$tag" \
+            artifacts/exe-artifact/*.exe \
+            artifacts/apk-artifact/*.apk \
+            --title "Medicion Obra $tag" \
+            --notes-file notas.md
