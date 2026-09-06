@@ -51,12 +51,14 @@ def build():
     cmd = [
         sys.executable, '-m', 'PyInstaller',
         '--onefile',
-        '--noconsole',
         '--name', 'MedicionObra',
         '--distpath', DIST_DIR,
         '--workpath', BUILD_DIR,
         '--specpath', BUILD_DIR,
     ]
+
+    if sys.platform == 'win32':
+        cmd += ['--noconsole']
 
     for d in add_data:
         cmd += ['--add-data', d]
@@ -80,10 +82,10 @@ def build():
         print('ERROR: PyInstaller fallo con codigo %d' % result.returncode)
         sys.exit(1)
 
-    exe = os.path.join(DIST_DIR, 'MedicionObra.exe')
-    if os.path.exists(exe):
-        size_kb = os.path.getsize(exe) // 1024
-        print('Generado: %s (%d KB)' % (exe, size_kb))
+    binary = os.path.join(DIST_DIR, 'MedicionObra.exe' if sys.platform == 'win32' else 'MedicionObra')
+    if os.path.exists(binary):
+        size_kb = os.path.getsize(binary) // 1024
+        print('Generado: %s (%d KB)' % (binary, size_kb))
     else:
         print('Generado en: %s' % DIST_DIR)
 

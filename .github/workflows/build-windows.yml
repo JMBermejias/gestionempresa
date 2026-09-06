@@ -123,8 +123,36 @@ jobs:
           name: apk-artifact
           path: android-app/android/app/build/outputs/apk/debug/app-debug.apk
 
+  build-linux:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build binario Linux
+        run: python tools/build_windows.py
+
+      - name: Empacar .deb
+        run: python tools/package_deb.py
+
+      - name: Subir .deb como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifact
+          path: dist/medicion-obra.deb
+
   release:
-    needs: [build-windows, build-android]
+    needs: [build-windows, build-android, build-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -149,7 +177,7 @@ jobs:
           set -e
           tag="${{ steps.version.outputs.tag }}"
           echo "Tag: $tag"
-          ls -la artifacts/exe-artifact artifacts/apk-artifact
+          ls -la artifacts/exe-artifact artifacts/apk-artifact artifacts/linux-artifact
           if [ "$tag" = "v1" ]; then
             echo "No se detecto version valida, abortando"
             exit 1
@@ -165,6 +193,7 @@ jobs:
 
           **Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
           **Android:** descarga **app-debug.apk** e instalalo (permite origenes desconocidos).
+          **Linux (Debian/Ubuntu):** descarga **medicion-obra.deb** e instala con `sudo dpkg -i medicion-obra.deb` (o doble clic).
 
           ### Notas
           - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
@@ -180,5 +209,6 @@ jobs:
           gh release create "$tag" \
             artifacts/exe-artifact/*.exe \
             artifacts/apk-artifact/*.apk \
+            artifacts/linux-artifact/*.deb \
             --title "Medicion Obra $tag" \
             --notes-file notas.md

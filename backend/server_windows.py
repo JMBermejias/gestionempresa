@@ -28,7 +28,18 @@ else:
     ASSETS_DIR = os.path.join(BASE_DIR)
 
 WEB_DIR = ASSETS_DIR
-APPDATA = os.path.join(os.environ.get('APPDATA', BASE_DIR), 'MedicionObra')
+
+
+def appdata_dir():
+    if sys.platform.startswith('linux'):
+        home = os.path.expanduser('~')
+        if os.path.isdir(home):
+            xdg = os.environ.get('XDG_DATA_HOME') or os.path.join(home, '.local', 'share')
+            return os.path.join(xdg, 'MedicionObra')
+    return os.path.join(os.environ.get('APPDATA', BASE_DIR), 'MedicionObra')
+
+
+APPDATA = appdata_dir()
 DB_PATH = os.path.join(APPDATA, 'medicion.db')
 AUTH_FILE = os.path.join(APPDATA, 'auth.json')
 UPDATES_DIR = os.path.join(APPDATA, 'updates')
@@ -36,7 +47,10 @@ HOST = '0.0.0.0'
 PORT = 8080
 GITHUB_REPO = 'JMBermejias/medicion-obra'
 GITHUB_API = 'https://api.github.com/repos/%s/releases/latest' % GITHUB_REPO
-EXE_NAME = 'MedicionObra.exe'
+if sys.platform.startswith('linux'):
+    EXE_NAME = 'medicion-obra.deb'
+else:
+    EXE_NAME = 'MedicionObra.exe'
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
 
 SCHEMA = (
