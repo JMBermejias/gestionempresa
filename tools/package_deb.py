@@ -70,19 +70,20 @@ def main():
             'Keywords=obra;medicion;\n'
         )
 
+    control = (
+        'Package: medicion-obra\n'
+        'Version: %s\n'
+        'Section: utils\n'
+        'Priority: optional\n'
+        'Architecture: amd64\n'
+        'Depends: libc6 (>= 2.17)\n'
+        'Maintainer: JMBernabeu <jmbernabeu@users.noreply.github.com>\n'
+        'Description: Medicion Obra - Sistema de medicion de obras\n'
+        ' Aplicacion que sirve en http://127.0.0.1:8080 el sistema de\n'
+        ' medicion de obras (escritorio y movil con la misma autenticacion).\n'
+    ) % ver
     with open(os.path.join(debian, 'control'), 'w', encoding='utf-8') as f:
-        f.write(
-            'Package: medicion-obra\n'
-            'Version: %s\n'
-            'Section: utils\n'
-            'Priority: optional\n'
-            'Architecture: amd64\n'
-            'Depends: libc6 (>= 2.17)\n'
-            'Maintainer: JMBernabeu <jmbernabeu@users.noreply.github.com>\n'
-            'Description: Medicion Obra - Sistema de medicion de obras\n'
-            ' Aplicacion que sirve en http://127.0.0.1:8080 el sistema de\n'
-            ' medicion de obras (escritorio y movil con la misma autenticacion).\n'
-        ) % ver
+        f.write(control)
 
     deb = os.path.join(DIST_DIR, DEB_NAME)
     if os.path.exists(deb):
