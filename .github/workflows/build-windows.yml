@@ -1,8 +1,8 @@
-name: Build Windows EXE
+name: Build EXE + Release Automatica
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -21,10 +21,56 @@ jobs:
       - name: Install PyInstaller and Pillow
         run: pip install pyinstaller pillow
 
+      - name: Leer version del HTML
+        id: version
+        shell: pwsh
+        run: |
+          $html = Get-Content -Raw mediotec.html
+          $v = "1"
+          if ($html -match "APP_VERSION='(\d+)'") { $v = $matches[1] }
+          Write-Output ("tag=v" + $v)
+
       - name: Build EXE
         run: python tools/build_windows.py
 
-      - name: Upload EXE to release
+      - name: Verificar si el tag ya existe
+        id: checktag
+        shell: pwsh
+        run: |
+          $v = "${{ steps.version.outputs.tag }}"
+          $exists = git ls-remote --tags origin refs/tags/$v
+          if ($exists -match $v) {
+            Write-Output "exists=true"
+          } else {
+            Write-Output "exists=false"
+          }
+
+      - name: Crear tag si no existe
+        if: steps.checktag.outputs.exists == 'false'
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Subir EXE a la release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Medicion Obra ${{ steps.version.outputs.tag }}"
+          body: |
+            ## Medicion Obra ${{ steps.version.outputs.tag }}
+
+            Version generada automaticamente desde el push a `main`.
+
+            **Escritorio (Windows):** descarga `MedicionObra.exe` y ejecutalo.
+
+            **Movil / PWA:** la misma aplicacion web funciona desde el navegador del movil usando el mismo usuario y contrasena.
+
+            ### Notas
+            - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
+            - El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
           files: dist/MedicionObra.exe
+          fail_on_unmatched_files: true
+          update_if_release_exists: true

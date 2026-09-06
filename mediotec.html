@@ -148,9 +148,60 @@ tr:hover{background:rgba(79,195,247,0.05)}
 #sync-status{font-weight:600}
 .sync-ok{color:#2e7d32}
 .sync-off{color:#c62828}
+.auth-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#0288D1,#4FC3F7);z-index:9999;display:flex;align-items:center;justify-content:center}
+.auth-overlay.hidden{display:none}
+.hidden{display:none!important}
+.auth-box{background:#fff;border-radius:20px;padding:40px 35px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.3)}
+.auth-box h2{text-align:center;color:var(--primary-dark);margin-bottom:8px}
+.auth-box .subtitle{text-align:center;color:var(--text-light);font-size:.85rem;margin-bottom:25px}
+.auth-box .form-group{margin-bottom:18px}
+.auth-box .form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--text-light);margin-bottom:5px;text-transform:uppercase}
+.auth-box .form-group input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:.95rem;transition:border-color .2s}
+.auth-box .form-group input:focus{border-color:var(--primary);outline:none}
+.auth-box .btn-auth{width:100%;padding:13px;border:none;border-radius:10px;background:var(--primary-dark);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:5px}
+.auth-box .btn-auth:hover{background:#0277BD}
+.auth-box .auth-error{color:var(--danger);font-size:.8rem;text-align:center;margin-top:8px;min-height:1.2em}
+.auth-box .auth-logo{display:block;margin:0 auto 20px;width:80px;height:80px}
+.upd-toast{position:fixed;top:20px;right:20px;background:var(--primary-dark);color:#fff;padding:14px 20px;border-radius:10px;font-size:.85rem;z-index:300;max-width:340px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;animation:slideUp .3s}
+.upd-toast.show{display:block}
+.upd-toast h4{margin:0 0 6px;font-size:.95rem}
+.upd-toast .upd-btns{margin-top:10px;display:flex;gap:8px}
+.upd-toast .upd-btn{padding:6px 16px;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer}
+.upd-toast .upd-btn-apply{background:var(--success);color:#fff}
+.upd-toast .upd-btn-dismiss{background:rgba(255,255,255,0.2);color:#fff}
+.upd-toast .upd-btn-cancel{background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;border:none;border-radius:6px;padding:6px 12px;font-size:.8rem}
 </style>
 </head>
 <body>
+<div class="auth-overlay" id="auth-overlay">
+<img class="auth-logo" src="icon-192.png" alt="Medicion Obra">
+<div class="auth-box" id="auth-box-login">
+<h2>&#128274; Acceso Requerido</h2>
+<p class="subtitle">Introduce tu usuario y contrasena para acceder</p>
+<div class="form-group"><label>Usuario</label><input type="text" id="auth-user" placeholder="Tu usuario" autocomplete="username"></div>
+<div class="form-group"><label>Contrasena</label><input type="password" id="auth-pass" placeholder="Tu contrasena" autocomplete="current-password"></div>
+<button class="btn-auth" id="auth-btn-login" onclick="doLogin()">&#128274; Entrar</button>
+<p class="auth-error" id="auth-err"></p>
+</div>
+<div class="auth-box hidden" id="auth-box-setup">
+<h2>&#9881; Primera Configuracion</h2>
+<p class="subtitle">Crea tu usuario y contrasena de acceso (valdra para escritorio y movil)</p>
+<div class="form-group"><label>Usuario</label><input type="text" id="setup-user" placeholder="Ej: admin" autocomplete="username"></div>
+<div class="form-group"><label>Contrasena</label><input type="password" id="setup-pass" placeholder="Minimo 4 caracteres" autocomplete="new-password"></div>
+<div class="form-group"><label>Confirmar contrasena</label><input type="password" id="setup-pass2" placeholder="Repite la contrasena" autocomplete="new-password"></div>
+<button class="btn-auth" onclick="doSetup()">&#9881; Crear acceso</button>
+<p class="auth-error" id="setup-err"></p>
+</div>
+</div>
+<div id="upd-toast" class="upd-toast">
+<h4 id="upd-title">Actualizacion disponible</h4>
+<p id="upd-info" style="margin:0 0 8px;font-size:.82rem;opacity:.9"></p>
+<div class="upd-btns">
+<button class="upd-btn upd-btn-apply" id="upd-btn-download" onclick="updateDownload()">Descargar</button>
+<button class="upd-btn upd-btn-dismiss" id="upd-btn-apply" onclick="updateApply()" style="display:none">Reiniciar ahora</button>
+<button class="upd-btn upd-btn-cancel" id="upd-btn-close" onclick="closeToast()">Ahora no</button>
+</div>
+</div>
 <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
 
 <div class="app">
@@ -165,6 +216,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
 <button class="nav-btn" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
 <button class="nav-btn" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
+<button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
 </aside>
 
 <main class="main">
@@ -529,8 +581,10 @@ let medSerieCounter = parseInt(localStorage.getItem('med_serie_counter') || '0')
 let _syncing=false;let _ready=false;
 let _fbConnected=false;
 let _db=null;let _dbRef=null;
+let _authToken=localStorage.getItem('mo_token')||'';
+let _authUser=localStorage.getItem('mo_user')||'';
 const FB_CONFIG={apiKey:"AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y",authDomain:"medicion-obra.firebaseapp.com",databaseURL:"https://medicion-obra-default-rtdb.europe-west1.firebasedatabase.app",projectId:"medicion-obra",storageBucket:"medicion-obra.firebasestorage.app",messagingSenderId:"996090302101",appId:"1:996090302101:web:3d0385e1f2911b3ce1559c"};
-const APP_VERSION='31';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload())}}
+const APP_VERSION='32';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload())}}
 
 function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
@@ -564,7 +618,9 @@ function save(){
   if(_dbRef){
     _dbRef.set(payload).catch(e=>console.warn('Firebase save error',e));
   }
-  fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
+  fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_authToken},body:JSON.stringify(payload)}).then(r=>{
+    if(r.status===401){_authToken='';localStorage.removeItem('mo_token');showAuth();}
+  }).catch(()=>{});
 }
 
 function initSync(){
@@ -595,7 +651,10 @@ function initSync(){
     console.warn('Firebase init error',e);
     _fbConnected=false;
     updateSyncStatus();
-    fetch('/api/data').then(r=>r.json()).then(data=>{
+    fetch('/api/data',{headers:{'Authorization':'Bearer '+_authToken}}).then(r=>{
+      if(r.status===401){_authToken='';localStorage.removeItem('mo_token');showAuth();throw new Error('noauth')}
+      return r.json();
+    }).then(data=>{
       Object.keys(data).forEach(k=>{if(data[k]&&data[k].length>0)window[k]=data[k];});
       saveLocal();renderAll();_ready=true;
     }).catch(()=>{});
@@ -605,8 +664,121 @@ function initSync(){
 function updateSyncStatus(){
   const el=document.getElementById('sync-status');
   if(!el)return;
-  if(_fbConnected){el.textContent='v31 | Sincronizado';el.className='sync-ok'}
-  else{el.textContent='v31 | Sin conexion';el.className='sync-off'}
+  if(_fbConnected){el.textContent='v'+APP_VERSION+' | Sincronizado';el.className='sync-ok'}
+  else{el.textContent='v'+APP_VERSION+' | Sin conexion';el.className='sync-off'}
+}
+
+function authFetch(url,opts){
+  opts=opts||{};
+  opts.headers=opts.headers||{};
+  opts.headers['Authorization']='Bearer '+_authToken;
+  return fetch(url,opts);
+}
+function showAuth(){
+  document.getElementById('auth-overlay').classList.remove('hidden');
+}
+function hideAuth(){
+  document.getElementById('auth-overlay').classList.add('hidden');
+}
+function checkAuthStatus(){
+  fetch('/api/auth/status').then(r=>r.json()).then(data=>{
+    if(!data.configured){
+      document.getElementById('auth-box-login').style.display='none';
+      document.getElementById('auth-box-setup').style.display='block';
+      showAuth();
+    }else if(_authToken){
+      authFetch('/api/health').then(r=>{
+        if(r.status===401){_authToken='';localStorage.removeItem('mo_token');document.getElementById('auth-box-setup').style.display='none';document.getElementById('auth-box-login').style.display='block';showAuth();}
+        else hideAuth();
+      }).catch(()=>hideAuth());
+    }else{
+      document.getElementById('auth-box-setup').style.display='none';
+      document.getElementById('auth-box-login').style.display='block';
+      showAuth();
+    }
+  }).catch(()=>{hideAuth();});
+}
+function doLogin(){
+  const user=document.getElementById('auth-user').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  const err=document.getElementById('auth-err');
+  err.textContent='';
+  if(!user||!pass){err.textContent='Introduce usuario y contrasena';return}
+  fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user,password:pass})}).then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
+    if(!ok){err.textContent=b.error||'Error de acceso';return}
+    _authToken=b.token;_authUser=b.user;
+    localStorage.setItem('mo_token',b.token);
+    localStorage.setItem('mo_user',b.user);
+    hideAuth();
+    location.reload();
+  }).catch(()=>{err.textContent='Error de conexion con el servidor'});
+}
+function doSetup(){
+  const user=document.getElementById('setup-user').value.trim();
+  const p1=document.getElementById('setup-pass').value;
+  const p2=document.getElementById('setup-pass2').value;
+  const err=document.getElementById('setup-err');
+  err.textContent='';
+  if(user.length<3){err.textContent='El usuario debe tener al menos 3 caracteres';return}
+  if(p1.length<4){err.textContent='La contrasena debe tener al menos 4 caracteres';return}
+  if(p1!==p2){err.textContent='Las contrasenas no coinciden';return}
+  fetch('/api/auth/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user,password:p1,confirm:p2})}).then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
+    if(!ok){err.textContent=b.error||'Error';return}
+    _authToken=b.token;_authUser=b.user;
+    localStorage.setItem('mo_token',b.token);
+    localStorage.setItem('mo_user',b.user);
+    hideAuth();
+    toast('Bienvenido '+b.user);
+    location.reload();
+  }).catch(()=>{err.textContent='Error de conexion con el servidor'});
+}
+function closeToast(){
+  document.getElementById('upd-toast').classList.remove('show');
+}
+function updateCheck(){
+  authFetch('/api/update/check').then(r=>{
+    if(r.status===401){return}
+    return r.json();
+  }).then(data=>{
+    if(!data||data.offline){return}
+    if(data.needs_update){
+      const info=document.getElementById('upd-info');
+      info.textContent='Version '+data.latest_tag+' disponible (tienes v'+data.current+').';
+      document.getElementById('upd-title').textContent='Nueva version disponible';
+      document.getElementById('upd-btn-download').style.display='';
+      document.getElementById('upd-btn-apply').style.display='none';
+      document.getElementById('upd-toast').classList.add('show');
+      _lastUpdateCheck=data;
+    }
+  }).catch(()=>{});
+}
+let _lastUpdateCheck=null;
+function updateDownload(){
+  const info=document.getElementById('upd-info');
+  info.textContent='Descargando la actualizacion...';
+  document.getElementById('upd-btn-download').disabled=true;
+  authFetch('/api/update/download').then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
+    if(ok){
+      info.textContent='Descarga completada. Reinicia la aplicacion para aplicar la actualizacion.';
+      document.getElementById('upd-btn-download').style.display='none';
+      document.getElementById('upd-btn-apply').style.display='';
+      document.getElementById('upd-title').textContent='Actualizacion lista';
+    }else{
+      info.textContent=b.error||'Error al descargar';
+      document.getElementById('upd-btn-download').disabled=false;
+    }
+  }).catch(()=>{info.textContent='Error de conexion durante la descarga';document.getElementById('upd-btn-download').disabled=false});
+}
+function updateApply(){
+  const info=document.getElementById('upd-info');
+  info.textContent='Aplicando actualizacion... La aplicacion se reiniciara.';
+  authFetch('/api/update/apply').then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
+    info.textContent=ok?'Reiniciando...':'Error al aplicar: '+(b.error||'');
+  }).catch(()=>{info.textContent='Error al aplicar la actualizacion'});
+}
+function doCheckUpdate(){
+  toast('Buscando actualizaciones...');
+  updateCheck();
 }
 
 function renderAll(){
@@ -1578,6 +1750,8 @@ if('serviceWorker' in navigator){
   });
 }
 initSync();
+checkAuthStatus();
+setTimeout(updateCheck,3000);
 </script>
 <footer class="app-footer">
   <span id="sync-status" class="sync-off">Sin conexion</span>

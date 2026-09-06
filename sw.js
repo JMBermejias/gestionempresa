@@ -1,7 +1,7 @@
 // Medicion Obra - Service Worker
 // Copyright (C) 2026 JMBernabeu
 // License: GNU General Public License v3.0 or later (see LICENSE)
-const CACHE = 'medicion-obra-v11';
+const CACHE = 'medicion-obra-v12';
 const ASSETS = [
   './',
   './mediotec.html',
