@@ -8,10 +8,46 @@ permissions:
   contents: write
 
 jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.do_bump.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Auto-incrementar version
+        id: do_bump
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          cur=$(grep -oP "APP_VERSION='\K[0-9]+" mediotec.html || echo "1")
+          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null | grep -oP '^v\K[0-9]+' || echo "$cur")
+          if [ "$last" -ge "$cur" ]; then nex=$((last + 1)); else nex=$cur; fi
+          echo "cur=$cur last=$last next=v$nex"
+          sed -i "s/APP_VERSION='[0-9]*'/APP_VERSION='$nex'/" mediotec.html
+          sed -i "s/medicion-obra-v[0-9]*/medicion-obra-v$nex/" sw.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mediotec.html sw.js
+          if git diff --cached --quiet; then
+            echo "Version ya actualizada, sin commit nuevo."
+          else
+            git commit -m "chore: bump version a v$nex [skip ci]"
+            git push origin main
+          fi
+          echo "tag=v$nex" >> "$GITHUB_OUTPUT"
+
   build-windows:
+    needs: bump-version
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,9 +67,12 @@ jobs:
           path: dist/MedicionObra.exe
 
   build-android:
+    needs: bump-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -89,6 +128,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - id: version
         shell: bash
@@ -123,13 +164,17 @@ jobs:
           Version generada automaticamente desde el push a main.
 
           **Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
-
           **Android:** descarga **app-debug.apk** e instalalo (permite origenes desconocidos).
 
           ### Notas
           - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
           - El APK funciona standalone con Firebase (no necesita el PC encendido).
-          - El escritorio se actualiza automaticamente (busca releases y puede auto-aplicar el nuevo .exe).
+          - El escritorio detecta actualizaciones, las descarga y te avisa para que las apliques (apaga la app y ejecuta el archivo nuevo).
+
+          ### Aviso del antivirus (falso positivo)
+          Algunos antivirus (Windows Defender) pueden marcar **MedicionObra.exe** como `Trojan:Win32/Wacatac.B!ml`. Es un **falso positivo**: salta por la heuristica de Machine Learning sobre ejecutables "onefile" compilados con PyInstaller, no porque el programa tenga virus. Es una aplicacion propia de codigo abierto (repositorio publico JMBermejias/medicion-obra).
+
+          **Si Defender bloquea el archivo:** Windows Security -> Proteccion contra virus y amenazas -> Historial de proteccion -> Restaurar, y luego Agregar exclusion -> Archivo -> MedicionObra.exe.
           NOTE
           sed -i "s/AUTOVERSION/$tag/g" notas.md
           gh release create "$tag" \

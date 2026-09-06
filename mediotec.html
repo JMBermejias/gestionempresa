@@ -583,8 +583,10 @@ let _fbConnected=false;
 let _db=null;let _dbRef=null;
 let _authToken=localStorage.getItem('mo_token')||'';
 let _authUser=localStorage.getItem('mo_user')||'';
+const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1');
+let _authRetries=0;
 const FB_CONFIG={apiKey:"AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y",authDomain:"medicion-obra.firebaseapp.com",databaseURL:"https://medicion-obra-default-rtdb.europe-west1.firebasedatabase.app",projectId:"medicion-obra",storageBucket:"medicion-obra.firebasestorage.app",messagingSenderId:"996090302101",appId:"1:996090302101:web:3d0385e1f2911b3ce1559c"};
-const APP_VERSION='33';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload())}}
+const APP_VERSION='34';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
 function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
@@ -681,6 +683,7 @@ function hideAuth(){
   document.getElementById('auth-overlay').classList.add('hidden');
 }
 function checkAuthStatus(){
+  _authRetries=0;
   fetch('/api/auth/status').then(r=>r.json()).then(data=>{
     if(!data.configured){
       document.getElementById('auth-box-login').style.display='none';
@@ -696,7 +699,7 @@ function checkAuthStatus(){
       document.getElementById('auth-box-login').style.display='block';
       showAuth();
     }
-  }).catch(()=>{hideAuth();});
+  }).catch(()=>{if(_authRetries++<10){setTimeout(checkAuthStatus,1000)}else{hideAuth();}});
 }
 function doLogin(){
   const user=document.getElementById('auth-user').value.trim();
@@ -1753,12 +1756,12 @@ renderDashboard();
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').then(function(reg){reg.update()});
   navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED'){location.reload()}
+    if(e.data&&e.data.type==='SW_UPDATED'&&document.getElementById('auth-overlay').classList.contains('hidden')){location.reload()}
   });
 }
 initSync();
-checkAuthStatus();
-setTimeout(updateCheck,3000);
+if(IS_DESKTOP){checkAuthStatus()}else{document.getElementById('auth-overlay').classList.add('hidden');}
+setTimeout(function(){if(IS_DESKTOP)updateCheck()},3000);
 </script>
 <footer class="app-footer">
   <span id="sync-status" class="sync-off">Sin conexion</span>
