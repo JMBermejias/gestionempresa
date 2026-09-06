@@ -10,7 +10,6 @@ import json
 import os
 import re
 import sqlite3
-import subprocess
 import sys
 import threading
 import time
@@ -160,46 +159,6 @@ def _norm_version(v):
     return int(m.group(1)) if m else 0
 
 
-def apply_desktop_update():
-    if not getattr(sys, 'frozen', False):
-        return False
-    old = sys.executable
-    new = os.path.join(UPDATES_DIR, EXE_NAME)
-    if not os.path.exists(new):
-        return False
-    bat = os.path.join(UPDATES_DIR, 'updater.cmd')
-    bat_body = (
-        '@echo off\r\n'
-        'timeout /t 2 /nobreak >nul\r\n'
-        ':wait\r\n'
-        'tasklist /fi "imagename eq %s" 2>nul | find /i "%s" >nul\r\n'
-        'if not errorlevel 1 (timeout /t 1 /nobreak >nul & goto wait)\r\n'
-        'copy /y "%s" "%s" >nul\r\n'
-        'start "" "%s"\r\n'
-        'del /q "%s" 2>nul\r\n'
-        'del /q "%~f0" 2>nul\r\n'
-    ) % (EXE_NAME, EXE_NAME, new, old, old, new)
-    with open(bat, 'w', encoding='utf-8') as f:
-        f.write(bat_body)
-    DETACHED_PROCESS = 0x00000008
-    CREATE_NEW_PROCESS_GROUP = 0x00000200
-    subprocess.Popen(
-        ['cmd', '/c', bat],
-        creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
-        close_fds=True)
-    return True
-
-
-def shutdown_delayed(server):
-    def _shutdown():
-        time.sleep(1.0)
-        try:
-            server.shutdown()
-        except Exception:
-            pass
-    threading.Thread(target=_shutdown, daemon=True).start()
-
-
 class Handler(BaseHTTPRequestHandler):
 
     def _send_json(self, code, body):
@@ -334,11 +293,12 @@ class Handler(BaseHTTPRequestHandler):
             if not os.path.exists(new):
                 self._send_json(400, {'error': 'Primero descarga la actualizacion'})
                 return True
-            if apply_desktop_update():
-                threading.Thread(target=lambda: shutdown_delayed(self.server), daemon=True).start()
-                self._send_json(200, {'ok': True, 'restarting': True})
-            else:
-                self._send_json(400, {'error': 'No aplicable en modo desarrollo'})
+            self._send_json(200, {
+                'ok': True,
+                'path': new,
+                'message': 'La actualizacion se ha descargado en: "%s". '
+                           'Cierra esta aplicacion y ejecuta el nuevo archivo para aplicar la version.' % new,
+            })
             return True
         if path == '/api/update/progress':
             new = os.path.join(UPDATES_DIR, EXE_NAME)

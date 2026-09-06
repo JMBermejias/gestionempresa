@@ -198,7 +198,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <p id="upd-info" style="margin:0 0 8px;font-size:.82rem;opacity:.9"></p>
 <div class="upd-btns">
 <button class="upd-btn upd-btn-apply" id="upd-btn-download" onclick="updateDownload()">Descargar</button>
-<button class="upd-btn upd-btn-dismiss" id="upd-btn-apply" onclick="updateApply()" style="display:none">Reiniciar ahora</button>
+<button class="upd-btn upd-btn-dismiss" id="upd-btn-apply" onclick="updateApply()" style="display:none">Aplicar actualizacion</button>
 <button class="upd-btn upd-btn-cancel" id="upd-btn-close" onclick="closeToast()">Ahora no</button>
 </div>
 </div>
@@ -759,10 +759,10 @@ function updateDownload(){
   document.getElementById('upd-btn-download').disabled=true;
   authFetch('/api/update/download').then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
     if(ok){
-      info.textContent='Descarga completada. Reinicia la aplicacion para aplicar la actualizacion.';
+      info.textContent='Descarga completada. Pulsa "Aplicar actualizacion" para ver los pasos.';
       document.getElementById('upd-btn-download').style.display='none';
       document.getElementById('upd-btn-apply').style.display='';
-      document.getElementById('upd-title').textContent='Actualizacion lista';
+      document.getElementById('upd-title').textContent='Actualizacion descargada';
     }else{
       info.textContent=b.error||'Error al descargar';
       document.getElementById('upd-btn-download').disabled=false;
@@ -771,10 +771,17 @@ function updateDownload(){
 }
 function updateApply(){
   const info=document.getElementById('upd-info');
-  info.textContent='Aplicando actualizacion... La aplicacion se reiniciara.';
+  info.textContent='Preparando la actualizacion...';
   authFetch('/api/update/apply').then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
-    info.textContent=ok?'Reiniciando...':'Error al aplicar: '+(b.error||'');
-  }).catch(()=>{info.textContent='Error al aplicar la actualizacion'});
+    if(ok){
+      info.textContent=b.message||'Cierra la aplicacion y ejecuta el nuevo archivo para actualizar.';
+      document.getElementById('upd-title').textContent='Actualizacion lista';
+      document.getElementById('upd-btn-apply').style.display='none';
+      document.getElementById('upd-btn-close').style.display='';
+    }else{
+      info.textContent='Error: '+(b.error||'');
+    }
+  }).catch(()=>{info.textContent='Error al preparar la actualizacion'});
 }
 function doCheckUpdate(){
   toast('Buscando actualizaciones...');
