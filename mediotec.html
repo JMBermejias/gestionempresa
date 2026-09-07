@@ -1771,7 +1771,8 @@ renderDashboard();
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').then(function(reg){reg.update()});
   navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED'&&document.getElementById('auth-overlay').classList.contains('hidden')){location.reload()}
+    if(e.data&&e.data.type==='SW_UPDATED'){location.reload()}
+    if(e.data&&e.data.type==='SW_CONTROLLED'){location.reload()}
   });
 }
 initSync();
