@@ -586,7 +586,7 @@ let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1');
 let _authRetries=0;
 const FB_CONFIG={apiKey:"AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y",authDomain:"medicion-obra.firebaseapp.com",databaseURL:"https://medicion-obra-default-rtdb.europe-west1.firebasedatabase.app",projectId:"medicion-obra",storageBucket:"medicion-obra.firebasestorage.app",messagingSenderId:"996090302101",appId:"1:996090302101:web:3d0385e1f2911b3ce1559c"};
-const APP_VERSION='37';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
+const APP_VERSION='38';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
 function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
