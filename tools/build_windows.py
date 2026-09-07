@@ -10,13 +10,14 @@
 import os, subprocess, sys, shutil
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ASSETS = ['mediotec.html', 'sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']
+ASSETS = ['mediotec.html', 'sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'favicon.ico']
 ASSETS_DIR_NAME = 'assets'
 DIST_DIR = os.path.join(ROOT, 'dist')
 BUILD_DIR = os.path.join(ROOT, 'build', 'windows')
 SERVER = os.path.join(ROOT, 'backend', 'server_windows.py')
 ENTRY = os.path.join(ROOT, 'backend', 'entry_windows.py')
 ICON = os.path.join(ROOT, 'icon-512.png')
+FAVICON = os.path.join(ROOT, 'favicon.ico')
 
 
 def ensure_entry():
@@ -31,11 +32,25 @@ def ensure_entry():
     print('  entry_windows.py creado')
 
 
+def ensure_favicon():
+    if os.path.exists(FAVICON):
+        print('  favicon.ico ya existe')
+        return
+    try:
+        from PIL import Image
+        img = Image.open(ICON)
+        img.save(FAVICON, format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])
+        print('  favicon.ico generado desde icon-512.png')
+    except ImportError:
+        print('  AVISO: Pillow no instalado, no se puede generar favicon.ico')
+
+
 def build():
     os.makedirs(DIST_DIR, exist_ok=True)
     os.makedirs(BUILD_DIR, exist_ok=True)
 
     ensure_entry()
+    ensure_favicon()
 
     add_data = []
     for a in ASSETS:

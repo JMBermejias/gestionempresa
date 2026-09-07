@@ -57,6 +57,9 @@ jobs:
       - name: Install PyInstaller and Pillow
         run: pip install pyinstaller pillow
 
+      - name: Generar favicon.ico
+        run: python -c "from PIL import Image; img=Image.open('icon-512.png'); img.save('favicon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])"
+
       - name: Build EXE
         run: python tools/build_windows.py
 
@@ -95,6 +98,8 @@ jobs:
           cp manifest.json android-app/www/manifest.json
           cp icon-192.png android-app/www/icon-192.png
           cp icon-512.png android-app/www/icon-512.png
+          python3 -c "from PIL import Image; img=Image.open('icon-512.png'); img.save('favicon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])" || true
+          cp favicon.ico android-app/www/favicon.ico || true
           mkdir -p android-app/resources/icon android-app/resources/icon-only android-app/resources/splash
           cp icon-512.png android-app/resources/icon-only.png
           cp icon-512.png android-app/resources/icon.png
@@ -136,8 +141,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install PyInstaller
-        run: pip install pyinstaller
+      - name: Install PyInstaller and Pillow
+        run: pip install pyinstaller pillow
 
       - name: Build binario Linux
         run: python tools/build_windows.py
