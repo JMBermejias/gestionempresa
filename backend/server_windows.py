@@ -410,6 +410,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def open_browser():
+    if os.environ.get('MEDICION_NO_BROWSER') == '1':
+        return
     time.sleep(1.0)
     webbrowser.open('http://127.0.0.1:%d' % PORT)
 

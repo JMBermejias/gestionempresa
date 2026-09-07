@@ -48,7 +48,13 @@ def main():
     for d in (bin_dir, app_dir, icon_dir, icon_scalable, debian):
         os.makedirs(d, exist_ok=True)
 
-    shutil.copy2(BINARY, os.path.join(bin_dir, 'medicion-obra'))
+    shutil.copy2(BINARY, os.path.join(bin_dir, 'medicion-obra-bin'))
+    os.chmod(os.path.join(bin_dir, 'medicion-obra-bin'), 0o755)
+
+    # Script lanzador: arranca el servidor en segundo plano y abre el navegador
+    launcher = os.path.join(ROOT, 'tools', 'medicion-obra-launcher.sh')
+    shutil.copy2(launcher, os.path.join(bin_dir, 'medicion-obra'))
+    os.chmod(os.path.join(bin_dir, 'medicion-obra'), 0o755)
     if os.path.exists(ICON):
         shutil.copy2(ICON, os.path.join(icon_dir, 'medicion-obra.png'))
         shutil.copy2(ICON, os.path.join(icon_scalable, 'medicion-obra.png'))
