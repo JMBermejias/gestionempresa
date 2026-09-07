@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Servidor integrado (estaticos + API SQLite)
-# Copyright (C) 2026 JMBernabeu
-# License: GNU General Public License v3.0 or later (see LICENSE)
+# Medicion Obra - Servidor integrado (estaticos + API SQLite + Autenticacion)
+# Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import json
 import os
 import sqlite3
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
-WEB_DIR = os.environ.get('MEDICION_WEB', '/var/www/medicion-obra')
-DB_PATH = os.environ.get('MEDICION_DB', '/var/lib/medicion-obra/medicion.db')
-HOST = os.environ.get('MEDICION_HOST', '0.0.0.0')
-PORT = int(os.environ.get('MEDICION_PORT', '80'))
+try:
+    import auth
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import auth
+
+WEB_DIR = os.environ.get('WEB_DIR', '/var/www/medicion-obra')
+DB_PATH = os.environ.get('DB_PATH', '/var/lib/medicion-obra/medicion.db')
+AUTH_FILE = os.environ.get('AUTH_FILE', '/var/lib/medicion-obra/auth.json')
+HOST = os.environ.get('HOST', '0.0.0.0')
+PORT = int(os.environ.get('PORT', '80'))
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
 
 SCHEMA = (
@@ -78,6 +84,36 @@ def save_data(payload):
         conn.close()
 
 
+def auth_is_configured():
+    cfg = auth.load_config(AUTH_FILE)
+    return bool(cfg.get('user') and cfg.get('salt') and cfg.get('hash'))
+
+
+def verify_login(user, password):
+    cfg = auth.load_config(AUTH_FILE)
+    if not cfg.get('user') or not cfg.get('salt') or not cfg.get('hash'):
+        return None
+    if user != cfg.get('user'):
+        return None
+    expected = cfg['hash']
+    actual = auth.hash_password(password, cfg['salt'])
+    import hmac as _hmac
+    if not _hmac.compare_digest(expected, actual):
+        return None
+    return auth.new_token(cfg.get('secret', ''), user)
+
+
+def check_request_token(handler):
+    token = None
+    auth_header = handler.headers.get('Authorization', '')
+    if auth_header.lower().startswith('bearer '):
+        token = auth_header[7:].strip()
+    if token:
+        secret = auth.get_secret(AUTH_FILE)
+        return auth.check_token(secret, token)
+    return None
+
+
 class Handler(BaseHTTPRequestHandler):
 
     def _send_json(self, code, body):
@@ -87,6 +123,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         self.end_headers()
         self.wfile.write(data)
 
@@ -103,6 +141,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             else:
                 self.send_header('Cache-Control', 'public, max-age=3600')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(content)
         except FileNotFoundError:
@@ -118,34 +157,115 @@ class Handler(BaseHTTPRequestHandler):
             return {}
         return json.loads(self.rfile.read(length).decode('utf-8'))
 
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Max-Age', '86400')
+        self.end_headers()
+
     def do_GET(self):
         path = urlparse(self.path).path
-        if path.startswith('/api/data'):
-            try:
-                data = load_data()
-                self._send_json(200, {c: data.get(c, []) for c in COLLECTIONS})
-            except Exception as e:
-                self._send_json(500, {'error': str(e)})
-        elif path.startswith('/api/health'):
-            self._send_json(200, {'ok': True, 'db': DB_PATH})
+        if path.startswith('/api/'):
+            if path == '/api/auth/status':
+                self._send_json(200, {
+                    'configured': auth_is_configured(),
+                    'version': self._get_version(),
+                })
+                return
+            authed = check_request_token(self)
+            if path == '/api/health':
+                self._send_json(200, {
+                    'ok': True,
+                    'db': DB_PATH,
+                    'version': self._get_version(),
+                    'configured': auth_is_configured(),
+                })
+                return
+            if path.startswith('/api/data'):
+                if not authed:
+                    self._send_json(401, {'error': 'Autenticacion requerida'})
+                    return
+                try:
+                    data = load_data()
+                    self._send_json(200, {c: data.get(c, []) for c in COLLECTIONS})
+                except Exception as e:
+                    self._send_json(500, {'error': str(e)})
+                return
+            self._send_json(404, {'error': 'not found'})
+            return
+        filepath = os.path.join(WEB_DIR, path.lstrip('/'))
+        if os.path.isfile(filepath):
+            self._send_file(filepath)
         else:
-            filepath = os.path.join(WEB_DIR, path.lstrip('/'))
-            if os.path.isfile(filepath):
-                self._send_file(filepath)
-            else:
-                self._serve_index()
+            self._serve_index()
 
     def do_POST(self):
         path = urlparse(self.path).path
+        if not path.startswith('/api/'):
+            self._serve_index()
+            return
+        post_data = self._read_json()
+        if path == '/api/auth/setup':
+            if auth_is_configured():
+                self._send_json(400, {'error': 'Ya configurado'})
+                return
+            user = (post_data.get('user') or '').strip()
+            password = post_data.get('password') or ''
+            confirm = post_data.get('confirm') or ''
+            if len(user) < 3:
+                self._send_json(400, {'error': 'El usuario debe tener al menos 3 caracteres'})
+                return
+            if len(password) < 4:
+                self._send_json(400, {'error': 'La contrasena debe tener al menos 4 caracteres'})
+                return
+            if password != confirm:
+                self._send_json(400, {'error': 'Las contrasenas no coinciden'})
+                return
+            secret = auth.get_secret(AUTH_FILE)
+            cfg = auth.load_config(AUTH_FILE)
+            cfg['user'] = user
+            cfg['salt'] = auth.gen_salt()
+            cfg['hash'] = auth.hash_password(password, cfg['salt'])
+            cfg['secret'] = secret
+            auth.save_config(AUTH_FILE, cfg)
+            token = auth.new_token(secret, user)
+            self._send_json(200, {'ok': True, 'token': token, 'user': user})
+            return
+        if path == '/api/auth/login':
+            user = (post_data.get('user') or '').strip()
+            password = post_data.get('password') or ''
+            token = verify_login(user, password)
+            if token:
+                self._send_json(200, {'ok': True, 'token': token, 'user': user})
+            else:
+                self._send_json(401, {'error': 'Usuario o contrasena incorrectos'})
+            return
+        authed = check_request_token(self)
         if path.startswith('/api/data'):
+            if not authed:
+                self._send_json(401, {'error': 'Autenticacion requerida'})
+                return
             try:
-                payload = self._read_json()
-                save_data(payload)
+                save_data(post_data)
                 self._send_json(200, {'ok': True})
             except Exception as e:
                 self._send_json(500, {'error': str(e)})
-        else:
-            self._send_json(404, {'error': 'not found'})
+            return
+        self._send_json(404, {'error': 'not found'})
+
+    def _get_version(self):
+        import re
+        try:
+            html = os.path.join(WEB_DIR, 'mediotec.html')
+            with open(html, 'r', encoding='utf-8') as f:
+                m = re.search(r"APP_VERSION='(\d+)'", f.read())
+                if m:
+                    return m.group(1)
+        except OSError:
+            pass
+        return '0'
 
     def log_message(self, fmt, *args):
         sys.stderr.write('%s - %s\n' % (self.address_string(), fmt % args))
@@ -156,10 +276,19 @@ def main():
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     except OSError:
         pass
+    auth_dir = os.path.dirname(AUTH_FILE)
+    if auth_dir:
+        try:
+            os.makedirs(auth_dir, exist_ok=True)
+        except OSError:
+            pass
+    auth.get_secret(AUTH_FILE)
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     sys.stderr.write(
         'Medicion Obra en http://%s:%d (web: %s, db: %s)\n'
         % (HOST, PORT, WEB_DIR, DB_PATH))
+    if not auth_is_configured():
+        sys.stderr.write('PRIMER ACCESO: abre http://%s:%d y crea tu usuario.\n' % (HOST, PORT))
     server.serve_forever()
 
 

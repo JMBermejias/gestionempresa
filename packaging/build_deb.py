@@ -38,6 +38,8 @@ DATA_FILES = [
     (os.path.join(ROOT, 'icon-192.png'), 'var/www/medicion-obra/icon-192.png', 0o644),
     (os.path.join(ROOT, 'icon-512.png'), 'var/www/medicion-obra/icon-512.png', 0o644),
     (os.path.join(ROOT, 'LICENSE'), 'var/www/medicion-obra/LICENSE', 0o644),
+    (os.path.join(ROOT, 'backend', 'auth.py'),
+     'usr/lib/medicion-obra/auth.py', 0o644),
     (os.path.join(ROOT, 'backend', 'server.py'),
      'usr/lib/medicion-obra/server.py', 0o755),
     (os.path.join(ROOT, 'backend', 'medicion_server.py'),
