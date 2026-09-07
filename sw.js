@@ -1,8 +1,8 @@
 // Medicion Obra - Service Worker
 // Copyright (C) 2026 JMBernabeu
 // License: GNU General Public License v3.0 or later (see LICENSE)
-// Cada version de la app renueva la caché (medicion-obra-v38<N>); el CI lo auto-incrementa.
-const CACHE = 'medicion-obra-v38';
+// Cada version de la app renueva la caché (medicion-obra-v39<N>); el CI lo auto-incrementa.
+const CACHE = 'medicion-obra-v39';
 const ASSETS = [
   './',
   './mediotec.html',
