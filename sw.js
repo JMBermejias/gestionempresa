@@ -26,7 +26,8 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys => Promise.all(
       keys.filter(k => k !== CACHE).map(k => caches.delete(k))
     )).then(() => self.clients.matchAll({includeUncontrolled:true})).then(clients => {
-      clients.forEach(c => c.postMessage({type:'SW_UPDATED'}));
+      const ver = CACHE.replace('medicion-obra-v','');
+      clients.forEach(c => c.postMessage({type:'SW_UPDATED', version: ver}));
     })
   );
   self.clients.claim();
