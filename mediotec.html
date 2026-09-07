@@ -583,7 +583,7 @@ let _fbConnected=false;
 let _db=null;let _dbRef=null;
 let _authToken=localStorage.getItem('mo_token')||'';
 let _authUser=localStorage.getItem('mo_user')||'';
-const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1');
+const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8080';
 let _authRetries=0;
 const FB_CONFIG={apiKey:"AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y",authDomain:"medicion-obra.firebaseapp.com",databaseURL:"https://medicion-obra-default-rtdb.europe-west1.firebasedatabase.app",projectId:"medicion-obra",storageBucket:"medicion-obra.firebasestorage.app",messagingSenderId:"996090302101",appId:"1:996090302101:web:3d0385e1f2911b3ce1559c"};
 const APP_VERSION='38';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
@@ -684,7 +684,7 @@ function hideAuth(){
 }
 function checkAuthStatus(){
   _authRetries=0;
-  fetch('/api/auth/status').then(r=>r.json()).then(data=>{
+  fetch('/api/auth/status',{cache:'no-store'}).then(r=>r.json()).then(data=>{
     if(!data.configured){
       document.getElementById('auth-box-login').style.display='none';
       document.getElementById('auth-box-setup').style.display='block';
@@ -693,13 +693,21 @@ function checkAuthStatus(){
       authFetch('/api/health').then(r=>{
         if(r.status===401){_authToken='';localStorage.removeItem('mo_token');document.getElementById('auth-box-setup').style.display='none';document.getElementById('auth-box-login').style.display='block';showAuth();}
         else hideAuth();
-      }).catch(()=>hideAuth());
+      }).catch(()=>{showAuth();});
     }else{
       document.getElementById('auth-box-setup').style.display='none';
       document.getElementById('auth-box-login').style.display='block';
       showAuth();
     }
-  }).catch(()=>{if(_authRetries++<10){setTimeout(checkAuthStatus,1000)}else{hideAuth();}});
+  }).catch(()=>{
+    if(_authRetries++<10){
+      setTimeout(checkAuthStatus,1000);
+    }else{
+      document.getElementById('auth-box-setup').style.display='none';
+      document.getElementById('auth-box-login').style.display='block';
+      showAuth();
+    }
+  });
 }
 function doLogin(){
   const user=document.getElementById('auth-user').value.trim();
@@ -1760,8 +1768,12 @@ if('serviceWorker' in navigator){
   });
 }
 initSync();
-if(IS_DESKTOP){checkAuthStatus()}else{document.getElementById('auth-overlay').classList.add('hidden');}
-setTimeout(function(){if(IS_DESKTOP)updateCheck()},3000);
+if(IS_DESKTOP){
+  checkAuthStatus();
+}else{
+  fetch('/api/auth/status',{cache:'no-store'}).then(r=>{if(r.ok)checkAuthStatus();else document.getElementById('auth-overlay').classList.add('hidden')}).catch(()=>document.getElementById('auth-overlay').classList.add('hidden'));
+}
+setTimeout(function(){fetch('/api/health',{cache:'no-store'}).then(r=>{if(r.ok)updateCheck()}).catch(()=>{})},3000);
 </script>
 <footer class="app-footer">
   <span id="sync-status" class="sync-off">Sin conexion</span>
