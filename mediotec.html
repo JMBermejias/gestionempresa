@@ -657,7 +657,12 @@ function initSync(){
       if(r.status===401){_authToken='';localStorage.removeItem('mo_token');showAuth();throw new Error('noauth')}
       return r.json();
     }).then(data=>{
-      Object.keys(data).forEach(k=>{if(data[k]&&data[k].length>0)window[k]=data[k];});
+      if(data.materials)       materials    = data.materials;
+      if(data.mediciones)      mediciones   = data.mediciones;
+      if(data.empresas)        empresas     = data.empresas;
+      if(data.obras)           obras        = data.obras;
+      if(data.zonas)           zonas        = data.zonas;
+      if(data.subcontratas)    subcontratas = data.subcontratas;
       saveLocal();renderAll();_ready=true;
     }).catch(()=>{});
   }
