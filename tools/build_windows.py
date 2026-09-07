@@ -7,7 +7,7 @@
 #   pip install pyinstaller
 #   python build_windows.py
 #
-import os, subprocess, sys, shutil
+import os, subprocess, sys, shutil, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = ['mediotec.html', 'sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'favicon.ico']
@@ -45,12 +45,58 @@ def ensure_favicon():
         print('  AVISO: Pillow no instalado, no se puede generar favicon.ico')
 
 
+def app_version():
+    with open(os.path.join(ROOT, 'mediotec.html'), encoding='utf-8') as f:
+        m = re.search(r"APP_VERSION='(\d+)'", f.read())
+    return int(m.group(1)) if m else 1
+
+
+def ensure_version_file():
+    ver = app_version()
+    verfile = os.path.join(BUILD_DIR, 'version_info.txt')
+    content = (
+        "VSVersionInfo(\n"
+        "  ffi=FixedFileInfo(\n"
+        "    filevers=(%d, 0, 0, 0),\n"
+        "    prodvers=(%d, 0, 0, 0),\n"
+        "    mask=0x3f,\n"
+        "    flags=0x0,\n"
+        "    OS=0x40004,\n"
+        "    fileType=0x1,\n"
+        "    subtype=0x0,\n"
+        "    date=(0, 0)\n"
+        "  ),\n"
+        "  children=[\n"
+        "    StringFileInfo([\n"
+        "      StringTable(u'040904B0', [\n"
+        "        StringStruct(u'CompanyName', u'JMBernabeu'),\n"
+        "        StringStruct(u'FileDescription', u'Medicion Obra'),\n"
+        "        StringStruct(u'FileVersion', u'%d.0.0'),\n"
+        "        StringStruct(u'InternalName', u'MedicionObra'),\n"
+        "        StringStruct(u'OriginalFilename', u'MedicionObra.exe'),\n"
+        "        StringStruct(u'ProductName', u'Medicion Obra'),\n"
+        "        StringStruct(u'ProductVersion', u'%d.0.0')\n"
+        "      ])\n"
+        "    ]),\n"
+        "    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])\n"
+        "  ]\n"
+        ")\n"
+    ) % (ver, ver, ver, ver)
+    with open(verfile, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print('  version_info.txt generado (v%s)' % ver)
+    return verfile
+
+
 def build():
     os.makedirs(DIST_DIR, exist_ok=True)
     os.makedirs(BUILD_DIR, exist_ok=True)
 
     ensure_entry()
     ensure_favicon()
+    version_file = None
+    if sys.platform == 'win32':
+        version_file = ensure_version_file()
 
     add_data = []
     for a in ASSETS:
@@ -70,7 +116,11 @@ def build():
         '--distpath', DIST_DIR,
         '--workpath', BUILD_DIR,
         '--specpath', BUILD_DIR,
+        '--noupx',
     ]
+
+    if sys.platform == 'win32' and version_file:
+        cmd += ['--version-file', version_file]
 
     if sys.platform == 'win32':
         cmd += ['--noconsole']
