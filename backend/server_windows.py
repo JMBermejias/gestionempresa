@@ -303,15 +303,39 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(500, {'error': str(e)})
             return True
         if path == '/api/update/apply':
+            if not getattr(sys, 'frozen', False):
+                self._send_json(200, {'ok': True, 'message': 'Modo desarrollo: nueva version lista. Reinicia manualmente.'})
+                return True
             new = os.path.join(UPDATES_DIR, EXE_NAME)
             if not os.path.exists(new):
                 self._send_json(400, {'error': 'Primero descarga la actualizacion'})
                 return True
+            target = os.path.join(BASE_DIR, EXE_NAME)
+            if os.path.abspath(new) == os.path.abspath(target):
+                self._send_json(200, {'ok': True, 'message': 'La aplicacion ya esta actualizada.'})
+                return True
+            bat = os.path.join(UPDATES_DIR, 'apply_update.bat')
+            script = (
+                '@echo off\r\n'
+                ':wait\r\n'
+                'tasklist /FI "IMAGENAME eq %s" 2>NUL | find /I "%s" >NUL\r\n'
+                'if not errorlevel 1 ( timeout /t 2 /nobreak >NUL & goto wait )\r\n'
+                'copy /Y "%s" "%s" >NUL\r\n'
+                'start "" "%s"\r\n'
+                'del /Q "%s"\r\n'
+                'exit\r\n'
+            ) % (EXE_NAME, EXE_NAME, new, target, target, bat)
+            try:
+                with open(bat, 'w') as f:
+                    f.write(script)
+                os.startfile(bat)
+            except Exception as e:
+                self._send_json(500, {'error': 'No se pudo lanzar el actualizador: %s' % e})
+                return True
+            threading.Timer(2.0, lambda: os._exit(0)).start()
             self._send_json(200, {
                 'ok': True,
-                'path': new,
-                'message': 'La actualizacion se ha descargado en: "%s". '
-                           'Cierra esta aplicacion y ejecuta el nuevo archivo para aplicar la version.' % new,
+                'message': 'Actualizacion aplicada. La aplicacion se cerrara y se volvera a abrir sola con la nueva version.',
             })
             return True
         if path == '/api/update/progress':
