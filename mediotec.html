@@ -1769,10 +1769,18 @@ r.classList.remove('show');
 });
 renderDashboard();
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(function(reg){reg.update()});
-  navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED'&&e.data.version&&parseInt(e.data.version,10)>parseInt(APP_VERSION,10)){location.reload()}
-  });
+  if(IS_DESKTOP){
+    // Escritorio (EXE): no se usa Service Worker porque la app siempre se sirve
+    // desde el servidor local. Se eliminan registros y caché previos para que un SW
+    // antiguo no pueda recargar la pagina y cerrar el formulario de registro.
+    navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})});
+    if('caches' in window){caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))})}
+  }else{
+    navigator.serviceWorker.register('sw.js').then(function(reg){reg.update()});
+    navigator.serviceWorker.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='SW_UPDATED'&&e.data.version&&parseInt(e.data.version,10)>parseInt(APP_VERSION,10)){location.reload()}
+    });
+  }
 }
 initSync();
 if(IS_DESKTOP){
