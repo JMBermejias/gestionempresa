@@ -230,6 +230,19 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-dashboard" class="page active">
 <div class="page-header"><h1>&#128202; Panel Principal</h1></div>
 <div class="grid grid-5" id="stats-cards"></div>
+<div style="margin-top:20px">
+<h3 style="color:var(--primary-dark);margin-bottom:12px">&#128279; Accesos Rapidos</h3>
+<div class="grid grid-4">
+<div class="stat-card" style="background:linear-gradient(135deg,#78909C,#90A4AE);cursor:pointer" onclick="showPage('obras')"><div class="stat-icon">&#127959;</div><div class="stat-value">Obras</div><div class="stat-label">Gestion de obras</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#FF7043,#FFAB91);cursor:pointer" onclick="showPage('zonas')"><div class="stat-icon">&#128205;</div><div class="stat-value">Zonas</div><div class="stat-label">Gestion de zonas</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#78909C,#90A4AE);cursor:pointer" onclick="showPage('empresas')"><div class="stat-icon">&#127970;</div><div class="stat-value">Empresas</div><div class="stat-label">Instaladoras</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#AB47BC,#CE93D8);cursor:pointer" onclick="showPage('subcontratas')"><div class="stat-icon">&#128188;</div><div class="stat-value">Subcontratas</div><div class="stat-label">Gestion de subcontratas</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#29B6F6,#4FC3F7);cursor:pointer" onclick="showPage('materiales')"><div class="stat-icon">&#128230;</div><div class="stat-value">Materiales</div><div class="stat-label">Base de datos</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#8E24AA,#AB47BC);cursor:pointer" onclick="showPage('mediciones')"><div class="stat-icon">&#128221;</div><div class="stat-value">Mediciones</div><div class="stat-label">Registro de mediciones</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#FF7043,#FFAB91);cursor:pointer" onclick="showPage('estadisticas')"><div class="stat-icon">&#128200;</div><div class="stat-value">Estadisticas</div><div class="stat-label">Graficos y datos</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#29B6F6,#4FC3F7);cursor:pointer" onclick="showPage('reportes')"><div class="stat-icon">&#128196;</div><div class="stat-value">Reportes</div><div class="stat-label">Exportacion / PDF</div></div>
+</div>
+</div>
 <div class="grid grid-2" style="margin-top:20px">
 <div class="card">
 <h3 style="color:var(--primary-dark);margin-bottom:15px">Mediciones Recientes</h3>
@@ -246,7 +259,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-obras" class="page">
 <div class="page-header">
 <h1>&#127959; Obras</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-primary" onclick="openObraModal()">+ Nueva Obra</button>
+</div>
 </div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <input type="text" id="obra-search" placeholder="Buscar obra..." oninput="renderObras()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
@@ -263,7 +279,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-zonas" class="page">
 <div class="page-header">
 <h1>&#128205; Zonas</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-primary" onclick="openZonaModal()">+ Nueva Zona</button>
+</div>
 </div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <input type="text" id="zona-search" placeholder="Buscar zona..." oninput="renderZonas()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
@@ -280,7 +299,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-empresas" class="page">
 <div class="page-header">
 <h1>&#127970; Empresas Instaladoras</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-primary" onclick="openEmpresaModal()">+ Nueva Empresa</button>
+</div>
 </div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <input type="text" id="emp-search" placeholder="Buscar empresa..." oninput="renderEmpresas()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
@@ -297,7 +319,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-subcontratas" class="page">
 <div class="page-header">
 <h1>&#128188; Subcontratas</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-primary" onclick="openSubcontrataModal()">+ Nueva Subcontrata</button>
+</div>
 </div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <input type="text" id="sub-search" placeholder="Buscar subcontrata..." oninput="renderSubcontratas()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
@@ -314,7 +339,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="page-materiales" class="page">
 <div class="page-header">
 <h1>&#128230; Base de Datos de Materiales</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-primary" onclick="openMaterialModal()">+ Nuevo Material</button>
+</div>
 </div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <input type="text" id="mat-search" placeholder="Buscar material..." oninput="renderMaterials()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
@@ -333,6 +361,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="page-header">
 <h1>&#128221; Registro de Mediciones</h1>
 <div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 <button class="btn btn-success" onclick="exportMedicionesExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openMedicionModal()">+ Nueva Medicion</button>
 </div>
@@ -359,10 +388,11 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <!-- ESTADISTICAS -->
 <div id="page-estadisticas" class="page">
 <div class="page-header"><h1>&#128200; Estadisticas</h1>
-<div class="filters">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+</div>
+<div class="filters" style="margin-bottom:15px">
 <select id="stat-period" onchange="renderEstadisticas()"><option value="day">Diario</option><option value="month" selected>Mensual</option><option value="year">Anual</option></select>
 <select id="stat-cat" onchange="renderEstadisticas()"><option value="">Todas</option><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI</option></select>
-</div>
 </div>
 <div class="grid grid-4" id="stat-summary"></div>
 <div class="card" style="margin-top:20px">
@@ -383,7 +413,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 
 <!-- REPORTES -->
 <div id="page-reportes" class="page">
-<div class="page-header"><h1>&#128196; Reportes y Exportacion</h1></div>
+<div class="page-header"><h1>&#128196; Reportes y Exportacion</h1><button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button></div>
 <div class="card">
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <label style="font-size:.8rem;color:var(--text-light);font-weight:600">Desde:</label>
