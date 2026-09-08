@@ -221,6 +221,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
 <button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
 <button class="nav-btn" onclick="doLogout()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128682;</span>Salir (cerrar sesion)</button>
+<button class="nav-btn" onclick="doQuit()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128683;</span>Cerrar aplicacion</button>
 </aside>
 
 <main class="main">
@@ -780,6 +781,12 @@ function doLogout(){
     return;
   }
   window.location.reload();
+}
+function doQuit(){
+  if(!IS_DESKTOP){toast('En el movil usa el boton de tu telefono para cerrar la app');return}
+  if(!confirm('¿Cerrar la aplicacion Medicion Obra? Se detendran el servidor y el programa.'))return;
+  try{authFetch('/api/app/quit',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch(e){}
+  setTimeout(function(){window.close();},800);
 }
 function doFirebaseLogin(user,pass,err){
   if(typeof firebase==='undefined'||!firebase.auth){err.textContent='No hay conexion (Firebase no disponible)';return}

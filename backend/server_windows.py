@@ -344,12 +344,26 @@ class Handler(BaseHTTPRequestHandler):
             return True
         return False
 
+    def _handle_api_app(self, path, authed):
+        if not path.startswith('/api/app'):
+            return False
+        if not authed:
+            self._send_json(401, {'error': 'Autenticacion requerida'})
+            return True
+        if path == '/api/app/quit':
+            self._send_json(200, {'ok': True, 'message': 'Cerrando la aplicacion...'})
+            threading.Timer(1.0, lambda: os._exit(0)).start()
+            return True
+        return False
+
     def do_GET(self):
         path = urlparse(self.path).path
         if path.startswith('/api/'):
             if self._handle_api_auth(path):
                 return
             authed = self._require_auth()
+            if self._handle_api_app(path, authed):
+                return
             if self._handle_api_update(path, authed):
                 return
             if path.startswith('/api/data'):
@@ -413,6 +427,8 @@ class Handler(BaseHTTPRequestHandler):
             if self._handle_api_auth(path, post_data):
                 return
             authed = self._require_auth()
+            if self._handle_api_app(path, authed):
+                return
             if self._handle_api_update(path, authed):
                 return
             if path.startswith('/api/data'):
