@@ -23,11 +23,18 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE).map(k => caches.delete(k))
-    )).then(() => self.clients.matchAll({includeUncontrolled:true})).then(clients => {
-      const ver = CACHE.replace('medicion-obra-v44','');
-      clients.forEach(c => c.postMessage({type:'SW_UPDATED', version: ver}));
+    caches.keys().then(keys => {
+      const oldKeys = keys.filter(k => k !== CACHE);
+      return Promise.all(oldKeys.map(k => caches.delete(k))).then(() => {
+        // Solo avisar cuando realmente hay una version nueva (se reemplazo una cache vieja).
+        // Asi, al recargar con la misma version no se envia el mensaje y no hay bucle de recarga.
+        if (oldKeys.length > 0) {
+          const ver = CACHE.replace('medicion-obra-v','');
+          return self.clients.matchAll({includeUncontrolled:true}).then(clients => {
+            clients.forEach(c => c.postMessage({type:'SW_UPDATED', version: ver}));
+          });
+        }
+      });
     })
   );
   self.clients.claim();

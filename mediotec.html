@@ -1771,7 +1771,7 @@ renderDashboard();
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').then(function(reg){reg.update()});
   navigator.serviceWorker.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='SW_UPDATED'&&e.data.version&&e.data.version!==APP_VERSION){location.reload()}
+    if(e.data&&e.data.type==='SW_UPDATED'&&e.data.version&&parseInt(e.data.version,10)>parseInt(APP_VERSION,10)){location.reload()}
   });
 }
 initSync();
