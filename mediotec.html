@@ -220,6 +220,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
 <button class="nav-btn" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
 <button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
+<button class="nav-btn" onclick="doLogout()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128682;</span>Salir (cerrar sesion)</button>
 </aside>
 
 <main class="main">
@@ -740,6 +741,15 @@ function doLogin(){
 function fbaEmail(user){
   const norm=String(user).trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
   return norm+'@medicionobra.local';
+}
+function doLogout(){
+  _authToken='';_authUser='';
+  try{localStorage.removeItem('mo_token');localStorage.removeItem('mo_user');}catch(e){}
+  if(!IS_DESKTOP&&typeof firebase!=='undefined'&&firebase.auth){
+    firebase.auth().signOut().then(function(){window.location.reload();}).catch(function(){window.location.reload();});
+    return;
+  }
+  window.location.reload();
 }
 function doFirebaseLogin(user,pass,err){
   if(typeof firebase==='undefined'||!firebase.auth){err.textContent='No hay conexion (Firebase no disponible)';return}
