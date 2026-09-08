@@ -22,6 +22,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -722,6 +723,11 @@ function doLogin(){
   const err=document.getElementById('auth-err');
   err.textContent='';
   if(!user||!pass){err.textContent='Introduce usuario y contrasena';return}
+  if(!IS_DESKTOP){
+    // Móvil/APK (sin servidor local): validar contra Firebase Authentication
+    doFirebaseLogin(user,pass,err);
+    return;
+  }
   fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user,password:pass})}).then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
     if(!ok){err.textContent=b.error||'Error de acceso';return}
     _authToken=b.token;_authUser=b.user;
@@ -730,6 +736,44 @@ function doLogin(){
     hideAuth();
     location.reload();
   }).catch(()=>{err.textContent='Error de conexion con el servidor'});
+}
+function fbaEmail(user){
+  const norm=String(user).trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+  return norm+'@medicionobra.local';
+}
+function doFirebaseLogin(user,pass,err){
+  if(typeof firebase==='undefined'||!firebase.auth){err.textContent='No hay conexion (Firebase no disponible)';return}
+  firebase.auth().signInWithEmailAndPassword(fbaEmail(user),pass).then(()=>{
+    _authUser=user;
+    localStorage.setItem('mo_user',user);
+    localStorage.setItem('mo_token','firebase:'+user);
+    hideAuth();
+    location.reload();
+  }).catch(e=>{
+    const c=e&&e.code;
+    if(c==='auth/user-not-found'||c==='auth/wrong-password'||c==='auth/invalid-credential'){err.textContent='Usuario o contrasena incorrectos'}
+    else if(c==='auth/too-many-requests'){err.textContent='Demasiados intentos fallidos. Prueba en unos minutos'}
+    else if(c==='auth/network-request-failed'){err.textContent='Error de conexion. Revisa que el APK tenga acceso a internet'}
+    else{err.textContent='Error de acceso'+(e&&e.message?' ('+e.message+')':'')}
+  });
+}
+function initAuthMobile(){
+  const login=document.getElementById('auth-box-login');
+  const setup=document.getElementById('auth-box-setup');
+  if(typeof firebase==='undefined'||!firebase.auth){
+    login.style.display='block'; setup.style.display='none'; showAuth();
+    return;
+  }
+  firebase.auth().onAuthStateChanged(function(u){
+    if(u){
+      _authUser=u.email.split('@')[0];
+      localStorage.setItem('mo_user',_authUser);
+      localStorage.setItem('mo_token','firebase:'+_authUser);
+      hideAuth();
+    }else{
+      login.style.display='block'; setup.style.display='none'; showAuth();
+    }
+  });
 }
 function doSetup(){
   const user=document.getElementById('setup-user').value.trim();
@@ -740,6 +784,25 @@ function doSetup(){
   if(user.length<3){err.textContent='El usuario debe tener al menos 3 caracteres';return}
   if(p1.length<4){err.textContent='La contrasena debe tener al menos 4 caracteres';return}
   if(p1!==p2){err.textContent='Las contrasenas no coinciden';return}
+  if(!IS_DESKTOP){
+    // Móvil/APK (sin servidor local): crear el usuario en Firebase Authentication
+    if(typeof firebase==='undefined'||!firebase.auth){err.textContent='No hay conexion (Firebase no disponible)';return}
+    firebase.auth().createUserWithEmailAndPassword(fbaEmail(user),p1).then(()=>{
+      _authUser=user;
+      localStorage.setItem('mo_user',user);
+      localStorage.setItem('mo_token','firebase:'+user);
+      hideAuth();
+      toast('Bienvenido '+user);
+      location.reload();
+    }).catch(e=>{
+      const c=e&&e.code;
+      if(c==='auth/email-already-in-use'){err.textContent='Ese usuario ya existe. Usa el acceso normal (Entrar)'}
+      else if(c==='auth/weak-password'){err.textContent='La contrasena es demasiado debil'}
+      else if(c==='auth/network-request-failed'){err.textContent='Error de conexion. Revisa que el APK tenga acceso a internet'}
+      else{err.textContent='Error al crear el acceso'+(e&&e.message?' ('+e.message+')':'')}
+    });
+    return;
+  }
   fetch('/api/auth/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user,password:p1,confirm:p2})}).then(r=>r.json().then(b=>({ok:r.ok,b}))).then(({ok,b})=>{
     if(!ok){err.textContent=b.error||'Error';return}
     _authToken=b.token;_authUser=b.user;
@@ -1786,7 +1849,7 @@ initSync();
 if(IS_DESKTOP){
   checkAuthStatus();
 }else{
-  fetch('/api/auth/status',{cache:'no-store'}).then(r=>{if(r.ok)checkAuthStatus();else document.getElementById('auth-overlay').classList.add('hidden')}).catch(()=>document.getElementById('auth-overlay').classList.add('hidden'));
+  initAuthMobile();
 }
 setTimeout(function(){fetch('/api/health',{cache:'no-store'}).then(r=>{if(r.ok)updateCheck()}).catch(()=>{})},3000);
 </script>
