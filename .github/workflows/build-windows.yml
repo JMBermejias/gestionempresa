@@ -26,11 +26,15 @@ jobs:
           set -e
           cur=$(grep -oP "APP_VERSION='v?\K[0-9]+\.[0-9]+\.[0-9]+" gestion-empresa.html || echo "1.0.0")
           last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
-          last=${last#v}
-          if [ -z "$last" ]; then last="$cur"; fi
-          if [ "$(printf '%s\n' "$last" "$cur" | sort -V | tail -n1)" = "$last" ]; then
-            IFS='.' read -r ma mi pa <<< "$last"
-            nex="$ma.$mi.$((pa + 1))"
+          # Solo considerar releases con version semantica valida (descartar v55, v56... y tags invalidos)
+          if echo "$last" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            last=${last#v}
+            if [ "$(printf '%s\n' "$last" "$cur" | sort -V | tail -n1)" = "$last" ]; then
+              IFS='.' read -r ma mi pa <<< "$last"
+              nex="$ma.$mi.$((pa + 1))"
+            else
+              nex="$cur"
+            fi
           else
             nex="$cur"
           fi
