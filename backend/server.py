@@ -4,8 +4,11 @@
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import json
 import os
+import re
 import sqlite3
 import sys
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, unquote
 
@@ -21,6 +24,8 @@ AUTH_FILE = os.environ.get('AUTH_FILE', '/var/lib/medicion-obra/auth.json')
 HOST = os.environ.get('HOST', '0.0.0.0')
 PORT = int(os.environ.get('PORT', '80'))
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
+FB_API_KEY = 'AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y'
+FB_IDP = 'https://identitytoolkit.googleapis.com/v1/accounts:%s?key=' + FB_API_KEY
 
 SCHEMA = (
     'CREATE TABLE IF NOT EXISTS appdata ('
@@ -101,6 +106,63 @@ def verify_login(user, password):
     if not _hmac.compare_digest(expected, actual):
         return None
     return auth.new_token(cfg.get('secret', ''), user)
+
+
+def fba_email(user):
+    norm = re.sub(r'[^a-z0-9._-]', '', str(user).strip().lower())
+    return norm + '@medicionobra.local'
+
+
+def firebase_idp(action, payload):
+    url = FB_IDP % action
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode('utf-8'),
+        headers={'Content-Type': 'application/json'},
+        method='POST')
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode('utf-8')), resp.status
+    except urllib.error.HTTPError as e:
+        try:
+            return json.loads(e.read().decode('utf-8')), e.code
+        except Exception:
+            return {}, e.code
+    except Exception:
+        return {}, 0
+
+
+def firebase_sign_in(user, password):
+    data, status = firebase_idp('signInWithPassword', {
+        'email': fba_email(user),
+        'password': password,
+        'returnSecureToken': True,
+    })
+    if status == 200 and data.get('registered'):
+        return True
+    return data.get('error', {}).get('message') if status != 200 else None
+
+
+def firebase_create_user(user, password):
+    data, status = firebase_idp('signUp', {
+        'email': fba_email(user),
+        'password': password,
+        'returnSecureToken': True,
+    })
+    if status == 200 and data.get('localId'):
+        return True
+    msg = data.get('error', {}).get('message', '')
+    return None if status == 200 or 'EMAIL_EXISTS' in msg else msg
+
+
+def login_any(user, password):
+    token = verify_login(user, password)
+    if token:
+        return token, None
+    fberr = firebase_sign_in(user, password)
+    if fberr is True:
+        return auth.new_token(auth.get_secret(AUTH_FILE), user), None
+    return None, fberr
 
 
 def check_request_token(handler):
@@ -230,13 +292,17 @@ class Handler(BaseHTTPRequestHandler):
             cfg['hash'] = auth.hash_password(password, cfg['salt'])
             cfg['secret'] = secret
             auth.save_config(AUTH_FILE, cfg)
+            fberr = firebase_create_user(user, password)
+            if fberr:
+                cfg['fb_error'] = fberr
+                auth.save_config(AUTH_FILE, cfg)
             token = auth.new_token(secret, user)
             self._send_json(200, {'ok': True, 'token': token, 'user': user})
             return
         if path == '/api/auth/login':
             user = (post_data.get('user') or '').strip()
             password = post_data.get('password') or ''
-            token = verify_login(user, password)
+            token, fberr = login_any(user, password)
             if token:
                 self._send_json(200, {'ok': True, 'token': token, 'user': user})
             else:

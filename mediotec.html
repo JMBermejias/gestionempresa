@@ -163,6 +163,11 @@ tr:hover{background:rgba(79,195,247,0.05)}
 .auth-box .form-group input:focus{border-color:var(--primary);outline:none}
 .auth-box .btn-auth{width:100%;padding:13px;border:none;border-radius:10px;background:var(--primary-dark);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:5px}
 .auth-box .btn-auth:hover{background:#0277BD}
+.auth-box .btn-secondary{background:transparent;color:var(--primary-dark);border:2px solid var(--primary-dark);font-weight:600}
+.auth-box .btn-secondary:hover{background:rgba(2,119,189,0.08);color:var(--primary-dark)}
+.auth-box .auth-toggle{margin-top:14px;text-align:center}
+.auth-box .auth-toggle a{color:var(--primary-dark);font-weight:600;cursor:pointer;font-size:.85rem;text-decoration:underline}
+.auth-box .auth-note{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);color:var(--text-light);font-size:.75rem;text-align:center;line-height:1.4}
 .auth-box .auth-error{color:var(--danger);font-size:.8rem;text-align:center;margin-top:8px;min-height:1.2em}
 .auth-box .auth-logo{display:block;margin:0 auto 20px;width:80px;height:80px}
 .upd-toast{position:fixed;top:20px;right:20px;background:var(--primary-dark);color:#fff;padding:14px 20px;border-radius:10px;font-size:.85rem;z-index:300;max-width:340px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;animation:slideUp .3s}
@@ -184,16 +189,19 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Usuario</label><input type="text" id="auth-user" placeholder="Tu usuario" autocomplete="username"></div>
 <div class="form-group"><label>Contrasena</label><input type="password" id="auth-pass" placeholder="Tu contrasena" autocomplete="current-password"></div>
 <button class="btn-auth" id="auth-btn-login" onclick="doLogin()">&#128274; Entrar</button>
+<p class="auth-note" id="auth-note">La misma cuenta funciona en <b>escritorio y movil</b>.</p>
 <p class="auth-error" id="auth-err"></p>
+<p class="auth-toggle"><a id="auth-go-setup" onclick="showSetupBox()" style="display:none">&#9881; Crear cuenta nueva (primera vez)</a></p>
 </div>
 <div class="auth-box" id="auth-box-setup" style="display:none">
 <h2>&#9881; Primera Configuracion</h2>
-<p class="subtitle">Crea tu usuario y contrasena de acceso (valdra para escritorio y movil)</p>
+<p class="subtitle">Crea tu usuario y contrasena (servira para escritorio y movil)</p>
 <div class="form-group"><label>Usuario</label><input type="text" id="setup-user" placeholder="Ej: admin" autocomplete="username"></div>
 <div class="form-group"><label>Contrasena</label><input type="password" id="setup-pass" placeholder="Minimo 4 caracteres" autocomplete="new-password"></div>
 <div class="form-group"><label>Confirmar contrasena</label><input type="password" id="setup-pass2" placeholder="Repite la contrasena" autocomplete="new-password"></div>
 <button class="btn-auth" onclick="doSetup()">&#9881; Crear acceso</button>
 <p class="auth-error" id="setup-err"></p>
+<p class="auth-toggle"><a onclick="showLoginBox()">&#128274; Ya tengo cuenta, entrar</a></p>
 </div>
 </div>
 <div id="upd-toast" class="upd-toast">
@@ -619,7 +627,7 @@ let _db=null;let _dbRef=null;
 let _authToken=localStorage.getItem('mo_token')||'';
 let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8080';
-let _authRetries=0;
+let _authRetries=0;let _authConfigured=false;
 const FB_CONFIG={apiKey:"AIzaSyC5ykdqo7sP1of01Lm3wFYf6SuJdvbB62Y",authDomain:"medicion-obra.firebaseapp.com",databaseURL:"https://medicion-obra-default-rtdb.europe-west1.firebasedatabase.app",projectId:"medicion-obra",storageBucket:"medicion-obra.firebasestorage.app",messagingSenderId:"996090302101",appId:"1:996090302101:web:3d0385e1f2911b3ce1559c"};
 const APP_VERSION='52';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
@@ -722,19 +730,41 @@ function showAuth(){
 function hideAuth(){
   document.getElementById('auth-overlay').classList.add('hidden');
 }
+function authBoxes(){
+  return {
+    login:document.getElementById('auth-box-login'),
+    setup:document.getElementById('auth-box-setup'),
+  };
+}
+function showSetupBox(){
+  const b=authBoxes();
+  b.login.style.display='none';b.setup.style.display='block';
+  const g=document.getElementById('auth-go-setup');
+  if(g)g.style.display='none';
+  document.getElementById('auth-note').style.display='none';
+}
+function showLoginBox(){
+  const b=authBoxes();
+  b.login.style.display='block';b.setup.style.display='none';
+  const g=document.getElementById('auth-go-setup');
+  if(g)g.style.display=(_authConfigured? 'none':'inline');
+  document.getElementById('auth-note').style.display='block';
+}
 function checkAuthStatus(){
   _authRetries=0;
   fetch('/api/auth/status',{cache:'no-store'}).then(r=>r.json()).then(data=>{
     if(!data.configured){
-      document.getElementById('auth-box-login').style.display='none';
-      document.getElementById('auth-box-setup').style.display='block';
+      _authConfigured=false;
+      showLoginBox();
       showAuth();
     }else if(_authToken){
+      _authConfigured=true;
       authFetch('/api/health').then(r=>{
         if(r.status===401){_authToken='';localStorage.removeItem('mo_token');document.getElementById('auth-box-setup').style.display='none';document.getElementById('auth-box-login').style.display='block';showAuth();}
         else hideAuth();
       }).catch(()=>{showAuth();});
     }else{
+      _authConfigured=true;
       document.getElementById('auth-box-setup').style.display='none';
       document.getElementById('auth-box-login').style.display='block';
       showAuth();
@@ -818,7 +848,9 @@ function initAuthMobile(){
       localStorage.setItem('mo_token','firebase:'+_authUser);
       hideAuth();
     }else{
-      login.style.display='block'; setup.style.display='none'; showAuth();
+      _authConfigured=false;
+      showLoginBox();
+      showAuth();
     }
   });
 }
