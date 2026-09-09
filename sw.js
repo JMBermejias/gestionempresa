@@ -29,7 +29,7 @@ self.addEventListener('activate', e => {
         // Solo avisar cuando realmente hay una version nueva (se reemplazo una cache vieja).
         // Asi, al recargar con la misma version no se envia el mensaje y no hay bucle de recarga.
         if (oldKeys.length > 0) {
-          const ver = CACHE.replace('gestion-empresa-v1.0.0','');
+          const ver = CACHE.replace('gestion-empresa-v','');
           return self.clients.matchAll({includeUncontrolled:true}).then(clients => {
             clients.forEach(c => c.postMessage({type:'SW_UPDATED', version: ver}));
           });
