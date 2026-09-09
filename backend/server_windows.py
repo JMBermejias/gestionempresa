@@ -379,16 +379,39 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {'ok': True, 'message': 'La aplicacion ya esta actualizada.'})
                 return True
             bat = os.path.join(UPDATES_DIR, 'apply_update.bat')
+            logf = os.path.join(UPDATES_DIR, 'update_log.txt')
             script = (
                 '@echo off\r\n'
+                'title MedicionObra - Aplicando actualizacion...\r\n'
+                'set /a TRIES=0\r\n'
+                'echo [%%date%% %%time%%] Inicio actualizacion > "%(log)s"\r\n'
+                'echo Esperando cierre de %(exe)s >> "%(log)s"\r\n'
+                'ping -n 3 127.0.0.1 >NUL\r\n'
                 ':wait\r\n'
-                'tasklist /FI "IMAGENAME eq %s" 2>NUL | find /I "%s" >NUL\r\n'
-                'if not errorlevel 1 ( timeout /t 2 /nobreak >NUL & goto wait )\r\n'
-                'copy /Y "%s" "%s" >NUL\r\n'
-                'start "" "%s"\r\n'
-                'del /Q "%s"\r\n'
+                'tasklist /FI "IMAGENAME eq %(exe)s" 2>NUL | find /I "%(exe)s" >NUL\r\n'
+                'if errorlevel 1 goto copyit\r\n'
+                'set /a TRIES+=1\r\n'
+                'if %%TRIES%% GEQ 8 goto killit\r\n'
+                'ping -n 3 127.0.0.1 >NUL\r\n'
+                'goto wait\r\n'
+                ':killit\r\n'
+                'echo Forzando cierre de todas las instancias de %(exe)s >> "%(log)s"\r\n'
+                'taskkill /F /IM %(exe)s /T >NUL 2>&1\r\n'
+                'set /a TRIES=0\r\n'
+                ':wait2\r\n'
+                'tasklist /FI "IMAGENAME eq %(exe)s" 2>NUL | find /I "%(exe)s" >NUL\r\n'
+                'if errorlevel 1 goto copyit\r\n'
+                'set /a TRIES+=1\r\n'
+                'if %%TRIES%% GEQ 10 goto copyit\r\n'
+                'ping -n 2 127.0.0.1 >NUL\r\n'
+                'goto wait2\r\n'
+                ':copyit\r\n'
+                'copy /Y "%(new)s" "%(target)s" >> "%(log)s" 2>&1\r\n'
+                'echo Copy exit code: %%errorlevel%% >> "%(log)s"\r\n'
+                'start "" "%(target)s"\r\n'
+                'del /Q "%(bat)s" >NUL 2>&1\r\n'
                 'exit\r\n'
-            ) % (EXE_NAME, EXE_NAME, new, target, target, bat)
+            ) % {'exe': EXE_NAME, 'new': new, 'target': target, 'bat': bat, 'log': logf}
             try:
                 with open(bat, 'w') as f:
                     f.write(script)
