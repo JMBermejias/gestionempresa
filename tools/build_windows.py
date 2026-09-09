@@ -10,7 +10,7 @@
 import os, subprocess, sys, shutil, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ASSETS = ['mediotec.html', 'sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'favicon.ico']
+ASSETS = ['gestion-empresa.html', 'sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'favicon.ico']
 ASSETS_DIR_NAME = 'assets'
 DIST_DIR = os.path.join(ROOT, 'dist')
 BUILD_DIR = os.path.join(ROOT, 'build', 'windows')
@@ -46,7 +46,7 @@ def ensure_favicon():
 
 
 def app_version():
-    with open(os.path.join(ROOT, 'mediotec.html'), encoding='utf-8') as f:
+    with open(os.path.join(ROOT, 'gestion-empresa.html'), encoding='utf-8') as f:
         m = re.search(r"APP_VERSION='v?([0-9]+\.[0-9]+\.[0-9]+)'", f.read())
     return m.group(1) if m else '1.0.0'
 

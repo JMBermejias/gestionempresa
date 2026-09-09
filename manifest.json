@@ -2,7 +2,7 @@
   "name": "Gestion Empresa",
   "short_name": "Gestion Empresa",
   "description": "Sistema de gestion de empresa con control de materiales, mediciones y empresas instaladoras",
-  "start_url": "./mediotec.html",
+  "start_url": "./gestion-empresa.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#E1F5FE",

@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          cur=$(grep -oP "APP_VERSION='v?\K[0-9]+\.[0-9]+\.[0-9]+" mediotec.html || echo "1.0.0")
+          cur=$(grep -oP "APP_VERSION='v?\K[0-9]+\.[0-9]+\.[0-9]+" gestion-empresa.html || echo "1.0.0")
           last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
           last=${last#v}
           if [ -z "$last" ]; then last="$cur"; fi
@@ -35,11 +35,11 @@ jobs:
             nex="$cur"
           fi
           echo "cur=$cur last=$last next=v$nex"
-          sed -i "s/APP_VERSION='[^']*'/APP_VERSION='v$nex'/" mediotec.html
+          sed -i "s/APP_VERSION='[^']*'/APP_VERSION='v$nex'/" gestion-empresa.html
           sed -i "s/gestion-empresa-v[0-9.]*/gestion-empresa-v$nex/" sw.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add mediotec.html sw.js
+          git add gestion-empresa.html sw.js
           if git diff --cached --quiet; then
             echo "Version ya actualizada, sin commit nuevo."
           else
@@ -99,8 +99,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p android-app/www
-          cp mediotec.html android-app/www/index.html
-          cp mediotec.html android-app/www/mediotec.html
+          cp gestion-empresa.html android-app/www/index.html
+          cp gestion-empresa.html android-app/www/gestion-empresa.html
           cp sw.js android-app/www/sw.js
           cp manifest.json android-app/www/manifest.json
           cp icon-192.png android-app/www/icon-192.png
@@ -174,7 +174,7 @@ jobs:
       - id: version
         shell: bash
         run: |
-          v=$(grep -oP "APP_VERSION='\K[0-9]+\.[0-9]+\.[0-9]+" mediotec.html || echo "1")
+          v=$(grep -oP "APP_VERSION='\K[0-9]+\.[0-9]+\.[0-9]+" gestion-empresa.html || echo "1")
           echo "tag=v$v" >> "$GITHUB_OUTPUT"
 
       - name: Descargar artefactos

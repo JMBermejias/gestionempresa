@@ -5,7 +5,7 @@
 const CACHE = 'gestion-empresa-v1.0.0';
 const ASSETS = [
   './',
-  './mediotec.html',
+  './gestion-empresa.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -43,7 +43,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.indexOf('/api/') !== -1) return;
   if (e.request.url.indexOf('firebaseio.com') !== -1) return;
-  if (e.request.url.indexOf('mediotec.html') !== -1 || e.request.url.endsWith('/')) {
+  if (e.request.url.indexOf('gestion-empresa.html') !== -1 || e.request.url.endsWith('/')) {
     e.respondWith(
       fetch(e.request).then(r => {
         const clone = r.clone();

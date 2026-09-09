@@ -17,12 +17,12 @@
 
 1. Habilitar el proveedor **Email/Password**: Authentication > Sign-in method > Email/Password > Habilitar.
 2. **Crear la Realtime Database**: Build > Realtime Database > Create database (elegir region, p.ej. europe-west1).
-   - Anotar la `databaseURL` que resulte y actualizarla en `mediotec.html` (constante `FB_CONFIG`) si difiere de la URL base actual.
+   - Anotar la `databaseURL` que resulte y actualizarla en `gestion-empresa.html` (constante `FB_CONFIG`) si difiere de la URL base actual.
 
 ## Config Firebase (YA SUSTITUIDA, del proyecto gestionempresa-2026)
 
 La config actual pertenece al proyecto nuevo `gestionempresa-2026`, sustituida en:
-- `mediotec.html`: constante `FB_CONFIG` (apiKey/authDomain/databaseURL/projectId/storageBucket/messagingSenderId/appId).
+- `gestion-empresa.html`: constante `FB_CONFIG` (apiKey/authDomain/databaseURL/projectId/storageBucket/messagingSenderId/appId).
 - `backend/server_windows.py` y `backend/server.py`: `FB_API_KEY`.
 
 Nota: la URL de RTDB en `FB_CONFIG` es la base generica (`gestionempresa-2026-default-rtdb.firebaseio.com`); ajustar segun la region elegida al crear la DB.
@@ -31,7 +31,7 @@ Nota: la URL de RTDB en `FB_CONFIG` es la base generica (`gestionempresa-2026-de
 
 La aplicacion se ha renombrado de "Medicion Obra" a **"Gestion Empresa"** y el
 versionado a **semver v1.0.0**. Afecta a:
-- `mediotec.html`: titulos, `FB_CONFIG`, `APP_VERSION='v1.0.0'`.
+- `gestion-empresa.html`: titulos, `FB_CONFIG`, `APP_VERSION='v1.0.0'`.
 - `manifest.json`, `sw.js` (caché `gestion-empresa-v1.0.0`).
 - `backend/*`: comentarios, rutas (`/var/www/gestion-empresa`, `/var/lib/gestion-empresa`), `FB_API_KEY`, versionado semver en auto-update.
 - `tools/*`: generadores (exe `GestionEmpresa.exe`, deb `gestion-empresa.deb`, launcher), migracion (la URL de Firebase origen se mantiene apuntando a `medicion-obra`).

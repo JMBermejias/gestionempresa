@@ -23,7 +23,7 @@ DEB_NAME = 'gestion-empresa.deb'
 
 
 def app_version():
-    with open(os.path.join(ROOT, 'mediotec.html'), 'r', encoding='utf-8') as f:
+    with open(os.path.join(ROOT, 'gestion-empresa.html'), 'r', encoding='utf-8') as f:
         m = re.search(r"APP_VERSION='v?([0-9]+\.[0-9]+\.[0-9]+)'", f.read())
     return m.group(1) if m else '1.0.0'
 

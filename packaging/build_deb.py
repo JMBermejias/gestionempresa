@@ -32,7 +32,7 @@ DATA_DIRS = [
 ]
 
 DATA_FILES = [
-    (os.path.join(ROOT, 'mediotec.html'), 'var/www/gestion-empresa/mediotec.html', 0o644),
+    (os.path.join(ROOT, 'gestion-empresa.html'), 'var/www/gestion-empresa/gestion-empresa.html', 0o644),
     (os.path.join(ROOT, 'sw.js'), 'var/www/gestion-empresa/sw.js', 0o644),
     (os.path.join(ROOT, 'manifest.json'), 'var/www/gestion-empresa/manifest.json', 0o644),
     (os.path.join(ROOT, 'icon-192.png'), 'var/www/gestion-empresa/icon-192.png', 0o644),

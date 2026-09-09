@@ -6,7 +6,7 @@ server {
     server_name _;
 
     root /var/www/gestion-empresa;
-    index mediotec.html;
+    index gestion-empresa.html;
 
     location / {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
@@ -20,7 +20,7 @@ server {
             auth_basic "Gestion Empresa";
             auth_basic_user_file /etc/gestion-empresa/.htpasswd;
         }
-        try_files $uri $uri/ /mediotec.html;
+        try_files $uri $uri/ /gestion-empresa.html;
     }
 
     location /api/ {

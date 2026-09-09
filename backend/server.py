@@ -211,7 +211,7 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_index()
 
     def _serve_index(self):
-        index = os.path.join(WEB_DIR, 'mediotec.html')
+        index = os.path.join(WEB_DIR, 'gestion-empresa.html')
         self._send_file(index)
 
     def _read_json(self):
@@ -331,7 +331,7 @@ class Handler(BaseHTTPRequestHandler):
     def _get_version(self):
         import re
         try:
-            html = os.path.join(WEB_DIR, 'mediotec.html')
+            html = os.path.join(WEB_DIR, 'gestion-empresa.html')
             with open(html, 'r', encoding='utf-8') as f:
                 m = re.search(r"APP_VERSION='([^']+)'", f.read())
                 if m:
