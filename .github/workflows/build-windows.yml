@@ -40,7 +40,7 @@ jobs:
           fi
           echo "cur=$cur last=$last next=v$nex"
           sed -i "s/APP_VERSION='[^']*'/APP_VERSION='v$nex'/" gestion-empresa.html
-          sed -i "s/gestion-empresa-v[0-9.]*/gestion-empresa-v$nex/" sw.js
+          sed -i "s/const CACHE = 'gestion-empresa-v[0-9.]*/const CACHE = 'gestion-empresa-v$nex/" sw.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add gestion-empresa.html sw.js

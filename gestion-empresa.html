@@ -1788,17 +1788,11 @@ toast('Excel exportado correctamente');
 }
 
 const savedVersion=localStorage.getItem('app_version');
+// Al arrancar la aplicacion nueva (Gestion Empresa v1.0.0) se limpian por completo
+// los datos de versiones anteriores (Medicion Obra) para empezar desde cero.
 if(savedVersion!==APP_VERSION){
-  mediciones.forEach(m=>{
-    if(!m.lineas&&m.materialId){
-      m.lineas=[{materialId:m.materialId,material:m.material,categoria:m.categoria,unidad:m.unidad,cantidad:m.cantidad}];
-      delete m.materialId;delete m.material;delete m.categoria;delete m.unidad;delete m.cantidad;
-    }
-  });
+  ['mat_data','med_data','emp_data','obras_data','zonas_data','sub_data','med_serie_counter'].forEach(k=>localStorage.removeItem(k));
   medSerieCounter=0;
-  mediciones.forEach(m=>{m.serie=nextSerie()});
-  localStorage.setItem('med_serie_counter',medSerieCounter);
-  localStorage.setItem('med_data',JSON.stringify(mediciones));
   localStorage.setItem('app_version',APP_VERSION);
 }
 materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
