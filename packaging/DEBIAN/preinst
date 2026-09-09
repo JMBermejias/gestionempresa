@@ -1,13 +1,13 @@
 #!/bin/sh
-# Medicion Obra - preinst
+# Gestion Empresa - preinst
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 set -e
 
 # Garantizar los directorios antes de que dpkg desempaquete los ficheros
 # (necesario en sistemas sin /var/www).
-mkdir -p /var/www/medicion-obra
-mkdir -p /var/lib/medicion-obra
-mkdir -p /usr/lib/medicion-obra
-mkdir -p /usr/share/doc/medicion-obra
+mkdir -p /var/www/gestion-empresa
+mkdir -p /var/lib/gestion-empresa
+mkdir -p /usr/lib/gestion-empresa
+mkdir -p /usr/share/doc/gestion-empresa
 
 exit 0

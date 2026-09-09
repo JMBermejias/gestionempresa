@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - API local (SQLite)
+# Gestion Empresa - API local (SQLite)
 # Copyright (C) 2026 JMBernabeu
 # License: GNU General Public License v3.0 or later (see LICENSE)
 import json
@@ -9,7 +9,7 @@ import sqlite3
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-DB_PATH = os.environ.get('MEDICION_DB', '/var/lib/medicion-obra/medicion.db')
+DB_PATH = os.environ.get('MEDICION_DB', '/var/lib/gestion-empresa/medicion.db')
 HOST = os.environ.get('MEDICION_HOST', '127.0.0.1')
 PORT = int(os.environ.get('MEDICION_PORT', '8000'))
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
@@ -113,7 +113,7 @@ def main():
         pass
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     sys.stderr.write(
-        'Medicion Obra API en http://%s:%d (db: %s)\n' % (HOST, PORT, DB_PATH))
+        'Gestion Empresa API en http://%s:%d (db: %s)\n' % (HOST, PORT, DB_PATH))
     server.serve_forever()
 
 

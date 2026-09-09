@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Genera el paquete .deb de Medicion Obra (formato ar compatible con dpkg).
+# Genera el paquete .deb de Gestion Empresa (formato ar compatible con dpkg).
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import gzip
 import hashlib
@@ -13,53 +13,53 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PKG = os.path.join(ROOT, 'packaging')
 DEBIAN = os.path.join(PKG, 'DEBIAN')
 OUT_DIR = os.path.join(ROOT, 'dist')
-OUT_NAME = 'medicion-obra_1.0.0_all.deb'
+OUT_NAME = 'gestion-empresa_1.0.0_all.deb'
 
 # (fuente, destino en el paquete, modo, enlazar-a-root)
 # Directorios que deben crearse con su propietario y permisos correctos
 # antes de desempaquetar los ficheros (imprescindible si no existe /var/www).
 DATA_DIRS = [
     ('var/www', 0o755),
-    ('var/www/medicion-obra', 0o755),
-    ('var/lib/medicion-obra', 0o755),
-    ('usr/lib/medicion-obra', 0o755),
-    ('usr/share/doc/medicion-obra', 0o755),
+    ('var/www/gestion-empresa', 0o755),
+    ('var/lib/gestion-empresa', 0o755),
+    ('usr/lib/gestion-empresa', 0o755),
+    ('usr/share/doc/gestion-empresa', 0o755),
     ('usr/share/applications', 0o755),
     ('usr/share/icons/hicolor/512x512/apps', 0o755),
     ('usr/share/icons/hicolor/256x256/apps', 0o755),
     ('usr/share/icons/hicolor/192x192/apps', 0o755),
-    ('etc/medicion-obra', 0o755),
+    ('etc/gestion-empresa', 0o755),
 ]
 
 DATA_FILES = [
-    (os.path.join(ROOT, 'mediotec.html'), 'var/www/medicion-obra/mediotec.html', 0o644),
-    (os.path.join(ROOT, 'sw.js'), 'var/www/medicion-obra/sw.js', 0o644),
-    (os.path.join(ROOT, 'manifest.json'), 'var/www/medicion-obra/manifest.json', 0o644),
-    (os.path.join(ROOT, 'icon-192.png'), 'var/www/medicion-obra/icon-192.png', 0o644),
-    (os.path.join(ROOT, 'icon-512.png'), 'var/www/medicion-obra/icon-512.png', 0o644),
-    (os.path.join(ROOT, 'LICENSE'), 'var/www/medicion-obra/LICENSE', 0o644),
+    (os.path.join(ROOT, 'mediotec.html'), 'var/www/gestion-empresa/mediotec.html', 0o644),
+    (os.path.join(ROOT, 'sw.js'), 'var/www/gestion-empresa/sw.js', 0o644),
+    (os.path.join(ROOT, 'manifest.json'), 'var/www/gestion-empresa/manifest.json', 0o644),
+    (os.path.join(ROOT, 'icon-192.png'), 'var/www/gestion-empresa/icon-192.png', 0o644),
+    (os.path.join(ROOT, 'icon-512.png'), 'var/www/gestion-empresa/icon-512.png', 0o644),
+    (os.path.join(ROOT, 'LICENSE'), 'var/www/gestion-empresa/LICENSE', 0o644),
     (os.path.join(ROOT, 'backend', 'auth.py'),
-     'usr/lib/medicion-obra/auth.py', 0o644),
+     'usr/lib/gestion-empresa/auth.py', 0o644),
     (os.path.join(ROOT, 'backend', 'server.py'),
-     'usr/lib/medicion-obra/server.py', 0o755),
+     'usr/lib/gestion-empresa/server.py', 0o755),
     (os.path.join(ROOT, 'backend', 'medicion_server.py'),
-     'usr/lib/medicion-obra/medicion_server.py', 0o755),
+     'usr/lib/gestion-empresa/medicion_server.py', 0o755),
     (os.path.join(ROOT, 'tools', 'migrate_firebase_to_local.py'),
-     'usr/lib/medicion-obra/migrate_firebase_to_local.py', 0o755),
-    (os.path.join(PKG, 'lib', 'systemd', 'system', 'medicion-obra.service'),
-     'lib/systemd/system/medicion-obra.service', 0o644),
-    (os.path.join(PKG, 'usr', 'share', 'applications', 'medicion-obra.desktop'),
-     'usr/share/applications/medicion-obra.desktop', 0o644),
-    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '512x512', 'apps', 'medicion-obra.png'),
-     'usr/share/icons/hicolor/512x512/apps/medicion-obra.png', 0o644),
-    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '256x256', 'apps', 'medicion-obra.png'),
-     'usr/share/icons/hicolor/256x256/apps/medicion-obra.png', 0o644),
-    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '192x192', 'apps', 'medicion-obra.png'),
-     'usr/share/icons/hicolor/192x192/apps/medicion-obra.png', 0o644),
-    (os.path.join(PKG, 'usr', 'share', 'doc', 'medicion-obra', 'copyright'),
-     'usr/share/doc/medicion-obra/copyright', 0o644),
+     'usr/lib/gestion-empresa/migrate_firebase_to_local.py', 0o755),
+    (os.path.join(PKG, 'lib', 'systemd', 'system', 'gestion-empresa.service'),
+     'lib/systemd/system/gestion-empresa.service', 0o644),
+    (os.path.join(PKG, 'usr', 'share', 'applications', 'gestion-empresa.desktop'),
+     'usr/share/applications/gestion-empresa.desktop', 0o644),
+    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '512x512', 'apps', 'gestion-empresa.png'),
+     'usr/share/icons/hicolor/512x512/apps/gestion-empresa.png', 0o644),
+    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '256x256', 'apps', 'gestion-empresa.png'),
+     'usr/share/icons/hicolor/256x256/apps/gestion-empresa.png', 0o644),
+    (os.path.join(PKG, 'usr', 'share', 'icons', 'hicolor', '192x192', 'apps', 'gestion-empresa.png'),
+     'usr/share/icons/hicolor/192x192/apps/gestion-empresa.png', 0o644),
+    (os.path.join(PKG, 'usr', 'share', 'doc', 'gestion-empresa', 'copyright'),
+     'usr/share/doc/gestion-empresa/copyright', 0o644),
     (os.path.join(ROOT, 'LICENSE'),
-     'usr/share/doc/medicion-obra/LICENSE', 0o644),
+     'usr/share/doc/gestion-empresa/LICENSE', 0o644),
 ]
 
 CONTROL_SCRIPTS = ['preinst', 'postinst', 'prerm', 'postrm']

@@ -1,6 +1,6 @@
 {
-  "appId": "com.medicionobra.app",
-  "appName": "Medicion Obra",
+  "appId": "com.gestionempresa.app",
+  "appName": "Gestion Empresa",
   "webDir": "www",
   "android": {
     "allowMixedContent": false

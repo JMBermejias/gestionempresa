@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: medicion-obra
+Upstream-Name: gestion-empresa
 Upstream-Contact: JMBernabeu <https://github.com/JMBermejias>
-Source: https://github.com/JMBermejias/medicion-obra
+Source: https://github.com/JMBermejias/gestionempresa
 
 Files: *
 Copyright: 2026 JMBernabeu

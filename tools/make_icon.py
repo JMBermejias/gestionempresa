@@ -116,9 +116,9 @@ def main():
     draw_icon(512, os.path.join(root, "icon-512.png"))
     draw_icon(192, os.path.join(root, "icon-192.png"))
     hicolor = os.path.join(root, "packaging", "usr", "share", "icons", "hicolor")
-    draw_icon(512, os.path.join(hicolor, "512x512", "apps", "medicion-obra.png"))
-    draw_icon(256, os.path.join(hicolor, "256x256", "apps", "medicion-obra.png"))
-    draw_icon(192, os.path.join(hicolor, "192x192", "apps", "medicion-obra.png"))
+    draw_icon(512, os.path.join(hicolor, "512x512", "apps", "gestion-empresa.png"))
+    draw_icon(256, os.path.join(hicolor, "256x256", "apps", "gestion-empresa.png"))
+    draw_icon(192, os.path.join(hicolor, "192x192", "apps", "gestion-empresa.png"))
     return 0
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Autenticacion (compartida desktop + movil)
+# Gestion Empresa - Autenticacion (compartida desktop + movil)
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import hashlib
 import hmac

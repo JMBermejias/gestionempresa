@@ -11,7 +11,7 @@ import urllib.request
 
 DEFAULT_URL = ('https://medicion-obra-default-rtdb.europe-west1.'
                'firebasedatabase.app/appdata.json')
-DEFAULT_DB = '/var/lib/medicion-obra/medicion.db'
+DEFAULT_DB = '/var/lib/gestion-empresa/medicion.db'
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
 
 SCHEMA = (
@@ -24,7 +24,7 @@ SCHEMA = (
 
 
 def fetch_firebase(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'medicion-obra-migrate'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'gestion-empresa-migrate'})
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.loads(resp.read().decode('utf-8'))
 
@@ -82,7 +82,7 @@ def merge_by_id(existing, incoming):
 def main():
     ap = argparse.ArgumentParser(
         description='Migra los datos de Firebase Realtime Database a la '
-                    'base SQLite local de Medicion Obra.')
+                    'base SQLite local de Gestion Empresa.')
     ap.add_argument('--url', default=DEFAULT_URL,
                     help='URL del nodo appdata en Firebase (por defecto: '
                          '%(default)s)')

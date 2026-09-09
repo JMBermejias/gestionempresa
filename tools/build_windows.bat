@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo   Medicion Obra - Generador Windows .exe
+echo   Gestion Empresa - Generador Windows .exe
 echo ============================================
 echo.
 echo Comprobando Python...
@@ -17,15 +17,15 @@ echo.
 echo Generando .exe...
 python "%~dp0build_windows.py"
 echo.
-if exist "%~dp0dist\MedicionObra.exe" (
+if exist "%~dp0dist\GestionEmpresa.exe" (
     echo ============================================
     echo   INSTALADOR GENERADO:
-    echo   %~dp0dist\MedicionObra.exe
+    echo   %~dp0dist\GestionEmpresa.exe
     echo ============================================
     echo.
-    echo Copia MedicionObra.exe a donde quieras ejecutarlo.
+    echo Copia GestionEmpresa.exe a donde quieras ejecutarlo.
     echo Al ejecutarlo se abrira el navegador automaticamente.
-    echo Los datos se guardan en %%APPDATA%%\MedicionObra
+    echo Los datos se guardan en %%APPDATA%%\GestionEmpresa
 ) else (
     echo ERROR: No se pudo generar el .exe
 )

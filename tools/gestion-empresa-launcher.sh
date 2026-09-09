@@ -1,7 +1,7 @@
 #!/bin/sh
-# Medicion Obra - Lanzador Linux
+# Gestion Empresa - Lanzador Linux
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
-# Arranca el servidor Medicion Obra en segundo plano y abre el navegador.
+# Arranca el servidor Gestion Empresa en segundo plano y abre el navegador.
 set -e
 
 PORT="${MEDICION_PORT:-8080}"
@@ -23,7 +23,7 @@ if is_up; then
 fi
 
 # Arrancar el servidor en segundo plano (el wrapper abre el navegador).
-MEDICION_NO_BROWSER=1 nohup /usr/bin/medicion-obra-bin >/dev/null 2>&1 &
+MEDICION_NO_BROWSER=1 nohup /usr/bin/gestion-empresa-bin >/dev/null 2>&1 &
 PID=$!
 
 # Esperar a que el servidor este listo (max 15s).

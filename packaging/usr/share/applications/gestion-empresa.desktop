@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Gestion Empresa
+GenericName=Gestion de empresa
+Comment=Gestion de empresa: empresas, materiales, obras y mediciones
+Exec=xdg-open http://localhost
+Icon=gestion-empresa
+Terminal=false
+Categories=Office;Utility;
+Keywords=empresa;gestion;materiales;

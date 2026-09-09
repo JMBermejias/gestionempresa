@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Generador de instalable Windows
+# Gestion Empresa - Generador de instalable Windows
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 #
 # Uso (en Windows con Python 3.8+):
@@ -47,19 +47,23 @@ def ensure_favicon():
 
 def app_version():
     with open(os.path.join(ROOT, 'mediotec.html'), encoding='utf-8') as f:
-        m = re.search(r"APP_VERSION='(\d+)'", f.read())
-    return int(m.group(1)) if m else 1
+        m = re.search(r"APP_VERSION='v?([0-9]+\.[0-9]+\.[0-9]+)'", f.read())
+    return m.group(1) if m else '1.0.0'
 
 
 def ensure_version_file():
     ver = app_version()
+    parts = [int(x) for x in ver.split('.')]
+    while len(parts) < 3:
+        parts.append(0)
+    major, minor, patch = parts[0], parts[1], parts[2]
     verfile = os.path.join(BUILD_DIR, 'version_info.txt')
     content = (
         "# UTF-8\n"
         "VSVersionInfo(\n"
         "  ffi=FixedFileInfo(\n"
-        "    filevers=(%d, 0, 0, 0),\n"
-        "    prodvers=(%d, 0, 0, 0),\n"
+        "    filevers=(%d, %d, %d, 0),\n"
+        "    prodvers=(%d, %d, %d, 0),\n"
         "    mask=0x3f,\n"
         "    flags=0x0,\n"
         "    OS=0x40004,\n"
@@ -73,19 +77,19 @@ def ensure_version_file():
         "        r'040904B0',\n"
         "        [\n"
         "          StringStruct(r'CompanyName', u'JMBernabeu'),\n"
-        "          StringStruct(r'FileDescription', u'Medicion Obra'),\n"
-        "          StringStruct(r'FileVersion', u'%d.0.0'),\n"
-        "          StringStruct(r'InternalName', u'MedicionObra'),\n"
-        "          StringStruct(r'OriginalFilename', u'MedicionObra.exe'),\n"
-        "          StringStruct(r'ProductName', u'Medicion Obra'),\n"
-        "          StringStruct(r'ProductVersion', u'%d.0.0')\n"
+        "          StringStruct(r'FileDescription', u'Gestion Empresa'),\n"
+        "          StringStruct(r'FileVersion', u'%s'),\n"
+        "          StringStruct(r'InternalName', u'GestionEmpresa'),\n"
+        "          StringStruct(r'OriginalFilename', u'GestionEmpresa.exe'),\n"
+        "          StringStruct(r'ProductName', u'Gestion Empresa'),\n"
+        "          StringStruct(r'ProductVersion', u'%s')\n"
         "        ]\n"
         "      )\n"
         "    ]),\n"
         "    VarFileInfo([VarStruct(r'Translation', [1033, 1200])])\n"
         "  ]\n"
         ")\n"
-    ) % (ver, ver, ver, ver)
+    ) % (major, minor, patch, major, minor, patch, ver, ver)
     with open(verfile, 'w', encoding='utf-8') as f:
         f.write(content)
     print('  version_info.txt generado (v%s)' % ver)
@@ -116,7 +120,7 @@ def build():
     cmd = [
         sys.executable, '-m', 'PyInstaller',
         '--onefile',
-        '--name', 'MedicionObra',
+        '--name', 'GestionEmpresa',
         '--distpath', DIST_DIR,
         '--workpath', BUILD_DIR,
         '--specpath', BUILD_DIR,
@@ -151,7 +155,7 @@ def build():
         print('ERROR: PyInstaller fallo con codigo %d' % result.returncode)
         sys.exit(1)
 
-    binary = os.path.join(DIST_DIR, 'MedicionObra.exe' if sys.platform == 'win32' else 'MedicionObra')
+    binary = os.path.join(DIST_DIR, 'GestionEmpresa.exe' if sys.platform == 'win32' else 'GestionEmpresa')
     if os.path.exists(binary):
         size_kb = os.path.getsize(binary) // 1024
         print('Generado: %s (%d KB)' % (binary, size_kb))

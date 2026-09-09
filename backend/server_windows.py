@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Servidor Windows (.exe)
+# Gestion Empresa - Servidor Windows (.exe)
 # Autenticacion + Actualizaciones automaticas desde GitHub Releases
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import base64
@@ -36,8 +36,8 @@ def appdata_dir():
         home = os.path.expanduser('~')
         if os.path.isdir(home):
             xdg = os.environ.get('XDG_DATA_HOME') or os.path.join(home, '.local', 'share')
-            return os.path.join(xdg, 'MedicionObra')
-    return os.path.join(os.environ.get('APPDATA', BASE_DIR), 'MedicionObra')
+            return os.path.join(xdg, 'GestionEmpresa')
+    return os.path.join(os.environ.get('APPDATA', BASE_DIR), 'GestionEmpresa')
 
 
 APPDATA = appdata_dir()
@@ -46,12 +46,12 @@ AUTH_FILE = os.path.join(APPDATA, 'auth.json')
 UPDATES_DIR = os.path.join(APPDATA, 'updates')
 HOST = '0.0.0.0'
 PORT = 8080
-GITHUB_REPO = 'JMBermejias/medicion-obra'
+GITHUB_REPO = 'JMBermejias/gestionempresa'
 GITHUB_API = 'https://api.github.com/repos/%s/releases/latest' % GITHUB_REPO
 if sys.platform.startswith('linux'):
-    EXE_NAME = 'medicion-obra.deb'
+    EXE_NAME = 'gestion-empresa.deb'
 else:
-    EXE_NAME = 'MedicionObra.exe'
+    EXE_NAME = 'GestionEmpresa.exe'
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
 FB_API_KEY = 'AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k'
 FB_IDP = 'https://identitytoolkit.googleapis.com/v1/accounts:%s?key=' + FB_API_KEY
@@ -84,12 +84,12 @@ def get_app_version():
     try:
         html = os.path.join(WEB_DIR, 'mediotec.html')
         with open(html, 'r', encoding='utf-8') as f:
-            m = re.search(r"APP_VERSION='(\d+)'", f.read())
+            m = re.search(r"APP_VERSION='([^']+)'", f.read())
             if m:
-                return m.group(1)
+                return m.group(1).lstrip('v')
     except OSError:
         pass
-    return '0'
+    return '0.0.0'
 
 
 def get_conn():
@@ -150,7 +150,7 @@ def verify_login(user, password):
 
 def fba_email(user):
     norm = re.sub(r'[^a-z0-9._-]', '', str(user).strip().lower())
-    return norm + '@medicionobra.local'
+    return norm + '@gestionempresa.local'
 
 
 def firebase_idp(action, payload):
@@ -224,14 +224,17 @@ def check_request_token(handler, param=None):
 
 def fetch_github_release():
     req = urllib.request.Request(
-        GITHUB_API, headers={'User-Agent': 'MedicionObra', 'Accept': 'application/vnd.github+json'})
+        GITHUB_API, headers={'User-Agent': 'GestionEmpresa', 'Accept': 'application/vnd.github+json'})
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read().decode('utf-8'))
 
 
 def _norm_version(v):
+    m = re.search(r'v?(\d+)\.(\d+)\.(\d+)', v or '')
+    if m:
+        return tuple(int(x) for x in m.groups())
     m = re.search(r'(\d+)', v or '')
-    return int(m.group(1)) if m else 0
+    return (int(m.group(1)), 0, 0) if m else (0, 0, 0)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -330,7 +333,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {
                     'current': get_app_version(),
                     'latest_tag': tag,
-                    'latest_version': str(latest),
+                    'latest_version': '.'.join(str(x) for x in latest),
                     'needs_update': latest > current,
                     'download_url': exe_url,
                     'published_at': rel.get('published_at', ''),
@@ -353,7 +356,7 @@ class Handler(BaseHTTPRequestHandler):
                     return True
                 os.makedirs(UPDATES_DIR, exist_ok=True)
                 dest = os.path.join(UPDATES_DIR, EXE_NAME)
-                req = urllib.request.Request(exe_url, headers={'User-Agent': 'MedicionObra'})
+                req = urllib.request.Request(exe_url, headers={'User-Agent': 'GestionEmpresa'})
                 with urllib.request.urlopen(req, timeout=600) as resp, open(dest, 'wb') as f:
                     size = 0
                     while True:
@@ -382,7 +385,7 @@ class Handler(BaseHTTPRequestHandler):
             logf = os.path.join(UPDATES_DIR, 'update_log.txt')
             script = (
                 '@echo off\r\n'
-                'title MedicionObra - Aplicando actualizacion...\r\n'
+                'title GestionEmpresa - Aplicando actualizacion...\r\n'
                 'set /a TRIES=0\r\n'
                 'echo [%%date%% %%time%%] Inicio actualizacion > "%(log)s"\r\n'
                 'echo Esperando cierre de %(exe)s >> "%(log)s"\r\n'
@@ -557,8 +560,8 @@ def main():
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     threading.Thread(target=open_browser, daemon=True).start()
     print('===========================================')
-    print('  Medicion Obra - Control de Medicion')
-    print('  Version app: v%s' % get_app_version())
+    print('  Gestion Empresa')
+    print('  Version app: %s' % get_app_version())
     print('===========================================')
     print('  Servidor:  http://127.0.0.1:%d' % PORT)
     print('  Base datos: %s' % DB_PATH)

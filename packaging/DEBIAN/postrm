@@ -1,13 +1,13 @@
 #!/bin/sh
-# Medicion Obra - postrm
+# Gestion Empresa - postrm
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 set -e
 
 case "$1" in
   purge)
-    systemctl disable medicion-obra.service >/dev/null 2>&1 || true
+    systemctl disable gestion-empresa.service >/dev/null 2>&1 || true
     systemctl daemon-reload >/dev/null 2>&1 || true
-    rm -rf /var/lib/medicion-obra
+    rm -rf /var/lib/gestion-empresa
     ;;
 esac
 

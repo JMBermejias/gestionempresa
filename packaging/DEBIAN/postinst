@@ -1,20 +1,20 @@
 #!/bin/sh
-# Medicion Obra - postinst
+# Gestion Empresa - postinst
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 set -e
 
 case "$1" in
   configure)
-    mkdir -p /var/lib/medicion-obra
-    chown -R www-data:www-data /var/lib/medicion-obra
-    chmod 755 /var/lib/medicion-obra
+    mkdir -p /var/lib/gestion-empresa
+    chown -R www-data:www-data /var/lib/gestion-empresa
+    chmod 755 /var/lib/gestion-empresa
 
-    mkdir -p /var/www/medicion-obra
+    mkdir -p /var/www/gestion-empresa
 
     # Activar e iniciar el servicio
     systemctl daemon-reload >/dev/null 2>&1 || true
-    systemctl enable medicion-obra.service >/dev/null 2>&1 || true
-    systemctl restart medicion-obra.service >/dev/null 2>&1 || true
+    systemctl enable gestion-empresa.service >/dev/null 2>&1 || true
+    systemctl restart gestion-empresa.service >/dev/null 2>&1 || true
 
     # Refrescar el icono y el lanzador en el menu de aplicaciones
     if command -v gtk-update-icon-cache >/dev/null 2>&1; then
@@ -26,7 +26,7 @@ case "$1" in
 
     echo ""
     echo "==========================================="
-    echo " Medicion Obra instalado correctamente"
+    echo " Gestion Empresa instalado correctamente"
     echo " Abre la aplicacion desde el menu"
     echo " o accede a http://localhost"
     echo "==========================================="

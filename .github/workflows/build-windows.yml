@@ -24,12 +24,19 @@ jobs:
         shell: bash
         run: |
           set -e
-          cur=$(grep -oP "APP_VERSION='\K[0-9]+" mediotec.html || echo "1")
-          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null | grep -oP '^v\K[0-9]+' || echo "$cur")
-          if [ "$last" -ge "$cur" ]; then nex=$((last + 1)); else nex=$cur; fi
+          cur=$(grep -oP "APP_VERSION='v?\K[0-9]+\.[0-9]+\.[0-9]+" mediotec.html || echo "1.0.0")
+          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+          last=${last#v}
+          if [ -z "$last" ]; then last="$cur"; fi
+          if [ "$(printf '%s\n' "$last" "$cur" | sort -V | tail -n1)" = "$last" ]; then
+            IFS='.' read -r ma mi pa <<< "$last"
+            nex="$ma.$mi.$((pa + 1))"
+          else
+            nex="$cur"
+          fi
           echo "cur=$cur last=$last next=v$nex"
-          sed -i "s/APP_VERSION='[0-9]*'/APP_VERSION='$nex'/" mediotec.html
-          sed -i "s/medicion-obra-v[0-9]*/medicion-obra-v$nex/" sw.js
+          sed -i "s/APP_VERSION='[^']*'/APP_VERSION='v$nex'/" mediotec.html
+          sed -i "s/gestion-empresa-v[0-9.]*/gestion-empresa-v$nex/" sw.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add mediotec.html sw.js
@@ -67,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: exe-artifact
-          path: dist/MedicionObra.exe
+          path: dist/GestionEmpresa.exe
 
   build-android:
     needs: bump-version
@@ -154,7 +161,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifact
-          path: dist/medicion-obra.deb
+          path: dist/gestion-empresa.deb
 
   release:
     needs: [build-windows, build-android, build-linux]
@@ -167,7 +174,7 @@ jobs:
       - id: version
         shell: bash
         run: |
-          v=$(grep -oP "APP_VERSION='\K[0-9]+" mediotec.html || echo "1")
+          v=$(grep -oP "APP_VERSION='\K[0-9]+\.[0-9]+\.[0-9]+" mediotec.html || echo "1")
           echo "tag=v$v" >> "$GITHUB_OUTPUT"
 
       - name: Descargar artefactos
@@ -183,8 +190,8 @@ jobs:
           tag="${{ steps.version.outputs.tag }}"
           echo "Tag: $tag"
           ls -la artifacts/exe-artifact artifacts/apk-artifact artifacts/linux-artifact
-          if [ "$tag" = "v1" ]; then
-            echo "No se detecto version valida, abortando"
+          if ! echo "$tag" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "No se detecto version valida ($tag), abortando"
             exit 1
           fi
           if git ls-remote --tags origin "refs/tags/$tag" | grep -q .; then
@@ -192,13 +199,13 @@ jobs:
             gh release delete "$tag" --yes --cleanup-tag
           fi
           cat > notas.md << 'NOTE'
-          ## Medicion Obra AUTOVERSION
+          ## Gestion Empresa AUTOVERSION
 
           Version generada automaticamente desde el push a main.
 
-          **Escritorio (Windows):** descarga **MedicionObra.exe** y ejecutalo.
+          **Escritorio (Windows):** descarga **GestionEmpresa.exe** y ejecutalo.
           **Android:** descarga **app-debug.apk** e instalalo (permite origenes desconocidos).
-          **Linux (Debian/Ubuntu):** descarga **medicion-obra.deb** e instala con `sudo dpkg -i medicion-obra.deb` (o doble clic).
+          **Linux (Debian/Ubuntu):** descarga **gestion-empresa.deb** e instala con `sudo dpkg -i gestion-empresa.deb` (o doble clic).
 
           ### Notas
           - Escritorio y movil comparten la misma autenticacion (usuario + contrasena).
@@ -206,14 +213,14 @@ jobs:
           - El escritorio detecta actualizaciones, las descarga y te avisa para que las apliques (apaga la app y ejecuta el archivo nuevo).
 
           ### Aviso del antivirus (falso positivo)
-          Algunos antivirus (Windows Defender) pueden marcar **MedicionObra.exe** como `Trojan:Win32/Wacatac.B!ml`. Es un **falso positivo**: salta por la heuristica de Machine Learning sobre ejecutables "onefile" compilados con PyInstaller, no porque el programa tenga virus. Es una aplicacion propia de codigo abierto (repositorio publico JMBermejias/medicion-obra).
+          Algunos antivirus (Windows Defender) pueden marcar **GestionEmpresa.exe** como `Trojan:Win32/Wacatac.B!ml`. Es un **falso positivo**: salta por la heuristica de Machine Learning sobre ejecutables "onefile" compilados con PyInstaller, no porque el programa tenga virus. Es una aplicacion propia de codigo abierto (repositorio publico JMBermejias/gestionempresa).
 
-          **Si Defender bloquea el archivo:** Windows Security -> Proteccion contra virus y amenazas -> Historial de proteccion -> Restaurar, y luego Agregar exclusion -> Archivo -> MedicionObra.exe.
+          **Si Defender bloquea el archivo:** Windows Security -> Proteccion contra virus y amenazas -> Historial de proteccion -> Restaurar, y luego Agregar exclusion -> Archivo -> GestionEmpresa.exe.
           NOTE
           sed -i "s/AUTOVERSION/$tag/g" notas.md
           gh release create "$tag" \
             artifacts/exe-artifact/*.exe \
             artifacts/apk-artifact/*.apk \
             artifacts/linux-artifact/*.deb \
-            --title "Medicion Obra $tag" \
+            --title "Gestion Empresa $tag" \
             --notes-file notas.md

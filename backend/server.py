@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Servidor integrado (estaticos + API SQLite + Autenticacion)
+# Gestion Empresa - Servidor integrado (estaticos + API SQLite + Autenticacion)
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import json
 import os
@@ -18,9 +18,9 @@ except ImportError:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import auth
 
-WEB_DIR = os.environ.get('WEB_DIR', '/var/www/medicion-obra')
-DB_PATH = os.environ.get('DB_PATH', '/var/lib/medicion-obra/medicion.db')
-AUTH_FILE = os.environ.get('AUTH_FILE', '/var/lib/medicion-obra/auth.json')
+WEB_DIR = os.environ.get('WEB_DIR', '/var/www/gestion-empresa')
+DB_PATH = os.environ.get('DB_PATH', '/var/lib/gestion-empresa/medicion.db')
+AUTH_FILE = os.environ.get('AUTH_FILE', '/var/lib/gestion-empresa/auth.json')
 HOST = os.environ.get('HOST', '0.0.0.0')
 PORT = int(os.environ.get('PORT', '80'))
 COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas']
@@ -110,7 +110,7 @@ def verify_login(user, password):
 
 def fba_email(user):
     norm = re.sub(r'[^a-z0-9._-]', '', str(user).strip().lower())
-    return norm + '@medicionobra.local'
+    return norm + '@gestionempresa.local'
 
 
 def firebase_idp(action, payload):
@@ -333,12 +333,12 @@ class Handler(BaseHTTPRequestHandler):
         try:
             html = os.path.join(WEB_DIR, 'mediotec.html')
             with open(html, 'r', encoding='utf-8') as f:
-                m = re.search(r"APP_VERSION='(\d+)'", f.read())
+                m = re.search(r"APP_VERSION='([^']+)'", f.read())
                 if m:
-                    return m.group(1)
+                    return m.group(1).lstrip('v')
         except OSError:
             pass
-        return '0'
+        return '0.0.0'
 
     def log_message(self, fmt, *args):
         sys.stderr.write('%s - %s\n' % (self.address_string(), fmt % args))
@@ -358,7 +358,7 @@ def main():
     auth.get_secret(AUTH_FILE)
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     sys.stderr.write(
-        'Medicion Obra en http://%s:%d (web: %s, db: %s)\n'
+        'Gestion Empresa en http://%s:%d (web: %s, db: %s)\n'
         % (HOST, PORT, WEB_DIR, DB_PATH))
     if not auth_is_configured():
         sys.stderr.write('PRIMER ACCESO: abre http://%s:%d y crea tu usuario.\n' % (HOST, PORT))

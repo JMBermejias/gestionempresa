@@ -1,7 +1,7 @@
 {
-  "name": "Control de Medicion - Obra",
-  "short_name": "Medicion Obra",
-  "description": "Sistema de medicion de obra con control de materiales y empresas instaladoras",
+  "name": "Gestion Empresa",
+  "short_name": "Gestion Empresa",
+  "description": "Sistema de gestion de empresa con control de materiales, mediciones y empresas instaladoras",
   "start_url": "./mediotec.html",
   "display": "standalone",
   "orientation": "any",

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Medicion Obra - Generador de paquete Linux (.deb)
+# Gestion Empresa - Generador de paquete Linux (.deb)
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 #
 # Uso (en Linux con Python 3.8+ y dpkg-deb):
 #   pip install pyinstaller
-#   python tools/build_windows.py   # genera dist/MedicionObra
-#   python tools/package_deb.py      # genera dist/medicion-obra.deb
+#   python tools/build_windows.py   # genera dist/GestionEmpresa
+#   python tools/package_deb.py      # genera dist/gestion-empresa.deb
 #
 import os
 import re
@@ -17,15 +17,15 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST_DIR = os.path.join(ROOT, 'dist')
 STAGE = os.path.join(ROOT, 'build', 'deb')
-BINARY = os.path.join(DIST_DIR, 'MedicionObra')
+BINARY = os.path.join(DIST_DIR, 'GestionEmpresa')
 ICON = os.path.join(ROOT, 'icon-512.png')
-DEB_NAME = 'medicion-obra.deb'
+DEB_NAME = 'gestion-empresa.deb'
 
 
 def app_version():
     with open(os.path.join(ROOT, 'mediotec.html'), 'r', encoding='utf-8') as f:
-        m = re.search(r"APP_VERSION='(\d+)'", f.read())
-    return m.group(1) if m else '1'
+        m = re.search(r"APP_VERSION='v?([0-9]+\.[0-9]+\.[0-9]+)'", f.read())
+    return m.group(1) if m else '1.0.0'
 
 
 def main():
@@ -48,45 +48,45 @@ def main():
     for d in (bin_dir, app_dir, icon_dir, icon_scalable, debian):
         os.makedirs(d, exist_ok=True)
 
-    shutil.copy2(BINARY, os.path.join(bin_dir, 'medicion-obra-bin'))
-    os.chmod(os.path.join(bin_dir, 'medicion-obra-bin'), 0o755)
+    shutil.copy2(BINARY, os.path.join(bin_dir, 'gestion-empresa-bin'))
+    os.chmod(os.path.join(bin_dir, 'gestion-empresa-bin'), 0o755)
 
     # Script lanzador: arranca el servidor en segundo plano y abre el navegador
-    launcher = os.path.join(ROOT, 'tools', 'medicion-obra-launcher.sh')
-    shutil.copy2(launcher, os.path.join(bin_dir, 'medicion-obra'))
-    os.chmod(os.path.join(bin_dir, 'medicion-obra'), 0o755)
+    launcher = os.path.join(ROOT, 'tools', 'gestion-empresa-launcher.sh')
+    shutil.copy2(launcher, os.path.join(bin_dir, 'gestion-empresa'))
+    os.chmod(os.path.join(bin_dir, 'gestion-empresa'), 0o755)
     if os.path.exists(ICON):
-        shutil.copy2(ICON, os.path.join(icon_dir, 'medicion-obra.png'))
-        shutil.copy2(ICON, os.path.join(icon_scalable, 'medicion-obra.png'))
+        shutil.copy2(ICON, os.path.join(icon_dir, 'gestion-empresa.png'))
+        shutil.copy2(ICON, os.path.join(icon_scalable, 'gestion-empresa.png'))
     else:
         print('  AVISO: falta icon-512.png, el icono no se incluira')
 
-    with open(os.path.join(app_dir, 'medicion-obra.desktop'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(app_dir, 'gestion-empresa.desktop'), 'w', encoding='utf-8') as f:
         f.write(
             '[Desktop Entry]\n'
             'Type=Application\n'
             'Version=1.0\n'
-            'Name=Medicion Obra\n'
-            'GenericName=Sistema de Medicion de Obra\n'
-            'Comment=Sistema de medicion de obra (servidor local + navegador)\n'
-            'Exec=medicion-obra\n'
-            'Icon=medicion-obra\n'
+            'Name=Gestion Empresa\n'
+            'GenericName=Sistema de Gestion de Empresa\n'
+            'Comment=Sistema de gestion de empresa (servidor local + navegador)\n'
+            'Exec=gestion-empresa\n'
+            'Icon=gestion-empresa\n'
             'Terminal=false\n'
             'Categories=Office;\n'
-            'Keywords=obra;medicion;\n'
+            'Keywords=empresa;gestion;\n'
         )
 
     control = (
-        'Package: medicion-obra\n'
+        'Package: gestion-empresa\n'
         'Version: %s\n'
         'Section: utils\n'
         'Priority: optional\n'
         'Architecture: amd64\n'
         'Depends: libc6 (>= 2.17)\n'
         'Maintainer: JMBernabeu <jmbernabeu@users.noreply.github.com>\n'
-        'Description: Medicion Obra - Sistema de medicion de obras\n'
+        'Description: Gestion Empresa - Sistema de gestion de empresa\n'
         ' Aplicacion que sirve en http://127.0.0.1:8080 el sistema de\n'
-        ' medicion de obras (escritorio y movil con la misma autenticacion).\n'
+        ' gestion de empresa (escritorio y movil con la misma autenticacion).\n'
     ) % ver
     with open(os.path.join(debian, 'control'), 'w', encoding='utf-8') as f:
         f.write(control)

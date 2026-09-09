@@ -1,8 +1,8 @@
-// Medicion Obra - Service Worker
+// Gestion Empresa - Service Worker
 // Copyright (C) 2026 JMBernabeu
 // License: GNU General Public License v3.0 or later (see LICENSE)
-// Cada version de la app renueva la caché (medicion-obra-v57<N>); el CI lo auto-incrementa.
-const CACHE = 'medicion-obra-v57';
+// Cada version de la app renueva la caché (gestion-empresa-v1.0.0<N>); el CI lo auto-incrementa.
+const CACHE = 'gestion-empresa-v1.0.0';
 const ASSETS = [
   './',
   './mediotec.html',
@@ -29,7 +29,7 @@ self.addEventListener('activate', e => {
         // Solo avisar cuando realmente hay una version nueva (se reemplazo una cache vieja).
         // Asi, al recargar con la misma version no se envia el mensaje y no hay bucle de recarga.
         if (oldKeys.length > 0) {
-          const ver = CACHE.replace('medicion-obra-v57','');
+          const ver = CACHE.replace('gestion-empresa-v','');
           return self.clients.matchAll({includeUncontrolled:true}).then(clients => {
             clients.forEach(c => c.postMessage({type:'SW_UPDATED', version: ver}));
           });

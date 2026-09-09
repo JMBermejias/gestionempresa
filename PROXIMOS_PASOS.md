@@ -27,10 +27,20 @@ La config actual pertenece al proyecto nuevo `gestionempresa-2026`, sustituida e
 
 Nota: la URL de RTDB en `FB_CONFIG` es la base generica (`gestionempresa-2026-default-rtdb.firebaseio.com`); ajustar segun la region elegida al crear la DB.
 
-## Para hacer de esto un proyecto nuevo
+## Renombrado de la app (HECHO)
 
-- Renombrar la app: titulos "Medicion Obra" en `mediotec.html`, `EXE_NAME`, `APP_VERSION`, `manifest.json`, nombre de paquete en `android-app/`, versiones en CI.
-- Comprobar que `.github/workflows/build-windows.yml` publique releases en este repo nuevo.
+La aplicacion se ha renombrado de "Medicion Obra" a **"Gestion Empresa"** y el
+versionado a **semver v1.0.0**. Afecta a:
+- `mediotec.html`: titulos, `FB_CONFIG`, `APP_VERSION='v1.0.0'`.
+- `manifest.json`, `sw.js` (caché `gestion-empresa-v1.0.0`).
+- `backend/*`: comentarios, rutas (`/var/www/gestion-empresa`, `/var/lib/gestion-empresa`), `FB_API_KEY`, versionado semver en auto-update.
+- `tools/*`: generadores (exe `GestionEmpresa.exe`, deb `gestion-empresa.deb`, launcher), migracion (la URL de Firebase origen se mantiene apuntando a `medicion-obra`).
+- `packaging/*`: paquete `gestion-empresa`, systemd, nginx, desktop, icons, control.
+- `android-app/`: `appName` "Gestion Empresa", `appId` `com.gestionempresa.app`.
+- `.github/workflows/build-windows.yml`: versionado semver y nombres de artefactos.
+- `tools/migrate_firebase_to_local.py`: ruta local `gestion-empresa` (URL origen de Firebase sigue siendo la de `medicion-obra`).
+
+Pendiente de verificar: que `.github/workflows/build-windows.yml` publique releases en este repo nuevo con tags `v1.0.x`.
 
 ## Aviso de seguridad
 

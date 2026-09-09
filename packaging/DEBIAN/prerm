@@ -1,12 +1,12 @@
 #!/bin/sh
-# Medicion Obra - prerm
+# Gestion Empresa - prerm
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 set -e
 
 case "$1" in
   remove|purge|upgrade|deconfigure)
-    systemctl stop medicion-obra.service >/dev/null 2>&1 || true
-    rm -f /etc/nginx/sites-enabled/medicion-obra
+    systemctl stop gestion-empresa.service >/dev/null 2>&1 || true
+    rm -f /etc/nginx/sites-enabled/gestion-empresa
     if command -v nginx >/dev/null 2>&1; then
       nginx -t >/dev/null 2>&1 && systemctl reload nginx >/dev/null 2>&1 || true
     fi

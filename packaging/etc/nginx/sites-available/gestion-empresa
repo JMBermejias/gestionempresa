@@ -1,11 +1,11 @@
-# Medicion Obra - sitio nginx
+# Gestion Empresa - sitio nginx
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
 
-    root /var/www/medicion-obra;
+    root /var/www/gestion-empresa;
     index mediotec.html;
 
     location / {
@@ -17,8 +17,8 @@ server {
         if ($remote_addr = 127.0.0.1) { set $block_auth "local"; }
         if ($remote_addr = ::1) { set $block_auth "local"; }
         if ($block_auth = "") {
-            auth_basic "Medicion Obra";
-            auth_basic_user_file /etc/medicion-obra/.htpasswd;
+            auth_basic "Gestion Empresa";
+            auth_basic_user_file /etc/gestion-empresa/.htpasswd;
         }
         try_files $uri $uri/ /mediotec.html;
     }
