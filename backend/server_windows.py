@@ -198,7 +198,8 @@ def firebase_create_user(user, password):
 def login_any(user, password):
     token = verify_login(user, password)
     if token:
-        return token, None
+        warning = firebase_create_user(user, password)
+        return token, (warning if isinstance(warning, str) else None)
     fberr = firebase_sign_in(user, password)
     if fberr is True:
         return auth.new_token(auth.get_secret(AUTH_FILE), user), None
@@ -299,7 +300,10 @@ class Handler(BaseHTTPRequestHandler):
             password = body.get('password') or ''
             token, fberr = login_any(user, password)
             if token:
-                self._send_json(200, {'ok': True, 'token': token, 'user': user})
+                resp = {'ok': True, 'token': token, 'user': user, 'fb_in_sync': fberr is None}
+                if fberr:
+                    resp['fb_warning'] = fberr
+                self._send_json(200, resp)
             else:
                 self._send_json(401, {'error': 'Usuario o contrasena incorrectos'})
             return True
@@ -481,11 +485,14 @@ class Handler(BaseHTTPRequestHandler):
             cfg['secret'] = secret
             auth.save_config(AUTH_FILE, cfg)
             fberr = firebase_create_user(user, password)
-            if fberr:
+            if fberr and isinstance(fberr, str):
                 cfg['fb_error'] = fberr
                 auth.save_config(AUTH_FILE, cfg)
             token = auth.new_token(secret, user)
-            self._send_json(200, {'ok': True, 'token': token, 'user': user})
+            resp = {'ok': True, 'token': token, 'user': user, 'fb_in_sync': not isinstance(fberr, str)}
+            if isinstance(fberr, str):
+                resp['fb_warning'] = fberr
+            self._send_json(200, resp)
             return
         if path.startswith('/api/'):
             if self._handle_api_auth(path, post_data):

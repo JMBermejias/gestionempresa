@@ -218,6 +218,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="app">
 <aside class="sidebar">
 <h2>&#128295; Control de Obra<span>Sistema de Medicion</span></h2>
+<div id="sidebar-user" title="Usuario actual" style="padding:6px 18px;font-size:.78rem;color:#fff;opacity:.85;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
 <button class="nav-btn active" onclick="showPage('dashboard')"><span class="icon">&#128202;</span>Panel Principal</button>
 <button class="nav-btn" onclick="showPage('obras')"><span class="icon">&#127959;</span>Obras</button>
 <button class="nav-btn" onclick="showPage('zonas')"><span class="icon">&#128205;</span>Zonas</button>
@@ -728,6 +729,8 @@ function showAuth(){
   document.getElementById('auth-overlay').classList.remove('hidden');
 }
 function hideAuth(){
+  const el=document.getElementById('sidebar-user');
+  if(el)el.textContent=(_authUser?('\uD83D\uDC64 '+_authUser):'');
   document.getElementById('auth-overlay').classList.add('hidden');
 }
 function authBoxes(){
@@ -796,7 +799,12 @@ function doLogin(){
     localStorage.setItem('mo_token',b.token);
     localStorage.setItem('mo_user',b.user);
     hideAuth();
-    location.reload();
+    if(b.fb_warning){
+      toast('Cuenta creada localmente, pero aun no se activo en el movil: '+b.fb_warning);
+      setTimeout(function(){location.reload();},3500);
+    }else{
+      location.reload();
+    }
   }).catch(()=>{err.textContent='Error de conexion con el servidor'});
 }
 function fbaEmail(user){
@@ -889,7 +897,12 @@ function doSetup(){
     localStorage.setItem('mo_user',b.user);
     hideAuth();
     toast('Bienvenido '+b.user);
-    location.reload();
+    if(b.fb_warning){
+      setTimeout(function(){toast('Cuenta creada localmente, pero aun no se activo en el movil: '+b.fb_warning);},2800);
+      setTimeout(function(){location.reload();},5000);
+    }else{
+      location.reload();
+    }
   }).catch(()=>{err.textContent='Error de conexion con el servidor'});
 }
 function closeToast(){
