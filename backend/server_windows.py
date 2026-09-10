@@ -52,7 +52,7 @@ if sys.platform.startswith('linux'):
     EXE_NAME = 'gestion-empresa.deb'
 else:
     EXE_NAME = 'GestionEmpresa.exe'
-COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas', 'clientes', 'proveedores', 'compras', 'ventas', 'almacen']
+COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas', 'clientes', 'proveedores', 'empleados', 'compras', 'ventas', 'almacen', 'partes']
 FB_API_KEY = 'AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k'
 FB_IDP = 'https://identitytoolkit.googleapis.com/v1/accounts:%s?key=' + FB_API_KEY
 
