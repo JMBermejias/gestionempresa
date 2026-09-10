@@ -315,7 +315,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="empresas-list"></tbody></table>
 </div>
 </div>
@@ -335,7 +335,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>Empresa</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>Empresa</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="subcontratas-list"></tbody></table>
 </div>
 </div>
@@ -444,7 +444,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente</th><th>Empresa</th><th>Obra</th><th>Vencimiento</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente</th><th>Empresa</th><th>Obra</th><th>Subcontrata</th><th>Vencimiento</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
 <tbody id="facturas-list"></tbody></table>
 </div>
 </div>
@@ -464,7 +464,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="clientes-list"></tbody></table>
 </div>
 </div>
@@ -484,7 +484,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="proveedores-list"></tbody></table>
 </div>
 </div>
@@ -504,7 +504,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/DNI</th><th>Cargo</th><th>Telefono</th><th>Email</th><th>Alta</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/DNI</th><th>Cargo</th><th>Telefono</th><th>Email</th><th>Alta</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="empleados-list"></tbody></table>
 </div>
 </div>
@@ -627,28 +627,17 @@ tr:hover{background:rgba(79,195,247,0.05)}
 
 <!-- ESTADISTICAS -->
 <div id="page-estadisticas" class="page">
-<div class="page-header"><h1>&#128200; Estadisticas</h1>
+<div class="page-header"><h1>&#128200; Estadisticas de Facturacion</h1>
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
 </div>
 <div class="filters" style="margin-bottom:15px">
-<select id="stat-period" onchange="renderEstadisticas()"><option value="day">Diario</option><option value="month" selected>Mensual</option><option value="year">Anual</option></select>
-<select id="stat-cat" onchange="renderEstadisticas()"><option value="">Todas</option><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI</option></select>
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Desde:</label>
+<input type="date" id="est-desde" onchange="renderEstadisticas()">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Hasta:</label>
+<input type="date" id="est-hasta" onchange="renderEstadisticas()">
+<button class="btn btn-outline" onclick="clearEstFacFilters()" style="padding:6px 12px;font-size:.8rem">Limpiar</button>
 </div>
-<div class="grid grid-4" id="stat-summary"></div>
-<div class="card" style="margin-top:20px">
-<h3 style="color:var(--primary-dark);margin-bottom:15px" id="chart-title">Mediciones Mensuales</h3>
-<div id="chart-container"></div>
-</div>
-<div class="grid grid-2" style="margin-top:20px">
-<div class="card">
-<h3 style="color:var(--primary-dark);margin-bottom:15px">Por Categoria</h3>
-<div id="cat-pie"></div>
-</div>
-<div class="card">
-<h3 style="color:var(--primary-dark);margin-bottom:15px">Top Materiales</h3>
-<div id="top-materials"></div>
-</div>
-</div>
+<div class="grid grid-2" id="fac-stats-grid"></div>
 </div>
 
 <!-- REPORTES -->
@@ -687,6 +676,29 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 </div>
 </div>
+
+<div class="card" style="margin-top:20px">
+<div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+<h3 style="color:var(--primary-dark);margin:0">&#128176; Facturacion por Cliente, Proveedor, Empresa y Subcontrata</h3>
+</div>
+<p style="font-size:.8rem;color:var(--text-light);margin-bottom:12px">Desglose segun el rango de fechas de arriba. Facturas emitidas para cliente/empresa/subcontrata y Compras para proveedor (excluye anulados).</p>
+<div class="grid grid-2" id="fac-rpt-grid"></div>
+</div>
+
+<div class="card" style="margin-top:20px">
+<div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+<h3 style="color:var(--primary-dark);margin:0">&#129489; Trabajos y Horas por Empleado</h3>
+<div style="display:flex;gap:6px">
+<button class="btn btn-success" onclick="exportHorasExcel()" style="padding:5px 10px;font-size:.72rem">&#128202; Excel</button>
+<button class="btn btn-primary" onclick="exportHorasPDF()" style="padding:5px 10px;font-size:.72rem">&#128424; PDF</button>
+</div>
+</div>
+<p style="font-size:.8rem;color:var(--text-light);margin-bottom:12px">Partes de trabajo en el rango de fechas indicado (excluye anulados).</p>
+<div class="table-wrap">
+<table><thead><tr><th>Empleado</th><th>N&ordm; Partes</th><th>Horas</th><th>Total (IVA incl.)</th></tr></thead>
+<tbody id="rpt-horas-list"></tbody></table>
+</div>
+</div>
 </div>
 
 
@@ -706,6 +718,18 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Telefono</label><input type="text" id="emp-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="emp-email" placeholder="email@ejemplo.com"></div>
 <div class="form-group"><label>Notas</label><input type="text" id="emp-notas" placeholder="Observaciones"></div>
+<div class="form-group"><label>Logo / Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('emp-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('emp-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('emp-img-prev','emp-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="emp-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'emp-img-prev','emp-img-wrap')">
+<input type="file" id="emp-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'emp-img-prev','emp-img-wrap')">
+<div id="emp-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="emp-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-empresa')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveEmpresa()">Guardar</button>
@@ -724,6 +748,18 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Telefono</label><input type="text" id="sub-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="sub-email" placeholder="email@ejemplo.com"></div>
 <div class="form-group"><label>Notas</label><input type="text" id="sub-notas" placeholder="Observaciones"></div>
+<div class="form-group"><label>Logo / Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('sub-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('sub-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('sub-img-prev','sub-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="sub-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'sub-img-prev','sub-img-wrap')">
+<input type="file" id="sub-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'sub-img-prev','sub-img-wrap')">
+<div id="sub-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="sub-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-subcontrata')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveSubcontrata()">Guardar</button>
@@ -850,6 +886,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="form-group"><label>Empresa Instaladora *</label><select id="pres-empresa"></select></div>
 <div class="form-group"><label>Obra</label><select id="pres-obra"></select></div>
+<div class="form-group"><label>Subcontrata</label><select id="pres-subcontrata"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Cliente</label><input type="text" id="pres-cliente" placeholder="Nombre del cliente"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="pres-nif" placeholder="NIF o CIF"></div>
@@ -902,6 +939,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="form-group"><label>Empresa Instaladora *</label><select id="fac-empresa"></select></div>
 <div class="form-group"><label>Obra</label><select id="fac-obra"></select></div>
+<div class="form-group"><label>Subcontrata</label><select id="fac-subcontrata"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Cliente</label><input type="text" id="fac-cliente" placeholder="Nombre del cliente"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="fac-nif" placeholder="NIF o CIF"></div>
@@ -957,6 +995,18 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Email</label><input type="email" id="cli-email" placeholder="email@ejemplo.com"></div>
 </div>
 <div class="form-group"><label>Notas</label><input type="text" id="cli-notas" placeholder="Observaciones"></div>
+<div class="form-group"><label>Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('cli-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('cli-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('cli-img-prev','cli-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="cli-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'cli-img-prev','cli-img-wrap')">
+<input type="file" id="cli-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'cli-img-prev','cli-img-wrap')">
+<div id="cli-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="cli-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveCliente()">Guardar</button>
@@ -978,6 +1028,18 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Email</label><input type="email" id="prov-email" placeholder="email@ejemplo.com"></div>
 </div>
 <div class="form-group"><label>Notas</label><input type="text" id="prov-notas" placeholder="Observaciones"></div>
+<div class="form-group"><label>Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('prov-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('prov-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('prov-img-prev','prov-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="prov-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'prov-img-prev','prov-img-wrap')">
+<input type="file" id="prov-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'prov-img-prev','prov-img-wrap')">
+<div id="prov-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="prov-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-proveedor')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveProveedor()">Guardar</button>
@@ -998,6 +1060,18 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Email</label><input type="email" id="empl-email" placeholder="email@ejemplo.com"></div>
 </div>
 <div class="form-group"><label>Fecha de Alta</label><input type="date" id="empl-alta"></div>
+<div class="form-group"><label>Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('empl-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('empl-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('empl-img-prev','empl-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="empl-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'empl-img-prev','empl-img-wrap')">
+<input type="file" id="empl-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'empl-img-prev','empl-img-wrap')">
+<div id="empl-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="empl-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-empleado')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveEmpleado()">Guardar</button>
@@ -1076,6 +1150,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="form-group" id="ven-cliente-grp"><label>Cliente *</label><select id="ven-cliente"></select></div>
 <div class="form-group" id="ven-obra-grp" style="display:none"><label>Obra *</label><select id="ven-obra"></select></div>
+<div class="form-group"><label>Subcontrata</label><select id="ven-subcontrata"></select></div>
 <div style="background:#E1F5FE;border-radius:8px;padding:12px;margin-bottom:10px">
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
 <div style="flex:1;min-width:200px" class="search-picker">
@@ -1194,7 +1269,7 @@ let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8080';
 let _authRetries=0;let _authConfigured=false;
 const FB_CONFIG={apiKey:"AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k",authDomain:"gestionempresa-2026.firebaseapp.com",databaseURL:"https://gestionempresa-2026-default-rtdb.firebaseio.com",projectId:"gestionempresa-2026",storageBucket:"gestionempresa-2026.firebasestorage.app",messagingSenderId:"828319600246",appId:"1:828319600246:web:ce7061e9108ffef2c1d957"};
-const APP_VERSION='v1.4.0';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
+const APP_VERSION='v1.5.0';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
 function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
@@ -1211,6 +1286,20 @@ function getMaterialImg(m){
 if(m.img)return m.img;
 return _getIcon(m.categoria,m.nombre);
 }
+
+function handleFoto(event,previewId,wrapId){
+const f=event.target.files[0];
+if(!f)return;
+if(!f.type.startsWith('image/')){alert('Selecciona un archivo de imagen');event.target.value='';return}
+if(f.size>600000){alert('Imagen demasiado grande (max 600KB). Escoge una mas pequena');event.target.value='';return}
+const r=new FileReader();
+r.onload=e=>{const img=document.getElementById(previewId);img.src=e.target.result;document.getElementById(wrapId).style.display='block'};
+r.readAsDataURL(f);
+}
+function clearFoto(previewId,wrapId){const img=document.getElementById(previewId);if(img)img.src='';const w=document.getElementById(wrapId);if(w)w.style.display='none'}
+function getFotoSrc(previewId,wrapId){const w=document.getElementById(wrapId);if(w&&w.style.display==='block')return document.getElementById(previewId).src;return ''}
+function setFotoPreview(previewId,wrapId,foto){const img=document.getElementById(previewId);const w=document.getElementById(wrapId);if(!foto){if(img)img.src='';if(w)w.style.display='none'}else{img.src=foto;w.style.display='block'}}
+function fotoCell(foto){return foto?'<img src="'+foto+'" style="width:38px;height:38px;object-fit:cover;border-radius:50%;border:2px solid var(--border);vertical-align:middle">':'<span style="color:var(--text-light)">-</span>'}
 
 function saveLocal(){
   localStorage.setItem('mat_data',JSON.stringify(materials));
@@ -1624,6 +1713,7 @@ document.getElementById('cli-direccion').value='';
 document.getElementById('cli-telefono').value='';
 document.getElementById('cli-email').value='';
 document.getElementById('cli-notas').value='';
+clearFoto('cli-img-prev','cli-img-wrap');
 openModal('modal-cliente');
 }
 
@@ -1639,13 +1729,14 @@ document.getElementById('cli-direccion').value=c.direccion||'';
 document.getElementById('cli-telefono').value=c.telefono||'';
 document.getElementById('cli-email').value=c.email||'';
 document.getElementById('cli-notas').value=c.notas||'';
+setFotoPreview('cli-img-prev','cli-img-wrap',c.foto||'');
 openModal('modal-cliente');
 }
 
 function saveCliente(){
 const nombre=document.getElementById('cli-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de cliente');return}
-const data={nombre,nif:document.getElementById('cli-nif').value.trim(),contacto:document.getElementById('cli-contacto').value.trim(),direccion:document.getElementById('cli-direccion').value.trim(),telefono:document.getElementById('cli-telefono').value.trim(),email:document.getElementById('cli-email').value.trim(),notas:document.getElementById('cli-notas').value.trim()};
+const data={nombre,nif:document.getElementById('cli-nif').value.trim(),contacto:document.getElementById('cli-contacto').value.trim(),direccion:document.getElementById('cli-direccion').value.trim(),telefono:document.getElementById('cli-telefono').value.trim(),email:document.getElementById('cli-email').value.trim(),notas:document.getElementById('cli-notas').value.trim(),foto:getFotoSrc('cli-img-prev','cli-img-wrap')};
 const editId=document.getElementById('cli-edit-id').value;
 if(editId){const idx=clientes.findIndex(x=>x.id===editId);clientes[idx]={...clientes[idx],...data}}
 else{data.id='cli_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];clientes.push(data)}
@@ -1663,9 +1754,9 @@ const q=(document.getElementById('cli-search')?.value||'').toLowerCase();
 const list=clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||(c.nif||'').toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q));
 document.getElementById('clientes-list').innerHTML=list.length?list.map(c=>`<tr>
 <td><strong>${c.nombre}</strong></td>
-<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td>
+<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${fotoCell(c.foto)}</td>
 <td><button class="btn btn-warning" onclick="editCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
 }
 
 function populateClienteSelect(selectId){
@@ -1684,6 +1775,7 @@ document.getElementById('prov-direccion').value='';
 document.getElementById('prov-telefono').value='';
 document.getElementById('prov-email').value='';
 document.getElementById('prov-notas').value='';
+clearFoto('prov-img-prev','prov-img-wrap');
 openModal('modal-proveedor');
 }
 
@@ -1699,13 +1791,14 @@ document.getElementById('prov-direccion').value=p.direccion||'';
 document.getElementById('prov-telefono').value=p.telefono||'';
 document.getElementById('prov-email').value=p.email||'';
 document.getElementById('prov-notas').value=p.notas||'';
+setFotoPreview('prov-img-prev','prov-img-wrap',p.foto||'');
 openModal('modal-proveedor');
 }
 
 function saveProveedor(){
 const nombre=document.getElementById('prov-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de proveedor');return}
-const data={nombre,nif:document.getElementById('prov-nif').value.trim(),contacto:document.getElementById('prov-contacto').value.trim(),direccion:document.getElementById('prov-direccion').value.trim(),telefono:document.getElementById('prov-telefono').value.trim(),email:document.getElementById('prov-email').value.trim(),notas:document.getElementById('prov-notas').value.trim()};
+const data={nombre,nif:document.getElementById('prov-nif').value.trim(),contacto:document.getElementById('prov-contacto').value.trim(),direccion:document.getElementById('prov-direccion').value.trim(),telefono:document.getElementById('prov-telefono').value.trim(),email:document.getElementById('prov-email').value.trim(),notas:document.getElementById('prov-notas').value.trim(),foto:getFotoSrc('prov-img-prev','prov-img-wrap')};
 const editId=document.getElementById('prov-edit-id').value;
 if(editId){const idx=proveedores.findIndex(x=>x.id===editId);proveedores[idx]={...proveedores[idx],...data}}
 else{data.id='prov_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];proveedores.push(data)}
@@ -1723,9 +1816,9 @@ const q=(document.getElementById('prov-search')?.value||'').toLowerCase();
 const list=proveedores.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q));
 document.getElementById('proveedores-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td>
+<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
 }
 
 function populateProveedorSelect(selectId){
@@ -1743,6 +1836,7 @@ document.getElementById('empl-cargo').value='';
 document.getElementById('empl-telefono').value='';
 document.getElementById('empl-email').value='';
 document.getElementById('empl-alta').value=new Date().toISOString().split('T')[0];
+clearFoto('empl-img-prev','empl-img-wrap');
 openModal('modal-empleado');
 }
 
@@ -1757,13 +1851,14 @@ document.getElementById('empl-cargo').value=p.cargo||'';
 document.getElementById('empl-telefono').value=p.telefono||'';
 document.getElementById('empl-email').value=p.email||'';
 document.getElementById('empl-alta').value=p.alta||'';
+setFotoPreview('empl-img-prev','empl-img-wrap',p.foto||'');
 openModal('modal-empleado');
 }
 
 function saveEmpleado(){
 const nombre=document.getElementById('empl-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de empleado');return}
-const data={nombre,nif:document.getElementById('empl-nif').value.trim(),cargo:document.getElementById('empl-cargo').value.trim(),telefono:document.getElementById('empl-telefono').value.trim(),email:document.getElementById('empl-email').value.trim(),alta:document.getElementById('empl-alta').value};
+const data={nombre,nif:document.getElementById('empl-nif').value.trim(),cargo:document.getElementById('empl-cargo').value.trim(),telefono:document.getElementById('empl-telefono').value.trim(),email:document.getElementById('empl-email').value.trim(),alta:document.getElementById('empl-alta').value,foto:getFotoSrc('empl-img-prev','empl-img-wrap')};
 const editId=document.getElementById('empl-edit-id').value;
 if(editId){const idx=empleados.findIndex(x=>x.id===editId);empleados[idx]={...empleados[idx],...data}}
 else{data.id='emp2_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];empleados.push(data)}
@@ -1781,9 +1876,9 @@ const q=(document.getElementById('emp2-search')?.value||'').toLowerCase();
 const list=empleados.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.cargo||'').toLowerCase().includes(q));
 document.getElementById('empleados-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.cargo||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${p.alta||'-'}</td>
+<td>${p.nif||'-'}</td><td>${p.cargo||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${p.alta||'-'}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editEmpleado('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpleado('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay empleados registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay empleados registrados</td></tr>';
 }
 
 function populateEmpleadoSelect(selectId){
@@ -1914,6 +2009,7 @@ document.getElementById('emp-direccion').value='';
 document.getElementById('emp-telefono').value='';
 document.getElementById('emp-email').value='';
 document.getElementById('emp-notas').value='';
+clearFoto('emp-img-prev','emp-img-wrap');
 openModal('modal-empresa');
 }
 
@@ -1929,13 +2025,14 @@ document.getElementById('emp-direccion').value=e.direccion||'';
 document.getElementById('emp-telefono').value=e.telefono||'';
 document.getElementById('emp-email').value=e.email||'';
 document.getElementById('emp-notas').value=e.notas||'';
+setFotoPreview('emp-img-prev','emp-img-wrap',e.foto||'');
 openModal('modal-empresa');
 }
 
 function saveEmpresa(){
 const nombre=document.getElementById('emp-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de empresa');return}
-const data={nombre,especialidad:document.getElementById('emp-especialidad').value,contacto:document.getElementById('emp-contacto').value.trim(),nif:document.getElementById('emp-nif').value.trim(),direccion:document.getElementById('emp-direccion').value.trim(),telefono:document.getElementById('emp-telefono').value.trim(),email:document.getElementById('emp-email').value.trim(),notas:document.getElementById('emp-notas').value.trim()};
+const data={nombre,especialidad:document.getElementById('emp-especialidad').value,contacto:document.getElementById('emp-contacto').value.trim(),nif:document.getElementById('emp-nif').value.trim(),direccion:document.getElementById('emp-direccion').value.trim(),telefono:document.getElementById('emp-telefono').value.trim(),email:document.getElementById('emp-email').value.trim(),notas:document.getElementById('emp-notas').value.trim(),foto:getFotoSrc('emp-img-prev','emp-img-wrap')};
 const editId=document.getElementById('emp-edit-id').value;
 if(editId){const idx=empresas.findIndex(x=>x.id===editId);empresas[idx]={...empresas[idx],...data}}
 else{data.id='emp_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];empresas.push(data)}
@@ -1954,9 +2051,9 @@ const list=empresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.especia
 document.getElementById('empresas-list').innerHTML=list.length?list.map(e=>`<tr>
 <td><strong>${e.nombre}</strong></td>
 <td><span class="tag tag-${e.especialidad==='Electricidad'?'elec':e.especialidad==='PCI'?'pci':e.especialidad==='Fontaneria'?'font':e.especialidad==='Climatizacion'?'clim':'cal'}">${e.especialidad}</span></td>
-<td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td>
+<td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${fotoCell(e.foto)}</td>
 <td><button class="btn btn-outline" onclick="showEmpresaTrabajos('${e.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
+</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
 }
 
 function showEmpresaTrabajos(empresaId){
@@ -2123,6 +2220,7 @@ document.getElementById('sub-telefono').value='';
 document.getElementById('sub-email').value='';
 document.getElementById('sub-notas').value='';
 populateEmpresaSelect('sub-empresa');
+clearFoto('sub-img-prev','sub-img-wrap');
 openModal('modal-subcontrata');
 }
 
@@ -2137,6 +2235,7 @@ document.getElementById('sub-email').value=s.email||'';
 document.getElementById('sub-notas').value=s.notas||'';
 populateEmpresaSelect('sub-empresa');
 document.getElementById('sub-empresa').value=s.empresaId||'';
+setFotoPreview('sub-img-prev','sub-img-wrap',s.foto||'');
 openModal('modal-subcontrata');
 }
 
@@ -2145,7 +2244,7 @@ const nombre=document.getElementById('sub-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de subcontrata');return}
 const empresaId=document.getElementById('sub-empresa').value;
 const emp=empresas.find(e=>e.id===empresaId);
-const data={nombre,empresaId,empresa:emp?emp.nombre:'',contacto:document.getElementById('sub-contacto').value.trim(),telefono:document.getElementById('sub-telefono').value.trim(),email:document.getElementById('sub-email').value.trim(),notas:document.getElementById('sub-notas').value.trim()};
+const data={nombre,empresaId,empresa:emp?emp.nombre:'',contacto:document.getElementById('sub-contacto').value.trim(),telefono:document.getElementById('sub-telefono').value.trim(),email:document.getElementById('sub-email').value.trim(),notas:document.getElementById('sub-notas').value.trim(),foto:getFotoSrc('sub-img-prev','sub-img-wrap')};
 const editId=document.getElementById('sub-edit-id').value;
 if(editId){const idx=subcontratas.findIndex(x=>x.id===editId);subcontratas[idx]={...subcontratas[idx],...data}}
 else{data.id='sc_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];subcontratas.push(data)}
@@ -2163,9 +2262,9 @@ const q=(document.getElementById('sub-search')?.value||'').toLowerCase();
 const list=subcontratas.filter(s=>!q||s.nombre.toLowerCase().includes(q)||(s.empresa||'').toLowerCase().includes(q)||(s.contacto||'').toLowerCase().includes(q));
 document.getElementById('subcontratas-list').innerHTML=list.length?list.map(s=>`<tr>
 <td><strong>${s.nombre}</strong></td>
-<td>${s.empresa||'-'}</td><td>${s.contacto||'-'}</td><td>${s.telefono||'-'}</td><td>${s.email||'-'}</td>
+<td>${s.empresa||'-'}</td><td>${s.contacto||'-'}</td><td>${s.telefono||'-'}</td><td>${s.email||'-'}</td><td>${fotoCell(s.foto)}</td>
 <td><button class="btn btn-outline" onclick="showSubcontrataTrabajos('${s.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editSubcontrata('${s.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteSubcontrata('${s.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcontratas registradas</td></tr>';
+</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcontratas registradas</td></tr>';
 }
 
 function showSubcontrataTrabajos(subId){
@@ -2487,51 +2586,136 @@ const pct=Math.round((count/maxMat)*100);
 return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="width:80px;font-size:.8rem">${c.n}</span><div style="flex:1;height:24px;background:#E1F5FE;border-radius:12px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${c.c};border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:600">${count}</div></div></div>`}).join('');
 }
 
+function facturacionGroups(fDesde,fHasta){
+const ff=facturas.filter(f=>f.estado!=='Anulada'&&(!fDesde||f.fecha>=fDesde)&&(!fHasta||f.fecha<=fHasta));
+const cc=compras.filter(c=>c.estado!=='Anulada'&&(!fDesde||c.fecha>=fDesde)&&(!fHasta||c.fecha<=fHasta));
+function groupBy(list,campo,idCampo){
+const map=new Map();
+list.forEach(x=>{
+const nombre=String(x[campo]||'').trim()||'Sin asignar';
+const key=String(x[idCampo]||'')+'\u0000'+nombre;
+if(!map.has(key))map.set(key,{nombre,id:x[idCampo]||'',cantidad:0,total:0});
+const g=map.get(key);g.cantidad++;g.total+=(Number(x.total)||0);
+});
+return [...map.values()].sort((a,b)=>b.total-a.total);
+}
+return {
+cliente:groupBy(ff,'cliente'),
+empresa:groupBy(ff,'empresa','empresaId'),
+subcontrata:groupBy(ff,'subcontrata','subcontrataId'),
+proveedor:groupBy(cc,'proveedor','proveedorId')
+};
+}
+
+function facFoto(g,kindExact){
+if(kindExact==='cliente'){const c=clientes.find(x=>x.nombre.toLowerCase()===g.nombre.toLowerCase());return c&&c.foto?c.foto:''}
+if(kindExact==='empresa'){const e=empresas.find(x=>x.id===g.id);return e&&e.foto?e.foto:''}
+if(kindExact==='proveedor'){const p=proveedores.find(x=>x.id===g.id);return p&&p.foto?p.foto:''}
+if(kindExact==='subcontrata'){const s=subcontratas.find(x=>x.id===g.id);return s&&s.foto?s.foto:''}
+return '';
+}
+
+function facTableHTML(title,icon,rows,kindExact){
+return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><h3 style="color:var(--primary-dark);margin:0">${icon} Facturacion por ${title}</h3><div style="display:flex;gap:6px"><button class="btn btn-success" onclick="exportFacExcel('${kindExact}')" style="padding:5px 10px;font-size:.72rem">&#128202; Excel</button><button class="btn btn-primary" onclick="exportFacPDF('${kindExact}')" style="padding:5px 10px;font-size:.72rem">&#128424; PDF</button></div></div><div class="table-wrap"><table><thead><tr><th>${title}</th><th>Documentos</th><th>Total</th></tr></thead><tbody>${rows.map(r=>{const foto=facFoto(r,kindExact);return`<tr><td><strong>${foto?'<img src="'+foto+'" style="width:28px;height:28px;object-fit:cover;border-radius:50%;border:2px solid var(--border);vertical-align:middle;margin-right:6px">':''}${r.nombre}</strong></td><td>${r.cantidad}</td><td><strong>${r.total.toFixed(2)} &euro;</strong></td></tr>`}).join('')||'<tr><td colspan="3" style="text-align:center;padding:30px;color:var(--text-light)">Sin datos</td></tr>'}</tbody></table></div></div>`;
+}
+
+function renderStatsGridInto(containerId){
+const g=facturacionGroups((document.getElementById('est-desde')?.value||''),(document.getElementById('est-hasta')?.value||''));
+document.getElementById(containerId).innerHTML=
+facTableHTML('Cliente','&#128100;',g.cliente,'cliente')+
+facTableHTML('Empresa','&#127970;',g.empresa,'empresa')+
+facTableHTML('Proveedor','&#128666;',g.proveedor,'proveedor')+
+facTableHTML('Subcontrata','&#128188;',g.subcontrata,'subcontrata');
+}
+
 function renderEstadisticas(){
-const period=document.getElementById('stat-period').value;
-const cat=document.getElementById('stat-cat').value;
-function medMatchesCat(m,c){if(!c)return true;return(m.lineas||[]).some(l=>l.categoria===c)||(m.categoria===c)}
-let list=mediciones.filter(m=>medMatchesCat(m,cat));
-const totalUnidades=list.length;
-const allLineas=list.flatMap(m=>m.lineas||(m.materialId?[{materialId:m.materialId,material:m.material,categoria:m.categoria,unidad:m.unidad,cantidad:m.cantidad}]:[]));
-const matCount=new Set(allLineas.map(l=>l.materialId)).size;
-const empCount=new Set(list.map(m=>m.empresaId)).size;
-document.getElementById('stat-summary').innerHTML=`
-<div class="card" style="text-align:center"><div style="font-size:1.5rem;color:var(--primary)">&#128221;</div><div style="font-size:1.3rem;font-weight:700">${totalUnidades}</div><div style="font-size:.8rem;color:var(--text-light)">Total Mediciones</div></div>
-<div class="card" style="text-align:center"><div style="font-size:1.5rem;color:var(--warning)">&#128207;</div><div style="font-size:1.3rem;font-weight:700">${matCount}</div><div style="font-size:.8rem;color:var(--text-light)">Materiales Diferentes</div></div>
-<div class="card" style="text-align:center"><div style="font-size:1.5rem;color:var(--danger)">&#127970;</div><div style="font-size:1.3rem;font-weight:700">${empCount}</div><div style="font-size:.8rem;color:var(--text-light)">Empresas Activas</div></div>`;
+renderStatsGridInto('fac-stats-grid');
+}
 
-let groups={};
-if(period==='day'){
-document.getElementById('chart-title').textContent='Mediciones por Dia (ultimos 30 dias)';
-const today=new Date();
-for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const key=d.toISOString().split('T')[0];const short=key.substring(5);groups[short]=list.filter(m=>m.fecha===key).length}
-}else if(period==='month'){
-document.getElementById('chart-title').textContent='Mediciones por Mes';
-const years=[...new Set(mediciones.map(m=>m.fecha.substring(0,4)))].sort();
-const yr=years.length?years[years.length-1]:new Date().getFullYear();
-for(let i=1;i<=12;i++){const key=String(i).padStart(2,'0');groups[key+'/'+yr]=list.filter(m=>m.fecha.startsWith(yr+'-'+key)).length}
-}else{
-document.getElementById('chart-title').textContent='Mediciones por Anio';
-const years=[...new Set(mediciones.map(m=>m.fecha.substring(0,4)))].sort();
-years.forEach(y=>{groups[y]=list.filter(m=>m.fecha.startsWith(y)).length})}
-const maxVal=Math.max(...Object.values(groups),1);
-const keys=Object.keys(groups);
-document.getElementById('chart-container').innerHTML=keys.length?`<div class="chart-bar">${keys.map(k=>{
-const v=groups[k];const h=Math.round((v/maxVal)*180);
-return`<div class="chart-col"><div class="bar-value">${v>0?v.toFixed(1):''}</div><div class="bar" style="height:${Math.max(h,2)}px;background:linear-gradient(180deg,#B3E5FC,#4FC3F7)"></div><div style="font-size:.6rem;text-align:center;max-width:50px;word-break:break-all">${k}</div></div>`}).join('')}</div>`:'<p class="empty-state">Sin datos para graficar</p>';
+function clearEstFacFilters(){
+document.getElementById('est-desde').value='';
+document.getElementById('est-hasta').value='';
+renderEstadisticas();
+}
 
-const catColors={Electricidad:'#4FC3F7',Fontaneria:'#66BB6A',Calefaccion:'#29B6F6',Climatizacion:'#FFA726',PCI:'#EF5350'};
-const catData=['Electricidad','Fontaneria','Calefaccion','Climatizacion','PCI'].map(c=>({name:c,value:allLineas.filter(l=>l.categoria===c).reduce((s,l)=>s+l.cantidad,0),color:catColors[c]}));
-const catTotal=catData.reduce((s,c)=>s+c.value,0)||1;
-document.getElementById('cat-pie').innerHTML=catData.map(c=>{
-const pct=Math.round((c.value/catTotal)*100);
-return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:14px;height:14px;border-radius:3px;background:${c.color}"></div><span style="width:100px;font-size:.85rem">${c.name}</span><div style="flex:1;height:18px;background:#E1F5FE;border-radius:9px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${c.color};border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem">${pct}%</div></div><span style="font-size:.85rem;font-weight:600">${c.value.toFixed(1)}</span></div>`}).join('');
+function facRange(){
+let d=document.getElementById('est-desde')?.value||'';
+let h=document.getElementById('est-hasta')?.value||'';
+if(!d&&!h){d=document.getElementById('rpt-desde')?.value||'';h=document.getElementById('rpt-hasta')?.value||''}
+return {d,h};
+}
 
-const matMap={};
-allLineas.forEach(l=>{if(!matMap[l.material])matMap[l.material]={total:0,cat:l.categoria};matMap[l.material].total+=l.cantidad});
-const topList=Object.entries(matMap).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
-document.getElementById('top-materials').innerHTML=topList.length?topList.map(([n,v],i)=>{const mat=materials.find(x=>x.nombre===n);const imgSrc=mat?getMaterialImg(mat):'';return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="width:20px;font-weight:700;color:var(--primary)">#${i+1}</span>${imgSrc?'<img src="'+imgSrc+'" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex-shrink:0">':''}<span style="flex:1;font-size:.85rem">${n}</span><span style="font-size:.85rem;font-weight:600">${v.total.toFixed(1)}</span></div>`}).join(''):'<p style="color:var(--text-light);text-align:center;padding:20px">Sin datos</p>';
+function exportFacExcel(kindExact){
+const {d,h}=facRange();
+const rows=facturacionGroups(d,h)[kindExact];
+const cap={cliente:'Cliente',empresa:'Empresa',proveedor:'Proveedor',subcontrata:'Subcontrata'}[kindExact]||kindExact;
+const wsData=[['Nombre','Documentos','Total'],...rows.map(r=>[r.nombre,r.cantidad,r.total.toFixed(2)])];
+const ws=XLSX.utils.aoa_to_sheet(wsData);ws['!cols']=[{wch:35},{wch:12},{wch:12}];
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Facturacion '+cap);
+XLSX.writeFile(wb,'facturacion-'+kindExact+'-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de facturacion exportado');
+}
+
+function exportFacPDF(kindExact){
+const {jsPDF}=window.jspdf;const doc=new jsPDF();
+const cap={cliente:'Cliente',empresa:'Empresa',proveedor:'Proveedor',subcontrata:'Subcontrata'}[kindExact]||kindExact;
+const {d,h}=facRange();
+const rows=facturacionGroups(d,h)[kindExact];
+const title='Facturacion por '+cap+(d||h?' ('+(d||'inicio')+' al '+(h||'fin')+')':'');
+doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+doc.setFontSize(12);doc.setTextColor(0);doc.text(title,14,25);
+doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES'),14,31);
+doc.autoTable({head:[['Nombre','Documentos','Total']],body:rows.map(r=>[r.nombre,r.cantidad,r.total.toFixed(2)+' EUR']),startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:9},bodyStyles:{fontSize:8},alternateRowStyles:{fillColor:[225,245,254]}});
+doc.save('facturacion-'+kindExact+'-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de facturacion generado');
+}
+
+function renderFacRpt(){
+const g=facturacionGroups(document.getElementById('rpt-desde').value,document.getElementById('rpt-hasta').value);
+document.getElementById('fac-rpt-grid').innerHTML=
+facTableHTML('Cliente','&#128100;',g.cliente,'cliente')+
+facTableHTML('Empresa','&#127970;',g.empresa,'empresa')+
+facTableHTML('Proveedor','&#128666;',g.proveedor,'proveedor')+
+facTableHTML('Subcontrata','&#128188;',g.subcontrata,'subcontrata');
+}
+
+function horasPorEmpleado(fDesde,fHasta){
+const list=partes.filter(p=>p.estado!=='Anulada'&&(!fDesde||p.fecha>=fDesde)&&(!fHasta||p.fecha<=fHasta));
+const map=new Map();
+list.forEach(p=>{
+const nombre=String(p.empleado||'').trim()||'Sin asignar';
+if(!map.has(nombre))map.set(nombre,{nombre,id:p.empleadoId||'',partes:0,horas:0,total:0});
+const g=map.get(nombre);g.partes++;g.horas+=(Number(p.horas)||0);g.total+=(Number(p.total)||0);
+});
+return [...map.values()].sort((a,b)=>b.horas-a.horas);
+}
+
+function renderHorasRpt(){
+const rows=horasPorEmpleado(document.getElementById('rpt-desde').value,document.getElementById('rpt-hasta').value);
+document.getElementById('rpt-horas-list').innerHTML=rows.length?rows.map(r=>{
+const emp=empleados.find(x=>x.id===r.id);
+const foto=emp&&emp.foto?emp.foto:'';
+return`<tr><td><strong>${foto?'<img src="'+foto+'" style="width:28px;height:28px;object-fit:cover;border-radius:50%;border:2px solid var(--border);vertical-align:middle;margin-right:6px">':''}${r.nombre}</strong></td><td>${r.partes}</td><td><strong>${r.horas}</strong></td><td><strong>${r.total.toFixed(2)} &euro;</strong></td></tr>`;
+}).join(''):'<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light)">Sin datos de partes en el rango seleccionado</td></tr>';
+}
+
+function exportHorasExcel(){
+const rows=horasPorEmpleado(document.getElementById('rpt-desde').value,document.getElementById('rpt-hasta').value);
+const wsData=[['Empleado','Partes','Horas','Total'],...rows.map(r=>[r.nombre,r.partes,r.horas,r.total.toFixed(2)])];
+const ws=XLSX.utils.aoa_to_sheet(wsData);ws['!cols']=[{wch:30},{wch:10},{wch:10},{wch:12}];
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Horas por empleado');
+XLSX.writeFile(wb,'horas-empleados-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de horas exportado');
+}
+
+function exportHorasPDF(){
+const {jsPDF}=window.jspdf;const doc=new jsPDF();
+const d=document.getElementById('rpt-desde').value;
+const h=document.getElementById('rpt-hasta').value;
+const rows=horasPorEmpleado(d,h);
+const title='Trabajos y Horas por Empleado'+(d||h?' ('+(d||'inicio')+' al '+(h||'fin')+')':'');
+doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+doc.setFontSize(12);doc.setTextColor(0);doc.text(title,14,25);
+doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES'),14,31);
+doc.autoTable({head:[['Empleado','Partes','Horas','Total']],body:rows.map(r=>[r.nombre,r.partes,r.horas,r.total.toFixed(2)+' EUR']),startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:9},bodyStyles:{fontSize:8},alternateRowStyles:{fillColor:[225,245,254]}});
+doc.save('horas-empleados-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de horas generado');
 }
 
 
@@ -2686,6 +2870,7 @@ document.getElementById('pres-mat-search').value='';
 tempPresLineas=[];
 populateEmpresaSelect('pres-empresa');
 populateObraSelect('pres-obra');
+populateSubcontrataSelect('pres-subcontrata');
 filterMaterialsForPres();
 renderTempPresLineas();
 calcPresTotals();
@@ -2702,6 +2887,8 @@ populateEmpresaSelect('pres-empresa');
 document.getElementById('pres-empresa').value=p.empresaId||'';
 populateObraSelect('pres-obra');
 document.getElementById('pres-obra').value=p.obraId||'';
+populateSubcontrataSelect('pres-subcontrata');
+document.getElementById('pres-subcontrata').value=p.subcontrataId||'';
 document.getElementById('pres-cliente').value=p.cliente||'';
 document.getElementById('pres-nif').value=p.nif||'';
 document.getElementById('pres-direccion').value=p.direccion||'';
@@ -2731,7 +2918,9 @@ const ivaPct=parseFloat(document.getElementById('pres-iva-pct')?.textContent||'2
 const iva=subtotal*ivaPct/100;
 const total=subtotal+iva;
 const editId=document.getElementById('pres-edit-id').value;
-const data={fecha,fechaValidez:document.getElementById('pres-validez').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('pres-obra').value,obra:ob?ob.nombre:'',cliente:document.getElementById('pres-cliente').value.trim(),nif:document.getElementById('pres-nif').value.trim(),direccion:document.getElementById('pres-direccion').value.trim(),telefono:document.getElementById('pres-telefono').value.trim(),email:document.getElementById('pres-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('pres-estado').value,notas:document.getElementById('pres-notas').value.trim()};
+const subId=document.getElementById('pres-subcontrata').value;
+const sub=subcontratas.find(s=>s.id===subId);
+const data={fecha,fechaValidez:document.getElementById('pres-validez').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('pres-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',cliente:document.getElementById('pres-cliente').value.trim(),nif:document.getElementById('pres-nif').value.trim(),direccion:document.getElementById('pres-direccion').value.trim(),telefono:document.getElementById('pres-telefono').value.trim(),email:document.getElementById('pres-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('pres-estado').value,notas:document.getElementById('pres-notas').value.trim()};
 if(editId){const idx=presupuestos.findIndex(x=>x.id===editId);presupuestos[idx]={...presupuestos[idx],...data}}
 else{const numero=nextPresSerie();presupuestos.push({id:'pr_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempPresLineas=[];
@@ -2785,6 +2974,7 @@ document.getElementById('fac-mat-search').value='';
 tempFacLineas=[];
 populateEmpresaSelect('fac-empresa');
 populateObraSelect('fac-obra');
+populateSubcontrataSelect('fac-subcontrata');
 filterMaterialsForFac();
 renderTempFacLineas();
 calcFacTotals();
@@ -2801,6 +2991,8 @@ populateEmpresaSelect('fac-empresa');
 document.getElementById('fac-empresa').value=f.empresaId||'';
 populateObraSelect('fac-obra');
 document.getElementById('fac-obra').value=f.obraId||'';
+populateSubcontrataSelect('fac-subcontrata');
+document.getElementById('fac-subcontrata').value=f.subcontrataId||'';
 document.getElementById('fac-cliente').value=f.cliente||'';
 document.getElementById('fac-nif').value=f.nif||'';
 document.getElementById('fac-direccion').value=f.direccion||'';
@@ -2830,7 +3022,9 @@ const ivaPct=parseFloat(document.getElementById('fac-iva-pct')?.textContent||'21
 const iva=subtotal*ivaPct/100;
 const total=subtotal+iva;
 const editId=document.getElementById('fac-edit-id').value;
-const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
+const subId=document.getElementById('fac-subcontrata').value;
+const sub=subcontratas.find(s=>s.id===subId);
+const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
 if(editId){const idx=facturas.findIndex(x=>x.id===editId);facturas[idx]={...facturas[idx],...data}}
 else{const numero=nextFacSerie();facturas.push({id:'fc_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempFacLineas=[];
@@ -2860,8 +3054,8 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Enviada:'background:
 document.getElementById('facturas-list').innerHTML=
 (list.length?list.map(f=>{
 const total=(f.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
-}).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+}).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
 }
 
 function nextCompSerie(){compSerieCounter++;localStorage.setItem('comp_serie_counter',compSerieCounter);return compSerieCounter}
@@ -3141,6 +3335,7 @@ document.getElementById('ven-mat-search').value='';
 tempVenLineas=[];
 populateClienteSelect('ven-cliente');
 populateObraSelect('ven-obra');
+populateSubcontrataSelect('ven-subcontrata');
 filterMaterialsForVen();
 renderTempVenLineas();
 calcVenTotals();
@@ -3159,6 +3354,8 @@ populateClienteSelect('ven-cliente');
 document.getElementById('ven-cliente').value=v.clienteId||'';
 populateObraSelect('ven-obra');
 document.getElementById('ven-obra').value=v.obraId||'';
+populateSubcontrataSelect('ven-subcontrata');
+document.getElementById('ven-subcontrata').value=v.subcontrataId||'';
 document.getElementById('ven-notas').value=v.notas||'';
 document.getElementById('ven-estado').value=v.estado||'Confirmada';
 document.getElementById('ven-cat').value='Electricidad';
@@ -3207,7 +3404,9 @@ if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" al reacti
 }
 }
 }
-const data={fecha,destino,clienteId,cliente,obraId,obra,lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,notas:document.getElementById('ven-notas').value.trim()};
+const subId=document.getElementById('ven-subcontrata').value;
+const sub=subcontratas.find(s=>s.id===subId);
+const data={fecha,destino,clienteId,cliente,obraId,obra,subcontrataId:subId,subcontrata:sub?sub.nombre:'',lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,notas:document.getElementById('ven-notas').value.trim()};
 if(editId){const idx=ventas.findIndex(x=>x.id===editId);ventas[idx]={...ventas[idx],...data}}
 else{const numero=nextVenSerie();ventas.push({id:'ve_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempVenLineas=[];
@@ -3629,6 +3828,8 @@ return`<tr><td><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<i
 <td><span class="tag tag-${a.categoria==='Electricidad'?'elec':a.categoria==='PCI'?'pci':a.categoria==='Fontaneria'?'font':'clim'}">${a.categoria}</span></td>
 <td>${a.unidad}</td><td><strong>${a.total}</strong></td><td>${a.mediciones}</td></tr>`
 }).join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-light)">Sin datos</td></tr>';
+renderFacRpt();
+renderHorasRpt();
 }
 
 function clearMedFilters(){
