@@ -12,7 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 DB_PATH = os.environ.get('MEDICION_DB', '/var/lib/gestion-empresa/medicion.db')
 HOST = os.environ.get('MEDICION_HOST', '127.0.0.1')
 PORT = int(os.environ.get('MEDICION_PORT', '8000'))
-COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas']
+COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas', 'clientes', 'proveedores', 'compras', 'ventas', 'almacen']
 
 SCHEMA = (
     'CREATE TABLE IF NOT EXISTS appdata ('
