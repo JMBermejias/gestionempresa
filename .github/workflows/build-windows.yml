@@ -178,7 +178,7 @@ jobs:
       - id: version
         shell: bash
         run: |
-          v=$(grep -oP "APP_VERSION='\K[0-9]+\.[0-9]+\.[0-9]+" gestion-empresa.html || echo "1")
+          v=$(grep -oP "APP_VERSION='v?\K[0-9]+\.[0-9]+\.[0-9]+" gestion-empresa.html || echo "1.1.0")
           echo "tag=v$v" >> "$GITHUB_OUTPUT"
 
       - name: Descargar artefactos
