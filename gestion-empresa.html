@@ -226,6 +226,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" onclick="showPage('subcontratas')"><span class="icon">&#128188;</span>Subcontratas</button>
 <button class="nav-btn" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
 <button class="nav-btn" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
+<button class="nav-btn" onclick="showPage('presupuestos')"><span class="icon">&#128203;</span>Presupuestos</button>
+<button class="nav-btn" onclick="showPage('facturas')"><span class="icon">&#128176;</span>Facturas</button>
 <button class="nav-btn" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
 <button class="nav-btn" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
 <button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
@@ -391,6 +393,62 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="table-wrap">
 <table><thead><tr><th>N&ordm;/Fecha</th><th>Empresa</th><th>Obra</th><th>Zona</th><th>Materiales</th><th>Categorias</th><th>Acciones</th></tr></thead>
 <tbody id="mediciones-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- PRESUPUESTOS -->
+<div id="page-presupuestos" class="page">
+<div class="page-header">
+<h1>&#128203; Presupuestos</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+<button class="btn btn-success" onclick="exportPresupuestosExcel()">&#128202; Exportar Excel</button>
+<button class="btn btn-primary" onclick="openPresupuestoModal()">+ Nuevo Presupuesto</button>
+</div>
+</div>
+<div class="filters" style="margin-bottom:15px">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Desde:</label>
+<input type="date" id="filter-pres-desde" onchange="renderPresupuestos()">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Hasta:</label>
+<input type="date" id="filter-pres-hasta" onchange="renderPresupuestos()">
+<select id="filter-pres-empresa" onchange="renderPresupuestos()"><option value="">Todas las empresas</option></select>
+<select id="filter-pres-obra" onchange="renderPresupuestos()"><option value="">Todas las obras</option></select>
+<select id="filter-pres-estado" onchange="renderPresupuestos()"><option value="">Todos los estados</option><option value="Borrador">Borrador</option><option value="Aprobado">Aprobado</option><option value="Rechazado">Rechazado</option><option value="Anulado">Anulado</option></select>
+<button class="btn btn-outline" onclick="clearPresFilters()" style="padding:6px 12px;font-size:.8rem">Limpiar</button>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente</th><th>Empresa</th><th>Obra</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
+<tbody id="presupuestos-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- FACTURAS -->
+<div id="page-facturas" class="page">
+<div class="page-header">
+<h1>&#128176; Facturacion</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+<button class="btn btn-success" onclick="exportFacturasExcel()">&#128202; Exportar Excel</button>
+<button class="btn btn-primary" onclick="openFacturaModal()">+ Nueva Factura</button>
+</div>
+</div>
+<div class="filters" style="margin-bottom:15px">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Desde:</label>
+<input type="date" id="filter-fac-desde" onchange="renderFacturas()">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Hasta:</label>
+<input type="date" id="filter-fac-hasta" onchange="renderFacturas()">
+<select id="filter-fac-empresa" onchange="renderFacturas()"><option value="">Todas las empresas</option></select>
+<select id="filter-fac-obra" onchange="renderFacturas()"><option value="">Todas las obras</option></select>
+<select id="filter-fac-estado" onchange="renderFacturas()"><option value="">Todos los estados</option><option value="Borrador">Borrador</option><option value="Enviada">Enviada</option><option value="Pagada">Pagada</option><option value="Anulada">Anulada</option></select>
+<button class="btn btn-outline" onclick="clearFacFilters()" style="padding:6px 12px;font-size:.8rem">Limpiar</button>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente</th><th>Empresa</th><th>Obra</th><th>Vencimiento</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
+<tbody id="facturas-list"></tbody></table>
 </div>
 </div>
 </div>
@@ -609,6 +667,110 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 </div>
 
+<!-- MODAL PRESUPUESTO -->
+<div class="modal-overlay" id="modal-presupuesto">
+<div class="modal" style="max-width:700px">
+<h3 id="pres-modal-title">Nuevo Presupuesto</h3>
+<input type="hidden" id="pres-edit-id">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Fecha *</label><input type="date" id="pres-fecha"></div>
+<div class="form-group"><label>Validez</label><input type="date" id="pres-validez"></div>
+</div>
+<div class="form-group"><label>Empresa Instaladora *</label><select id="pres-empresa"></select></div>
+<div class="form-group"><label>Obra</label><select id="pres-obra"></select></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Cliente</label><input type="text" id="pres-cliente" placeholder="Nombre del cliente"></div>
+<div class="form-group"><label>NIF/CIF</label><input type="text" id="pres-nif" placeholder="NIF o CIF"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Direccion</label><input type="text" id="pres-direccion"></div>
+<div class="form-group"><label>Telefono</label><input type="text" id="pres-telefono"></div>
+</div>
+<div class="form-group"><label>Email</label><input type="email" id="pres-email"></div>
+<div style="background:#E1F5FE;border-radius:8px;padding:12px;margin-bottom:10px">
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+<div style="flex:1;min-width:200px" class="search-picker">
+<input type="text" id="pres-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<div class="search-picker-results" id="pres-mat-results"></div>
+</div>
+<select id="pres-cat" onchange="filterMaterialsForPres()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<select id="pres-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<input type="number" id="pres-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<input type="number" id="pres-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<button class="btn btn-success" onclick="addPresLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+</div>
+</div>
+<div id="pres-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
+<div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
+<div>Subtotal: <strong id="pres-subtotal">0.00 &euro;</strong></div>
+<div>IVA (<span id="pres-iva-pct">21</span>%): <strong id="pres-iva">0.00 &euro;</strong></div>
+<div style="font-size:1.1rem">Total: <strong id="pres-total" style="color:var(--primary-dark)">0.00 &euro;</strong></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+<div class="form-group"><label>Estado</label><select id="pres-estado"><option value="Borrador">Borrador</option><option value="Aprobado">Aprobado</option><option value="Rechazado">Rechazado</option><option value="Anulado">Anulado</option></select></div>
+<div class="form-group"><label>Observaciones</label><input type="text" id="pres-notas" placeholder="Opcional"></div>
+</div>
+<div class="modal-actions" style="margin-top:15px">
+<button class="btn btn-outline" onclick="closeModal('modal-presupuesto')">Cancelar</button>
+<button class="btn btn-primary" onclick="savePresupuesto()">Guardar Presupuesto</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL FACTURA -->
+<div class="modal-overlay" id="modal-factura">
+<div class="modal" style="max-width:700px">
+<h3 id="fac-modal-title">Nueva Factura</h3>
+<input type="hidden" id="fac-edit-id">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Fecha *</label><input type="date" id="fac-fecha"></div>
+<div class="form-group"><label>Vencimiento</label><input type="date" id="fac-vencimiento"></div>
+</div>
+<div class="form-group"><label>Empresa Instaladora *</label><select id="fac-empresa"></select></div>
+<div class="form-group"><label>Obra</label><select id="fac-obra"></select></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Cliente</label><input type="text" id="fac-cliente" placeholder="Nombre del cliente"></div>
+<div class="form-group"><label>NIF/CIF</label><input type="text" id="fac-nif" placeholder="NIF o CIF"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Direccion</label><input type="text" id="fac-direccion"></div>
+<div class="form-group"><label>Telefono</label><input type="text" id="fac-telefono"></div>
+</div>
+<div class="form-group"><label>Email</label><input type="email" id="fac-email"></div>
+<div style="background:#E1F5FE;border-radius:8px;padding:12px;margin-bottom:10px">
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+<div style="flex:1;min-width:200px" class="search-picker">
+<input type="text" id="fac-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<div class="search-picker-results" id="fac-mat-results"></div>
+</div>
+<select id="fac-cat" onchange="filterMaterialsForFac()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<select id="fac-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<input type="number" id="fac-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<input type="number" id="fac-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<button class="btn btn-success" onclick="addFacLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+</div>
+</div>
+<div id="fac-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
+<div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
+<div>Subtotal: <strong id="fac-subtotal">0.00 &euro;</strong></div>
+<div>IVA (<span id="fac-iva-pct">21</span>%): <strong id="fac-iva">0.00 &euro;</strong></div>
+<div style="font-size:1.1rem">Total: <strong id="fac-total" style="color:var(--primary-dark)">0.00 &euro;</strong></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+<div class="form-group"><label>Estado</label><select id="fac-estado"><option value="Borrador">Borrador</option><option value="Enviada">Enviada</option><option value="Pagada">Pagada</option><option value="Anulada">Anulada</option></select></div>
+<div class="form-group"><label>Observaciones</label><input type="text" id="fac-notas" placeholder="Opcional"></div>
+</div>
+<div class="modal-actions" style="margin-top:15px">
+<button class="btn btn-outline" onclick="closeModal('modal-factura')">Cancelar</button>
+<button class="btn btn-primary" onclick="saveFactura()">Guardar Factura</button>
+</div>
+</div>
+</div>
+
 
 <div class="toast" id="toast"></div>
 
@@ -620,8 +782,14 @@ let empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
 let obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
 let zonas = JSON.parse(localStorage.getItem('zonas_data') || '[]');
 let subcontratas = JSON.parse(localStorage.getItem('sub_data') || '[]');
+let presupuestos = JSON.parse(localStorage.getItem('pres_data') || '[]');
+let facturas = JSON.parse(localStorage.getItem('fac_data') || '[]');
 let tempMedicionLineas = [];
+let tempPresLineas = [];
+let tempFacLineas = [];
 let medSerieCounter = parseInt(localStorage.getItem('med_serie_counter') || '0');
+let presSerieCounter = parseInt(localStorage.getItem('pres_serie_counter') || '0');
+let facSerieCounter = parseInt(localStorage.getItem('fac_serie_counter') || '0');
 let _syncing=false;let _ready=false;
 let _fbConnected=false;
 let _db=null;let _dbRef=null;
@@ -630,7 +798,7 @@ let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8080';
 let _authRetries=0;let _authConfigured=false;
 const FB_CONFIG={apiKey:"AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k",authDomain:"gestionempresa-2026.firebaseapp.com",databaseURL:"https://gestionempresa-2026-default-rtdb.firebaseio.com",projectId:"gestionempresa-2026",storageBucket:"gestionempresa-2026.firebasestorage.app",messagingSenderId:"828319600246",appId:"1:828319600246:web:ce7061e9108ffef2c1d957"};
-const APP_VERSION='v1.0.0';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
+const APP_VERSION='v1.1.0';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
 function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
@@ -655,12 +823,16 @@ function saveLocal(){
   localStorage.setItem('obras_data',JSON.stringify(obras));
   localStorage.setItem('zonas_data',JSON.stringify(zonas));
   localStorage.setItem('sub_data',JSON.stringify(subcontratas));
+  localStorage.setItem('pres_data',JSON.stringify(presupuestos));
+  localStorage.setItem('fac_data',JSON.stringify(facturas));
   localStorage.setItem('med_serie_counter',medSerieCounter);
+  localStorage.setItem('pres_serie_counter',presSerieCounter);
+  localStorage.setItem('fac_serie_counter',facSerieCounter);
 }
 
 function save(){
   saveLocal();
-  const payload={materials,mediciones,empresas,obras,zonas,subcontratas};
+  const payload={materials,mediciones,empresas,obras,zonas,subcontratas,presupuestos,facturas};
   if(_dbRef){
     _dbRef.set(payload).catch(e=>console.warn('Firebase save error',e));
   }
@@ -688,11 +860,14 @@ function initSync(){
         if(r.obras)obras=r.obras;
         if(r.zonas)zonas=r.zonas;
         if(r.subcontratas)subcontratas=r.subcontratas;
+        if(r.presupuestos)presupuestos=r.presupuestos;
+        if(r.facturas)facturas=r.facturas;
         saveLocal();
         if(!_ready){toast('Datos sincronizados desde la nube');_ready=true;}
         renderAll();
       }
     });
+  }catch(e){
   }catch(e){
     console.warn('Firebase init error',e);
     _fbConnected=false;
@@ -707,6 +882,8 @@ function initSync(){
       if(data.obras)           obras        = data.obras;
       if(data.zonas)           zonas        = data.zonas;
       if(data.subcontratas)    subcontratas = data.subcontratas;
+      if(data.presupuestos)    presupuestos = data.presupuestos;
+      if(data.facturas)        facturas     = data.facturas;
       saveLocal();renderAll();_ready=true;
     }).catch(()=>{});
   }
@@ -970,10 +1147,12 @@ function renderAll(){
     if(id==='subcontratas')renderSubcontratas();
     if(id==='materiales')renderMaterials();
     if(id==='mediciones')renderMediciones();
+    if(id==='presupuestos')renderPresupuestos();
+    if(id==='facturas')renderFacturas();
     if(id==='zonas')renderZonas();
     if(id==='reportes')renderReportPreview();
     if(id==='estadisticas')renderEstadisticas();}
-  populateEmpresaReportSelect();populateEmpresaFilterSelect();populateObraSelects();populateZonaReportSelect();populateZonaFilterSelect();populateSubcontrataReportSelect();
+  populateEmpresaReportSelect();populateEmpresaFilterSelect();populateObraSelects();populateZonaReportSelect();populateZonaFilterSelect();populateSubcontrataReportSelect();populatePresFilterSelects();populateFacFilterSelects();
 }
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
@@ -982,7 +1161,7 @@ function showPage(id){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById('page-'+id).classList.add('active');
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-const pages=['dashboard','obras','zonas','empresas','subcontratas','materiales','mediciones','estadisticas','reportes'];
+const pages=['dashboard','obras','zonas','empresas','subcontratas','materiales','mediciones','presupuestos','facturas','estadisticas','reportes'];
 const idx=pages.indexOf(id);
 if(idx>=0)document.querySelectorAll('.nav-btn')[idx].classList.add('active');
 document.querySelector('.sidebar').classList.remove('open');
@@ -993,6 +1172,8 @@ if(id==='empresas')renderEmpresas();
 if(id==='subcontratas')renderSubcontratas();
 if(id==='materiales')renderMaterials();
 if(id==='mediciones')renderMediciones();
+if(id==='presupuestos')renderPresupuestos();
+if(id==='facturas')renderFacturas();
 if(id==='reportes')renderReportPreview();
 if(id==='estadisticas')renderEstadisticas();
 }
@@ -1559,7 +1740,9 @@ document.getElementById('stats-cards').innerHTML=`
 <div class="stat-card" style="background:linear-gradient(135deg,#78909C,#90A4AE)"><div class="stat-icon">&#127970;</div><div class="stat-value">${empresas.length}</div><div class="stat-label">Empresas Instaladoras</div></div>
 <div class="stat-card" style="background:linear-gradient(135deg,#AB47BC,#CE93D8)"><div class="stat-icon">&#127959;</div><div class="stat-value">${obras.length}</div><div class="stat-label">Obras</div></div>
 <div class="stat-card" style="background:linear-gradient(135deg,#FF7043,#FFAB91)"><div class="stat-icon">&#128205;</div><div class="stat-value">${zonas.length}</div><div class="stat-label">Zonas</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#8E24AA,#AB47BC)"><div class="stat-icon">&#128221;</div><div class="stat-value">${mediciones.length}</div><div class="stat-label">Total Mediciones</div></div>`;
+<div class="stat-card" style="background:linear-gradient(135deg,#8E24AA,#AB47BC)"><div class="stat-icon">&#128221;</div><div class="stat-value">${mediciones.length}</div><div class="stat-label">Total Mediciones</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#0288D1,#4FC3F7);cursor:pointer" onclick="showPage('presupuestos')"><div class="stat-icon">&#128203;</div><div class="stat-value">${presupuestos.length}</div><div class="stat-label">Presupuestos</div></div>
+<div class="stat-card" style="background:linear-gradient(135deg,#F57C00,#FFB74D);cursor:pointer" onclick="showPage('facturas')"><div class="stat-icon">&#128176;</div><div class="stat-value">${facturas.length}</div><div class="stat-label">Facturas</div></div>`;
 const recent=[...mediciones].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
 document.getElementById('recent-list').innerHTML=recent.map(m=>{
 const lines=m.lineas||(m.materialId?[{material:m.material,cantidad:m.cantidad,unidad:m.unidad}]:[]);
@@ -1621,6 +1804,413 @@ const topList=Object.entries(matMap).sort((a,b)=>b[1].total-a[1].total).slice(0,
 document.getElementById('top-materials').innerHTML=topList.length?topList.map(([n,v],i)=>{const mat=materials.find(x=>x.nombre===n);const imgSrc=mat?getMaterialImg(mat):'';return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="width:20px;font-weight:700;color:var(--primary)">#${i+1}</span>${imgSrc?'<img src="'+imgSrc+'" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex-shrink:0">':''}<span style="flex:1;font-size:.85rem">${n}</span><span style="font-size:.85rem;font-weight:600">${v.total.toFixed(1)}</span></div>`}).join(''):'<p style="color:var(--text-light);text-align:center;padding:20px">Sin datos</p>';
 }
 
+
+function nextPresSerie(){presSerieCounter++;localStorage.setItem('pres_serie_counter',presSerieCounter);return presSerieCounter}
+function nextFacSerie(){facSerieCounter++;localStorage.setItem('fac_serie_counter',facSerieCounter);return facSerieCounter}
+function getPresSerieStr(n){return 'PR-'+String(n).padStart(5,'0')}
+function getFacSerieStr(n){return 'FAC-'+String(n).padStart(5,'0')}
+
+function calcPresTotals(){
+const sub=tempPresLineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
+const ivaPct=parseFloat(document.getElementById('pres-iva-pct')?.textContent||'21');
+const iva=sub*ivaPct/100;
+document.getElementById('pres-subtotal').textContent=sub.toFixed(2)+' \u20ac';
+document.getElementById('pres-iva').textContent=iva.toFixed(2)+' \u20ac';
+document.getElementById('pres-total').textContent=(sub+iva).toFixed(2)+' \u20ac';
+}
+
+function calcFacTotals(){
+const sub=tempFacLineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
+const ivaPct=parseFloat(document.getElementById('fac-iva-pct')?.textContent||'21');
+const iva=sub*ivaPct/100;
+document.getElementById('fac-subtotal').textContent=sub.toFixed(2)+' \u20ac';
+document.getElementById('fac-iva').textContent=iva.toFixed(2)+' \u20ac';
+document.getElementById('fac-total').textContent=(sub+iva).toFixed(2)+' \u20ac';
+}
+
+function filterMaterialsForPres(){
+const cat=document.getElementById('pres-cat').value;
+const filtered=materials.filter(m=>m.categoria===cat);
+const sel=document.getElementById('pres-material');
+sel.innerHTML=filtered.map(m=>`<option value="${m.id}">${m.nombre} (${m.unidad})</option>`).join('');
+if(!filtered.length)sel.innerHTML='<option value="">No hay materiales en esta categoria</option>';
+}
+
+function filterMaterialsForFac(){
+const cat=document.getElementById('fac-cat').value;
+const filtered=materials.filter(m=>m.categoria===cat);
+const sel=document.getElementById('fac-material');
+sel.innerHTML=filtered.map(m=>`<option value="${m.id}">${m.nombre} (${m.unidad})</option>`).join('');
+if(!filtered.length)sel.innerHTML='<option value="">No hay materiales en esta categoria</option>';
+}
+
+function searchMaterialForPres(){
+const q=(document.getElementById('pres-mat-search').value||'').toLowerCase();
+const results=document.getElementById('pres-mat-results');
+if(!q){results.classList.remove('show');return}
+const filtered=materials.filter(m=>m.nombre.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q));
+results.innerHTML=filtered.length?filtered.map(m=>`<div class="search-picker-item" onclick="selectMaterialSearchPres(${JSON.stringify(m.id).replace(/"/g,'&quot;')})"><div class="spi-left"><img class="spi-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="spi-info"><div class="spi-name">${m.nombre.substring(0,50)}</div><div class="spi-meta">${m.categoria} &middot; ${m.unidad}</div></div></div></div>`).join(''):'<div class="search-picker-item"><em style="color:var(--text-light)">Sin resultados</em></div>';
+results.classList.add('show');
+}
+
+function selectMaterialSearchPres(matId){
+const m=materials.find(x=>x.id===matId);
+if(!m)return;
+document.getElementById('pres-mat-search').value='';
+document.getElementById('pres-mat-results').classList.remove('show');
+document.getElementById('pres-cat').value=m.categoria;
+filterMaterialsForPres();
+document.getElementById('pres-material').value=m.id;
+document.getElementById('pres-cantidad').focus();
+}
+
+function searchMaterialForFac(){
+const q=(document.getElementById('fac-mat-search').value||'').toLowerCase();
+const results=document.getElementById('fac-mat-results');
+if(!q){results.classList.remove('show');return}
+const filtered=materials.filter(m=>m.nombre.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q));
+results.innerHTML=filtered.length?filtered.map(m=>`<div class="search-picker-item" onclick="selectMaterialSearchFac(${JSON.stringify(m.id).replace(/"/g,'&quot;')})"><div class="spi-left"><img class="spi-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="spi-info"><div class="spi-name">${m.nombre.substring(0,50)}</div><div class="spi-meta">${m.categoria} &middot; ${m.unidad}</div></div></div></div>`).join(''):'<div class="search-picker-item"><em style="color:var(--text-light)">Sin resultados</em></div>';
+results.classList.add('show');
+}
+
+function selectMaterialSearchFac(matId){
+const m=materials.find(x=>x.id===matId);
+if(!m)return;
+document.getElementById('fac-mat-search').value='';
+document.getElementById('fac-mat-results').classList.remove('show');
+document.getElementById('fac-cat').value=m.categoria;
+filterMaterialsForFac();
+document.getElementById('fac-material').value=m.id;
+document.getElementById('fac-cantidad').focus();
+}
+
+function addPresLine(){
+const materialId=document.getElementById('pres-material').value;
+const cantidad=parseFloat(document.getElementById('pres-cantidad').value);
+const precioUnitario=parseFloat(document.getElementById('pres-precio').value);
+if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
+if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
+const mat=materials.find(m=>m.id===materialId);
+tempPresLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
+document.getElementById('pres-cantidad').value='';
+document.getElementById('pres-precio').value='';
+document.getElementById('pres-mat-search').value='';
+renderTempPresLineas();
+calcPresTotals();
+}
+
+function removeTempPresLine(idx){
+tempPresLineas.splice(idx,1);
+renderTempPresLineas();
+calcPresTotals();
+}
+
+function renderTempPresLineas(){
+const container=document.getElementById('pres-lineas');
+container.innerHTML=tempPresLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPresLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempPresLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+}
+
+function addFacLine(){
+const materialId=document.getElementById('fac-material').value;
+const cantidad=parseFloat(document.getElementById('fac-cantidad').value);
+const precioUnitario=parseFloat(document.getElementById('fac-precio').value);
+if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
+if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
+const mat=materials.find(m=>m.id===materialId);
+tempFacLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
+document.getElementById('fac-cantidad').value='';
+document.getElementById('fac-precio').value='';
+document.getElementById('fac-mat-search').value='';
+renderTempFacLineas();
+calcFacTotals();
+}
+
+function removeTempFacLine(idx){
+tempFacLineas.splice(idx,1);
+renderTempFacLineas();
+calcFacTotals();
+}
+
+function renderTempFacLineas(){
+const container=document.getElementById('fac-lineas');
+container.innerHTML=tempFacLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempFacLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempFacLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+}
+
+function openPresupuestoModal(){
+document.getElementById('pres-edit-id').value='';
+document.getElementById('pres-modal-title').textContent='Nuevo Presupuesto';
+document.getElementById('pres-fecha').value=new Date().toISOString().split('T')[0];
+const val=new Date();val.setDate(val.getDate()+30);
+document.getElementById('pres-validez').value=val.toISOString().split('T')[0];
+document.getElementById('pres-cat').value='Electricidad';
+document.getElementById('pres-cantidad').value='';
+document.getElementById('pres-precio').value='';
+document.getElementById('pres-cliente').value='';
+document.getElementById('pres-nif').value='';
+document.getElementById('pres-direccion').value='';
+document.getElementById('pres-telefono').value='';
+document.getElementById('pres-email').value='';
+document.getElementById('pres-notas').value='';
+document.getElementById('pres-estado').value='Borrador';
+document.getElementById('pres-mat-search').value='';
+tempPresLineas=[];
+populateEmpresaSelect('pres-empresa');
+populateObraSelect('pres-obra');
+filterMaterialsForPres();
+renderTempPresLineas();
+calcPresTotals();
+openModal('modal-presupuesto');
+}
+
+function editPresupuesto(id){
+const p=presupuestos.find(x=>x.id===id);
+document.getElementById('pres-edit-id').value=id;
+document.getElementById('pres-modal-title').textContent='Editar Presupuesto '+getPresSerieStr(p.numero||0);
+document.getElementById('pres-fecha').value=p.fecha;
+document.getElementById('pres-validez').value=p.fechaValidez||'';
+populateEmpresaSelect('pres-empresa');
+document.getElementById('pres-empresa').value=p.empresaId||'';
+populateObraSelect('pres-obra');
+document.getElementById('pres-obra').value=p.obraId||'';
+document.getElementById('pres-cliente').value=p.cliente||'';
+document.getElementById('pres-nif').value=p.nif||'';
+document.getElementById('pres-direccion').value=p.direccion||'';
+document.getElementById('pres-telefono').value=p.telefono||'';
+document.getElementById('pres-email').value=p.email||'';
+document.getElementById('pres-notas').value=p.notas||'';
+document.getElementById('pres-estado').value=p.estado||'Borrador';
+document.getElementById('pres-cat').value='Electricidad';
+filterMaterialsForPres();
+tempPresLineas=(p.lineas||[]).map(l=>({...l}));
+document.getElementById('pres-iva-pct').textContent=p.ivaPorcentaje||21;
+renderTempPresLineas();
+calcPresTotals();
+openModal('modal-presupuesto');
+}
+
+function savePresupuesto(){
+const fecha=document.getElementById('pres-fecha').value;
+const empresaId=document.getElementById('pres-empresa').value;
+if(!fecha){alert('Selecciona una fecha');return}
+if(!tempPresLineas.length){alert('Agrega al menos un material');return}
+const ob=obras.find(o=>o.id===document.getElementById('pres-obra').value);
+const emp=empresas.find(e=>e.id===empresaId);
+const lineas=tempPresLineas.map(l=>({materialId:l.materialId,material:l.material,categoria:l.categoria,unidad:l.unidad,cantidad:l.cantidad,precioUnitario:l.precioUnitario}));
+const subtotal=lineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
+const ivaPct=parseFloat(document.getElementById('pres-iva-pct')?.textContent||'21');
+const iva=subtotal*ivaPct/100;
+const total=subtotal+iva;
+const editId=document.getElementById('pres-edit-id').value;
+const data={fecha,fechaValidez:document.getElementById('pres-validez').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('pres-obra').value,obra:ob?ob.nombre:'',cliente:document.getElementById('pres-cliente').value.trim(),nif:document.getElementById('pres-nif').value.trim(),direccion:document.getElementById('pres-direccion').value.trim(),telefono:document.getElementById('pres-telefono').value.trim(),email:document.getElementById('pres-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('pres-estado').value,notas:document.getElementById('pres-notas').value.trim()};
+if(editId){const idx=presupuestos.findIndex(x=>x.id===editId);presupuestos[idx]={...presupuestos[idx],...data}}
+else{const numero=nextPresSerie();presupuestos.push({id:'pr_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
+tempPresLineas=[];
+save();closeModal('modal-presupuesto');renderPresupuestos();toast('Presupuesto guardado');
+}
+
+function deletePresupuesto(id){
+if(!confirm('Eliminar este presupuesto?'))return;
+presupuestos=presupuestos.filter(x=>x.id!==id);
+save();renderPresupuestos();toast('Presupuesto eliminado');
+}
+
+function renderPresupuestos(){
+const fDesde=document.getElementById('filter-pres-desde').value;
+const fHasta=document.getElementById('filter-pres-hasta').value;
+const fe=document.getElementById('filter-pres-empresa').value;
+const fo=document.getElementById('filter-pres-obra').value;
+const fe2=document.getElementById('filter-pres-estado').value;
+let list=[...presupuestos];
+if(fDesde)list=list.filter(p=>p.fecha>=fDesde);
+if(fHasta)list=list.filter(p=>p.fecha<=fHasta);
+if(fe)list=list.filter(p=>p.empresaId===fe);
+if(fo)list=list.filter(p=>p.obraId===fo);
+if(fe2)list=list.filter(p=>p.estado===fe2);
+list.sort((a,b)=>b.fecha.localeCompare(a.fecha));
+const estadoColor={Borrador:'background:#78909C;color:#fff',Aprobado:'background:#66BB6A;color:#fff',Rechazado:'background:#EF5350;color:#fff',Anulado:'background:#FFA726;color:#fff'};
+document.getElementById('presupuestos-list').innerHTML=
+(list.length?list.map(p=>{
+const total=(p.total||0).toFixed(2);
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPresSerieStr(p.numero||0)}</span><br><small style="color:var(--text-light)">${p.fecha}</small></td><td>${p.cliente||'-'}</td><td>${p.empresa||'-'}</td><td>${p.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[p.estado]||''}">${p.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editPresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deletePresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+}).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay presupuestos registrados</td></tr>');
+}
+
+function openFacturaModal(){
+document.getElementById('fac-edit-id').value='';
+document.getElementById('fac-modal-title').textContent='Nueva Factura';
+document.getElementById('fac-fecha').value=new Date().toISOString().split('T')[0];
+const ven=new Date();ven.setDate(ven.getDate()+30);
+document.getElementById('fac-vencimiento').value=ven.toISOString().split('T')[0];
+document.getElementById('fac-cat').value='Electricidad';
+document.getElementById('fac-cantidad').value='';
+document.getElementById('fac-precio').value='';
+document.getElementById('fac-cliente').value='';
+document.getElementById('fac-nif').value='';
+document.getElementById('fac-direccion').value='';
+document.getElementById('fac-telefono').value='';
+document.getElementById('fac-email').value='';
+document.getElementById('fac-notas').value='';
+document.getElementById('fac-estado').value='Borrador';
+document.getElementById('fac-mat-search').value='';
+tempFacLineas=[];
+populateEmpresaSelect('fac-empresa');
+populateObraSelect('fac-obra');
+filterMaterialsForFac();
+renderTempFacLineas();
+calcFacTotals();
+openModal('modal-factura');
+}
+
+function editFactura(id){
+const f=facturas.find(x=>x.id===id);
+document.getElementById('fac-edit-id').value=id;
+document.getElementById('fac-modal-title').textContent='Editar Factura '+getFacSerieStr(f.numero||0);
+document.getElementById('fac-fecha').value=f.fecha;
+document.getElementById('fac-vencimiento').value=f.fechaVencimiento||'';
+populateEmpresaSelect('fac-empresa');
+document.getElementById('fac-empresa').value=f.empresaId||'';
+populateObraSelect('fac-obra');
+document.getElementById('fac-obra').value=f.obraId||'';
+document.getElementById('fac-cliente').value=f.cliente||'';
+document.getElementById('fac-nif').value=f.nif||'';
+document.getElementById('fac-direccion').value=f.direccion||'';
+document.getElementById('fac-telefono').value=f.telefono||'';
+document.getElementById('fac-email').value=f.email||'';
+document.getElementById('fac-notas').value=f.notas||'';
+document.getElementById('fac-estado').value=f.estado||'Borrador';
+document.getElementById('fac-cat').value='Electricidad';
+filterMaterialsForFac();
+tempFacLineas=(f.lineas||[]).map(l=>({...l}));
+document.getElementById('fac-iva-pct').textContent=f.ivaPorcentaje||21;
+renderTempFacLineas();
+calcFacTotals();
+openModal('modal-factura');
+}
+
+function saveFactura(){
+const fecha=document.getElementById('fac-fecha').value;
+const empresaId=document.getElementById('fac-empresa').value;
+if(!fecha){alert('Selecciona una fecha');return}
+if(!tempFacLineas.length){alert('Agrega al menos un material');return}
+const ob=obras.find(o=>o.id===document.getElementById('fac-obra').value);
+const emp=empresas.find(e=>e.id===empresaId);
+const lineas=tempFacLineas.map(l=>({materialId:l.materialId,material:l.material,categoria:l.categoria,unidad:l.unidad,cantidad:l.cantidad,precioUnitario:l.precioUnitario}));
+const subtotal=lineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
+const ivaPct=parseFloat(document.getElementById('fac-iva-pct')?.textContent||'21');
+const iva=subtotal*ivaPct/100;
+const total=subtotal+iva;
+const editId=document.getElementById('fac-edit-id').value;
+const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
+if(editId){const idx=facturas.findIndex(x=>x.id===editId);facturas[idx]={...facturas[idx],...data}}
+else{const numero=nextFacSerie();facturas.push({id:'fc_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
+tempFacLineas=[];
+save();closeModal('modal-factura');renderFacturas();toast('Factura guardada');
+}
+
+function deleteFactura(id){
+if(!confirm('Eliminar esta factura?'))return;
+facturas=facturas.filter(x=>x.id!==id);
+save();renderFacturas();toast('Factura eliminada');
+}
+
+function renderFacturas(){
+const fDesde=document.getElementById('filter-fac-desde').value;
+const fHasta=document.getElementById('filter-fac-hasta').value;
+const fe=document.getElementById('filter-fac-empresa').value;
+const fo=document.getElementById('filter-fac-obra').value;
+const fe2=document.getElementById('filter-fac-estado').value;
+let list=[...facturas];
+if(fDesde)list=list.filter(f=>f.fecha>=fDesde);
+if(fHasta)list=list.filter(f=>f.fecha<=fHasta);
+if(fe)list=list.filter(f=>f.empresaId===fe);
+if(fo)list=list.filter(f=>f.obraId===fo);
+if(fe2)list=list.filter(f=>f.estado===fe2);
+list.sort((a,b)=>b.fecha.localeCompare(a.fecha));
+const estadoColor={Borrador:'background:#78909C;color:#fff',Enviada:'background:#29B6F6;color:#fff',Pagada:'background:#66BB6A;color:#fff',Anulada:'background:#EF5350;color:#fff'};
+document.getElementById('facturas-list').innerHTML=
+(list.length?list.map(f=>{
+const total=(f.total||0).toFixed(2);
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+}).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
+}
+
+function clearPresFilters(){
+document.getElementById('filter-pres-desde').value='';document.getElementById('filter-pres-hasta').value='';document.getElementById('filter-pres-empresa').value='';document.getElementById('filter-pres-obra').value='';document.getElementById('filter-pres-estado').value='';
+renderPresupuestos();
+}
+
+function clearFacFilters(){
+document.getElementById('filter-fac-desde').value='';document.getElementById('filter-fac-hasta').value='';document.getElementById('filter-fac-empresa').value='';document.getElementById('filter-fac-obra').value='';document.getElementById('filter-fac-estado').value='';
+renderFacturas();
+}
+
+function exportPresupuestosExcel(){
+const headers=['Serie','Fecha','Cliente','NIF','Empresa','Obra','Estado','Subtotal','IVA','Total','Observaciones'];
+const data=[...presupuestos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(p=>({Serie:getPresSerieStr(p.numero||0),Fecha:p.fecha,Cliente:p.cliente||'-',NIF:p.nif||'-',Empresa:p.empresa||'-',Obra:p.obra||'-',Estado:p.estado||'Borrador',Subtotal:(p.subtotal||0).toFixed(2),IVA:(p.iva||0).toFixed(2),Total:(p.total||0).toFixed(2),Observaciones:p.notas||''}));
+const wsData=[headers,...data.map(d=>Object.values(d))];
+const ws=XLSX.utils.aoa_to_sheet(wsData);ws['!cols']=[{wch:12},{wch:12},{wch:25},{wch:12},{wch:25},{wch:25},{wch:12},{wch:12},{wch:10},{wch:12},{wch:20}];
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Presupuestos');
+XLSX.writeFile(wb,'presupuestos-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de presupuestos exportado');
+}
+
+function exportFacturasExcel(){
+const headers=['Serie','Fecha','Vencimiento','Cliente','NIF','Empresa','Obra','Estado','Subtotal','IVA','Total','Observaciones'];
+const data=[...facturas].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(f=>({Serie:getFacSerieStr(f.numero||0),Fecha:f.fecha,Vencimiento:f.fechaVencimiento||'-',Cliente:f.cliente||'-',NIF:f.nif||'-',Empresa:f.empresa||'-',Obra:f.obra||'-',Estado:f.estado||'Borrador',Subtotal:(f.subtotal||0).toFixed(2),IVA:(f.iva||0).toFixed(2),Total:(f.total||0).toFixed(2),Observaciones:f.notas||''}));
+const wsData=[headers,...data.map(d=>Object.values(d))];
+const ws=XLSX.utils.aoa_to_sheet(wsData);ws['!cols']=[{wch:12},{wch:12},{wch:12},{wch:25},{wch:12},{wch:25},{wch:25},{wch:12},{wch:12},{wch:10},{wch:12},{wch:20}];
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Facturas');
+XLSX.writeFile(wb,'facturas-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de facturas exportado');
+}
+
+function generatePresupuestoPDF(id){
+const p=presupuestos.find(x=>x.id===id);if(!p)return;
+const {jsPDF}=window.jspdf;const doc=new jsPDF();
+doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+doc.setFontSize(12);doc.text('PRESUPUESTO '+getPresSerieStr(p.numero||0),14,25);
+doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+p.fecha,14,33);
+if(p.fechaValidez)doc.text('Validez: '+p.fechaValidez,14,39);
+doc.text('Estado: '+(p.estado||'Borrador'),14,p.fechaValidez?45:39);
+let y=p.fechaValidez?55:47;
+doc.setFontSize(10);doc.setTextColor(2);doc.text('Cliente: '+(p.cliente||'-'),14,y);y+=6;
+if(p.nif)doc.text('NIF/CIF: '+p.nif,14,y);y+=6;
+if(p.direccion)doc.text('Direccion: '+p.direccion,14,y);y+=6;
+if(p.empresa)doc.text('Empresa: '+p.empresa,14,y);y+=6;
+if(p.obra)doc.text('Obra: '+p.obra,14,y);y+=10;
+const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
+const data=(p.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
+doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
+const finalY=doc.lastAutoTable.finalY+10;
+doc.setFontSize(10);doc.text('Subtotal: '+(p.subtotal||0).toFixed(2)+' EUR',120,finalY);
+doc.text('IVA ('+(p.ivaPorcentaje||21)+'%): '+(p.iva||0).toFixed(2)+' EUR',120,finalY+6);
+doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(p.total||0).toFixed(2)+' EUR',120,finalY+14);
+if(p.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+p.notas,14,finalY+22);}
+doc.save('presupuesto-'+getPresSerieStr(p.numero||0)+'.pdf');toast('PDF del presupuesto generado');
+}
+
+function generateFacturaPDF(id){
+const f=facturas.find(x=>x.id===id);if(!f)return;
+const {jsPDF}=window.jspdf;const doc=new jsPDF();
+doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+doc.setFontSize(12);doc.text('FACTURA '+getFacSerieStr(f.numero||0),14,25);
+doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+f.fecha,14,33);
+if(f.fechaVencimiento)doc.text('Vencimiento: '+f.fechaVencimiento,14,39);
+doc.text('Estado: '+(f.estado||'Borrador'),14,f.fechaVencimiento?45:39);
+let y=f.fechaVencimiento?55:47;
+doc.setFontSize(10);doc.setTextColor(2);doc.text('Cliente: '+(f.cliente||'-'),14,y);y+=6;
+if(f.nif)doc.text('NIF/CIF: '+f.nif,14,y);y+=6;
+if(f.direccion)doc.text('Direccion: '+f.direccion,14,y);y+=6;
+if(f.empresa)doc.text('Empresa: '+f.empresa,14,y);y+=6;
+if(f.obra)doc.text('Obra: '+f.obra,14,y);y+=10;
+const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
+const data=(f.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
+doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
+const finalY=doc.lastAutoTable.finalY+10;
+doc.setFontSize(10);doc.text('Subtotal: '+(f.subtotal||0).toFixed(2)+' EUR',120,finalY);
+doc.text('IVA ('+(f.ivaPorcentaje||21)+'%): '+(f.iva||0).toFixed(2)+' EUR',120,finalY+6);
+doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(f.total||0).toFixed(2)+' EUR',120,finalY+14);
+if(f.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+f.notas,14,finalY+22);}
+doc.save('factura-'+getFacSerieStr(f.numero||0)+'.pdf');toast('PDF de la factura generado');
+}
 
 
 function getFilteredRpts(){
@@ -1791,15 +2381,19 @@ const savedVersion=localStorage.getItem('app_version');
 // Al arrancar la aplicacion nueva (Gestion Empresa v1.0.0) se limpian por completo
 // los datos de versiones anteriores (Medicion Obra) para empezar desde cero.
 if(savedVersion!==APP_VERSION){
-  ['mat_data','med_data','emp_data','obras_data','zonas_data','sub_data','med_serie_counter'].forEach(k=>localStorage.removeItem(k));
-  medSerieCounter=0;
+  ['mat_data','med_data','emp_data','obras_data','zonas_data','sub_data','med_serie_counter','pres_data','fac_data','pres_serie_counter','fac_serie_counter'].forEach(k=>localStorage.removeItem(k));
+  medSerieCounter=0;presSerieCounter=0;facSerieCounter=0;
   localStorage.setItem('app_version',APP_VERSION);
 }
 materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
 mediciones = JSON.parse(localStorage.getItem('med_data') || '[]');
 empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
 obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
+presupuestos = JSON.parse(localStorage.getItem('pres_data') || '[]');
+facturas = JSON.parse(localStorage.getItem('fac_data') || '[]');
 medSerieCounter = parseInt(localStorage.getItem('med_serie_counter') || '0');
+presSerieCounter = parseInt(localStorage.getItem('pres_serie_counter') || '0');
+facSerieCounter = parseInt(localStorage.getItem('fac_serie_counter') || '0');
 
 const yrSel=document.getElementById('rpt-year');
 if(yrSel){const yr=new Date().getFullYear();for(let y=yr;y>=yr-5;y--){yrSel.innerHTML+=`<option value="${y}">${y}</option>`}}
@@ -1904,11 +2498,19 @@ populateObraSelects();
 populateZonaReportSelect();
 populateZonaFilterSelect();
 populateSubcontrataReportSelect();
+populatePresFilterSelects();
+populateFacFilterSelects();
 document.getElementById('med-mat-search').addEventListener('input',searchMaterialForMedicion);
 document.getElementById('med-mat-search').addEventListener('focus',searchMaterialForMedicion);
 document.getElementById('med-obra').addEventListener('change',function(){
   populateZonaSelect('med-zona',this.value);
 });
+document.getElementById('pres-mat-search').addEventListener('input',searchMaterialForPres);
+document.getElementById('pres-mat-search').addEventListener('focus',searchMaterialForPres);
+document.getElementById('pres-obra').addEventListener('change',function(){});
+document.getElementById('fac-mat-search').addEventListener('input',searchMaterialForFac);
+document.getElementById('fac-mat-search').addEventListener('focus',searchMaterialForFac);
+document.getElementById('fac-obra').addEventListener('change',function(){});
 document.addEventListener('click',function(e){
 document.querySelectorAll('.search-picker-results').forEach(r=>{
 if(!r.closest('.search-picker')||!r.closest('.search-picker').contains(e.target)){
