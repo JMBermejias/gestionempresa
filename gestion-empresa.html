@@ -868,7 +868,6 @@ function initSync(){
       }
     });
   }catch(e){
-  }catch(e){
     console.warn('Firebase init error',e);
     _fbConnected=false;
     updateSyncStatus();
@@ -2437,6 +2436,20 @@ function populateSubcontrataReportSelect(){
 const sel=document.getElementById('rpt-subcontrata');
 if(!sel)return;
 sel.innerHTML='<option value="">Todas las subcontratas</option>'+subcontratas.map(s=>`<option value="${s.id}">${s.nombre}</option>`).join('');
+}
+
+function populatePresFilterSelects(){
+const es=document.getElementById('filter-pres-empresa');
+if(es)es.innerHTML='<option value="">Todas las empresas</option>'+empresas.map(e=>`<option value="${e.id}">${e.nombre}</option>`).join('');
+const os=document.getElementById('filter-pres-obra');
+if(os)os.innerHTML='<option value="">Todas las obras</option>'+obras.map(o=>`<option value="${o.id}">${o.nombre}</option>`).join('');
+}
+
+function populateFacFilterSelects(){
+const es=document.getElementById('filter-fac-empresa');
+if(es)es.innerHTML='<option value="">Todas las empresas</option>'+empresas.map(e=>`<option value="${e.id}">${e.nombre}</option>`).join('');
+const os=document.getElementById('filter-fac-obra');
+if(os)os.innerHTML='<option value="">Todas las obras</option>'+obras.map(o=>`<option value="${o.id}">${o.nombre}</option>`).join('');
 }
 
 const _IMG={
