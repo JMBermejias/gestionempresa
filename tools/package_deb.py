@@ -85,7 +85,7 @@ def main():
         'Depends: libc6 (>= 2.17)\n'
         'Maintainer: JMBernabeu <jmbernabeu@users.noreply.github.com>\n'
         'Description: Gestion Empresa - Sistema de gestion de empresa\n'
-        ' Aplicacion que sirve en http://127.0.0.1:8080 el sistema de\n'
+        ' Aplicacion que sirve en http://127.0.0.1:8081 el sistema de\n'
         ' gestion de empresa (escritorio y movil con la misma autenticacion).\n'
     ) % ver
     with open(os.path.join(debian, 'control'), 'w', encoding='utf-8') as f:

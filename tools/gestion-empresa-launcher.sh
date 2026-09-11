@@ -4,7 +4,7 @@
 # Arranca el servidor Gestion Empresa en segundo plano y abre el navegador.
 set -e
 
-PORT="${MEDICION_PORT:-8080}"
+PORT="${MEDICION_PORT:-8081}"
 URL="http://127.0.0.1:${PORT}"
 
 is_up() {

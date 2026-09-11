@@ -45,7 +45,7 @@ DB_PATH = os.path.join(APPDATA, 'medicion.db')
 AUTH_FILE = os.path.join(APPDATA, 'auth.json')
 UPDATES_DIR = os.path.join(APPDATA, 'updates')
 HOST = '0.0.0.0'
-PORT = 8080
+PORT = 8081
 GITHUB_REPO = 'JMBermejias/gestionempresa'
 GITHUB_API = 'https://api.github.com/repos/%s/releases/latest' % GITHUB_REPO
 if sys.platform.startswith('linux'):

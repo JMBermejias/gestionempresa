@@ -10,7 +10,7 @@ Group=www-data
 Environment=WEB_DIR=/var/www/gestion-empresa
 Environment=DB_PATH=/var/lib/gestion-empresa/medicion.db
 Environment=AUTH_FILE=/var/lib/gestion-empresa/auth.json
-Environment=PORT=8080
+Environment=PORT=8081
 ExecStart=/usr/bin/python3 /usr/lib/gestion-empresa/server.py
 WorkingDirectory=/usr/lib/gestion-empresa
 Restart=on-failure
