@@ -217,7 +217,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 
 <div class="app">
 <aside class="sidebar">
-<h2>&#128295; Control de Obra<span>Sistema de Medicion</span></h2>
+<h2>&#128295; Gestion de Empresa<span id="sidebar-version"></span></h2>
 <div id="sidebar-user" title="Usuario actual" style="padding:6px 18px;font-size:.78rem;color:#fff;opacity:.85;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
 <div style="padding:6px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px">
 <label style="font-size:.72rem;display:block;color:#fff;opacity:.85;margin-bottom:4px">&#128205; Empresa de trabajo</label>
@@ -4404,6 +4404,7 @@ r.classList.remove('show');
 renderDashboard();
 renderSidebarEmpresa();
 renderPrintHeader();
+document.getElementById('sidebar-version').textContent=APP_VERSION;
 if('serviceWorker' in navigator){
   if(IS_DESKTOP){
     // Escritorio (EXE): no se usa Service Worker porque la app siempre se sirve
