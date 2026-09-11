@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JMBernabeu
 // License: GNU General Public License v3.0 or later (see LICENSE)
 // Cada version de la app renueva la caché (gestion-empresa-v1.0.0<N>); el CI lo auto-incrementa.
-const CACHE = 'gestion-empresa-v1.5.1';
+const CACHE = 'gestion-empresa-v1.5.2';
 const ASSETS = [
   './',
   './gestion-empresa.html',
