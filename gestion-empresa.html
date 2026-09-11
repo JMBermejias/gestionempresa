@@ -219,7 +219,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <aside class="sidebar">
 <h2>&#128295; Control de Obra<span>Sistema de Medicion</span></h2>
 <div id="sidebar-user" title="Usuario actual" style="padding:6px 18px;font-size:.78rem;color:#fff;opacity:.85;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+<div style="padding:6px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px">
+<label style="font-size:.72rem;display:block;color:#fff;opacity:.85;margin-bottom:4px">&#128205; Empresa de trabajo</label>
+<select id="sidebar-empresa-select" onchange="setEmpresaActiva(this.value)" title="Empresa que aparecera en tus documentos" style="width:100%;background:#fff;color:#333;border-radius:6px;padding:4px 6px;font-size:.8rem"></select>
+</div>
 <button class="nav-btn active" onclick="showPage('dashboard')"><span class="icon">&#128202;</span>Panel Principal</button>
+<button class="nav-btn" onclick="showPage('miempresa')"><span class="icon">&#127970;</span>Mi Empresa</button>
 <button class="nav-btn" onclick="showPage('obras')"><span class="icon">&#127959;</span>Obras</button>
 <button class="nav-btn" onclick="showPage('zonas')"><span class="icon">&#128205;</span>Zonas</button>
 <button class="nav-btn" onclick="showPage('empresas')"><span class="icon">&#127970;</span>Empresas Instaladoras</button>
@@ -243,7 +248,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </aside>
 
 <main class="main">
-<div class="print-header"><h1>Control de Medicion - Obra</h1><hr style="margin:10px 0"></div>
+<div class="print-header" id="print-header"></div>
 
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
@@ -317,6 +322,33 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="table-wrap">
 <table><thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="empresas-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- MI EMPRESA -->
+<div id="page-miempresa" class="page">
+<div class="page-header">
+<h1>&#127970; Mi Empresa</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+<button class="btn btn-primary" onclick="openMiEmpresaModal()">+ Nueva Empresa</button>
+</div>
+</div>
+<div class="card" style="background:var(--primary);color:#fff;margin-bottom:15px">
+<div style="padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<strong style="font-size:.92rem">&#128205; Empresa de trabajo:</strong>
+<select id="mie-activa-select" onchange="setEmpresaActiva(this.value)" style="flex:1;min-width:200px;background:#fff;color:#333;border-radius:8px;padding:8px 12px;font-size:.88rem;border:none"></select>
+<span id="mie-activa-hint" style="font-size:.78rem;opacity:.9">Asi saldra en tus documentos</span>
+</div>
+</div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
+<input type="text" id="mie-search" placeholder="Buscar empresa..." oninput="renderMiEmpresas()" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>Activa</th><th>Logo</th><th>Nombre</th><th>NIF/CIF</th><th>Direccion</th><th>Telefono</th><th>Email</th><th>Notas</th><th>Acciones</th></tr></thead>
+<tbody id="miempresas-list"></tbody></table>
 </div>
 </div>
 </div>
@@ -733,6 +765,36 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-empresa')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveEmpresa()">Guardar</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL MI EMPRESA -->
+<div class="modal-overlay" id="modal-miempresa">
+<div class="modal">
+<h3 id="mie-modal-title">Nueva Empresa</h3>
+<input type="hidden" id="mie-edit-id">
+<div class="form-group"><label>Nombre de la Empresa *</label><input type="text" id="mie-nombre" placeholder="Nombre de tu empresa"></div>
+<div class="form-group"><label>NIF/CIF</label><input type="text" id="mie-nif" placeholder="12345678A"></div>
+<div class="form-group"><label>Direccion</label><input type="text" id="mie-direccion" placeholder="Direccion completa"></div>
+<div class="form-group"><label>Telefono</label><input type="text" id="mie-telefono" placeholder="600 000 000"></div>
+<div class="form-group"><label>Email</label><input type="email" id="mie-email" placeholder="email@ejemplo.com"></div>
+<div class="form-group"><label>Notas</label><input type="text" id="mie-notas" placeholder="Observaciones"></div>
+<div class="form-group"><label>Logo / Foto</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button type="button" class="btn btn-primary" onclick="document.getElementById('mie-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
+<button type="button" class="btn btn-success" onclick="document.getElementById('mie-img-camera').click()" style="font-size:.8rem;padding:6px 12px">&#128247; Tomar foto</button>
+<button type="button" class="btn btn-danger" onclick="clearFoto('mie-img-prev','mie-img-wrap')" style="font-size:.8rem;padding:6px 12px">X Quitar</button>
+</div>
+<input type="file" id="mie-img-file" accept="image/*" style="display:none" onchange="handleFoto(event,'mie-img-prev','mie-img-wrap')">
+<input type="file" id="mie-img-camera" accept="image/*" capture="environment" style="display:none" onchange="handleFoto(event,'mie-img-prev','mie-img-wrap')">
+<div id="mie-img-wrap" style="margin-top:10px;display:none;text-align:center">
+<img id="mie-img-prev" src="" style="width:96px;height:96px;border-radius:50%;border:2px solid var(--border);object-fit:cover">
+</div>
+</div>
+<div class="modal-actions">
+<button class="btn btn-outline" onclick="closeModal('modal-miempresa')">Cancelar</button>
+<button class="btn btn-primary" onclick="saveMiEmpresa()">Guardar</button>
 </div>
 </div>
 </div>
@@ -1237,6 +1299,8 @@ let materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
 let mediciones = JSON.parse(localStorage.getItem('med_data') || '[]');
 let matFilter = 'all';
 let empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
+let misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
+let empresaActivaId = localStorage.getItem('mie_activa') || '';
 let obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
 let zonas = JSON.parse(localStorage.getItem('zonas_data') || '[]');
 let subcontratas = JSON.parse(localStorage.getItem('sub_data') || '[]');
@@ -1305,6 +1369,8 @@ function saveLocal(){
   localStorage.setItem('mat_data',JSON.stringify(materials));
   localStorage.setItem('med_data',JSON.stringify(mediciones));
   localStorage.setItem('emp_data',JSON.stringify(empresas));
+  localStorage.setItem('mie_data',JSON.stringify(misEmpresas));
+  localStorage.setItem('mie_activa',empresaActivaId);
   localStorage.setItem('obras_data',JSON.stringify(obras));
   localStorage.setItem('zonas_data',JSON.stringify(zonas));
   localStorage.setItem('sub_data',JSON.stringify(subcontratas));
@@ -1327,7 +1393,7 @@ function saveLocal(){
 
 function save(){
   saveLocal();
-  const payload={materials,mediciones,empresas,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes};
+  const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes};
   if(_dbRef){
     _dbRef.set(payload).catch(e=>console.warn('Firebase save error',e));
   }
@@ -1352,6 +1418,8 @@ function initSync(){
         if(r.materials)materials=r.materials;
         if(r.mediciones)mediciones=r.mediciones;
         if(r.empresas)empresas=r.empresas;
+        if(r.misEmpresas)misEmpresas=r.misEmpresas;
+        if(typeof r.empresaActivaId==='string')empresaActivaId=r.empresaActivaId;
         if(r.obras)obras=r.obras;
         if(r.zonas)zonas=r.zonas;
         if(r.subcontratas)subcontratas=r.subcontratas;
@@ -1380,6 +1448,8 @@ function initSync(){
       if(data.materials)       materials    = data.materials;
       if(data.mediciones)      mediciones   = data.mediciones;
       if(data.empresas)        empresas     = data.empresas;
+      if(data.misEmpresas)     misEmpresas  = data.misEmpresas;
+      if(typeof data.empresaActivaId==='string')empresaActivaId=data.empresaActivaId;
       if(data.obras)           obras        = data.obras;
       if(data.zonas)           zonas        = data.zonas;
       if(data.subcontratas)    subcontratas = data.subcontratas;
@@ -1650,6 +1720,7 @@ function renderAll(){
   const p=document.querySelector('.page.active');
   if(p){const id=p.id.replace('page-','');
     if(id==='dashboard')renderDashboard();
+    if(id==='miempresa')renderMiEmpresas();
     if(id==='obras')renderObras();
     if(id==='empresas')renderEmpresas();
     if(id==='subcontratas')renderSubcontratas();
@@ -1668,6 +1739,7 @@ function renderAll(){
     if(id==='reportes')renderReportPreview();
     if(id==='estadisticas')renderEstadisticas();}
   populateEmpresaReportSelect();populateEmpresaFilterSelect();populateObraSelects();populateZonaReportSelect();populateZonaFilterSelect();populateSubcontrataReportSelect();populatePresFilterSelects();populateFacFilterSelects();populateCompFilterSelects();populateVenFilterSelects();populatePartFilterSelects();
+  renderSidebarEmpresa();renderPrintHeader();
 }
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
@@ -1676,11 +1748,12 @@ function showPage(id){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById('page-'+id).classList.add('active');
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-const pages=['dashboard','obras','zonas','empresas','subcontratas','clientes','proveedores','empleados','materiales','almacen','mediciones','partes','compras','ventas','presupuestos','facturas','estadisticas','reportes'];
+const pages=['dashboard','miempresa','obras','zonas','empresas','subcontratas','clientes','proveedores','empleados','materiales','almacen','mediciones','partes','compras','ventas','presupuestos','facturas','estadisticas','reportes'];
 const idx=pages.indexOf(id);
 if(idx>=0)document.querySelectorAll('.nav-btn')[idx].classList.add('active');
 document.querySelector('.sidebar').classList.remove('open');
 if(id==='dashboard')renderDashboard();
+if(id==='miempresa')renderMiEmpresas();
 if(id==='obras')renderObras();
 if(id==='zonas')renderZonas();
 if(id==='empresas')renderEmpresas();
@@ -2054,6 +2127,123 @@ document.getElementById('empresas-list').innerHTML=list.length?list.map(e=>`<tr>
 <td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${fotoCell(e.foto)}</td>
 <td><button class="btn btn-outline" onclick="showEmpresaTrabajos('${e.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
+}
+
+function getEmpresaActiva(){
+if(!empresaActivaId)return null;
+return misEmpresas.find(e=>e.id===empresaActivaId)||null;
+}
+
+function setEmpresaActiva(id){
+if(id&&!misEmpresas.find(e=>e.id===id))return;
+empresaActivaId=id||'';
+saveLocal();
+renderSidebarEmpresa();
+renderPrintHeader();
+renderMiEmpresas();
+toast(empresaActivaId?'Empresa activa: '+getEmpresaActiva().nombre:'Sin empresa de trabajo');
+}
+
+function renderSidebarEmpresa(){
+const sel=document.getElementById('sidebar-empresa-select');
+const sel2=document.getElementById('mie-activa-select');
+const opts=misEmpresas.map(e=>`<option value="${e.id}"${e.id===empresaActivaId?' selected':''}>${e.nombre}${e.nif?' - '+e.nif:''}</option>`).join('');
+const html='<option value="">Sin empresa (uso general)</option>'+opts;
+if(sel){sel.innerHTML=html;sel.value=empresaActivaId||''}
+if(sel2){sel2.innerHTML=html;sel2.value=empresaActivaId||''}
+const hint=document.getElementById('mie-activa-hint');
+if(hint&&getEmpresaActiva())hint.textContent='Saldra como emisor en tus documentos';
+document.title=getEmpresaActiva()?(getEmpresaActiva().nombre+' | Gestion Empresa'):'Control de Medicion - Obra';
+}
+
+function renderPrintHeader(){
+const el=document.getElementById('print-header');
+if(!el)return;
+const emp=getEmpresaActiva();
+if(!emp){el.innerHTML='<h1>Control de Medicion - Obra</h1><hr style="margin:10px 0">';return}
+const fields=[emp.nif,emp.direccion,emp.telefono,emp.email].filter(Boolean);
+el.innerHTML='<h1>'+(emp.nombre||'Mi Empresa')+'</h1>'+(fields.length?'<div style="font-size:.8rem;color:#444">'+fields.join(' | ')+'</div>':'')+(emp.foto?'<img src="'+emp.foto+'" style="height:44px;float:right;margin-top:-50px">':'')+'<hr style="margin:10px 0">';
+}
+
+function openMiEmpresaModal(){
+document.getElementById('mie-edit-id').value='';
+document.getElementById('mie-modal-title').textContent='Nueva Empresa';
+document.getElementById('mie-nombre').value='';
+document.getElementById('mie-nif').value='';
+document.getElementById('mie-direccion').value='';
+document.getElementById('mie-telefono').value='';
+document.getElementById('mie-email').value='';
+document.getElementById('mie-notas').value='';
+clearFoto('mie-img-prev','mie-img-wrap');
+openModal('modal-miempresa');
+}
+
+function editMiEmpresa(id){
+const e=misEmpresas.find(x=>x.id===id);
+if(!e)return;
+document.getElementById('mie-edit-id').value=id;
+document.getElementById('mie-modal-title').textContent='Editar Empresa';
+document.getElementById('mie-nombre').value=e.nombre;
+document.getElementById('mie-nif').value=e.nif||'';
+document.getElementById('mie-direccion').value=e.direccion||'';
+document.getElementById('mie-telefono').value=e.telefono||'';
+document.getElementById('mie-email').value=e.email||'';
+document.getElementById('mie-notas').value=e.notas||'';
+setFotoPreview('mie-img-prev','mie-img-wrap',e.foto||'');
+openModal('modal-miempresa');
+}
+
+function saveMiEmpresa(){
+const nombre=document.getElementById('mie-nombre').value.trim();
+if(!nombre){alert('Introduce un nombre de empresa');return}
+const data={nombre,nif:document.getElementById('mie-nif').value.trim(),direccion:document.getElementById('mie-direccion').value.trim(),telefono:document.getElementById('mie-telefono').value.trim(),email:document.getElementById('mie-email').value.trim(),notas:document.getElementById('mie-notas').value.trim(),foto:getFotoSrc('mie-img-prev','mie-img-wrap')};
+const editId=document.getElementById('mie-edit-id').value;
+if(editId){const idx=misEmpresas.findIndex(x=>x.id===editId);misEmpresas[idx]={...misEmpresas[idx],...data}}
+else{data.id='mie_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];misEmpresas.push(data);if(!empresaActivaId)empresaActivaId=data.id}
+save();closeModal('modal-miempresa');renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa guardada');
+}
+
+function deleteMiEmpresa(id){
+if(!confirm('Eliminar esta empresa?'))return;
+if(empresaActivaId===id)empresaActivaId='';
+misEmpresas=misEmpresas.filter(x=>x.id!==id);
+save();renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa eliminada');
+}
+
+function renderMiEmpresas(){
+const q=(document.getElementById('mie-search')?.value||'').toLowerCase();
+const list=misEmpresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.nif||'').toLowerCase().includes(q)||(e.email||'').toLowerCase().includes(q));
+const tb=document.getElementById('miempresas-list');
+if(tb)tb.innerHTML=list.length?list.map(e=>`<tr>
+<td>${e.id===empresaActivaId?'<span style="color:var(--success);font-size:1.1rem">&#10003;</span>':''}</td>
+<td>${fotoCell(e.foto)}</td>
+<td><strong>${e.nombre}</strong></td>
+<td>${e.nif||'-'}</td><td>${e.direccion||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${e.notas||'-'}</td>
+<td><button class="btn ${e.id===empresaActivaId?'btn-success':'btn-primary'}" onclick="setEmpresaActiva('${e.id}')" style="padding:5px 10px;font-size:.75rem">${e.id===empresaActivaId?'Activa':'Usar'}</button> <button class="btn btn-warning" onclick="editMiEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteMiEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
+</tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas creadas</td></tr>';
+renderSidebarEmpresa();
+}
+
+function drawEmpresaHeader(doc){
+const emp=getEmpresaActiva();
+doc.setFontSize(16);doc.setTextColor(2,136,209);
+doc.text(emp&&emp.nombre?emp.nombre:'Gestion Empresa',14,15);
+if(emp){
+  const block=[];
+  if(emp.nif)block.push(emp.nif);
+  if(emp.direccion)block.push(String(emp.direccion).slice(0,30));
+  if(emp.telefono)block.push('Tel: '+emp.telefono);
+  if(emp.email)block.push(emp.email);
+  const logoWidth=emp.foto?35:0;
+  const txtX=emp.foto?145:195;
+  let y=18;
+  doc.setFontSize(6.5);doc.setTextColor(90);
+  block.slice(0,4).forEach(l=>{doc.text(l,txtX,y,{align:'right'});y+=3});
+  if(emp.foto){
+    try{doc.addImage(emp.foto,emp.foto.startsWith('data:image/jpeg')?'JPEG':'PNG',156,6,logoWidth-15<=20?20:logoWidth-15,14);}catch(e){}
+  }
+  doc.setTextColor(0);
+}
 }
 
 function showEmpresaTrabajos(empresaId){
@@ -2661,7 +2851,7 @@ const cap={cliente:'Cliente',empresa:'Empresa',proveedor:'Proveedor',subcontrata
 const {d,h}=facRange();
 const rows=facturacionGroups(d,h)[kindExact];
 const title='Facturacion por '+cap+(d||h?' ('+(d||'inicio')+' al '+(h||'fin')+')':'');
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.setTextColor(0);doc.text(title,14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES'),14,31);
 doc.autoTable({head:[['Nombre','Documentos','Total']],body:rows.map(r=>[r.nombre,r.cantidad,r.total.toFixed(2)+' EUR']),startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:9},bodyStyles:{fontSize:8},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -2711,7 +2901,7 @@ const d=document.getElementById('rpt-desde').value;
 const h=document.getElementById('rpt-hasta').value;
 const rows=horasPorEmpleado(d,h);
 const title='Trabajos y Horas por Empleado'+(d||h?' ('+(d||'inicio')+' al '+(h||'fin')+')':'');
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.setTextColor(0);doc.text(title,14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES'),14,31);
 doc.autoTable({head:[['Empleado','Partes','Horas','Total']],body:rows.map(r=>[r.nombre,r.partes,r.horas,r.total.toFixed(2)+' EUR']),startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:9},bodyStyles:{fontSize:8},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -3231,7 +3421,7 @@ XLSX.writeFile(wb,'compras-'+new Date().toISOString().split('T')[0]+'.xlsx');toa
 function generateCompraPDF(id){
 const c=compras.find(x=>x.id===id);if(!c)return;
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('COMPRA '+getCompSerieStr(c.numero||0),14,25);
 doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+c.fecha,14,33);
 doc.text('Estado: '+(c.estado||'Recibida'),14,39);
@@ -3468,7 +3658,7 @@ XLSX.writeFile(wb,'ventas-'+new Date().toISOString().split('T')[0]+'.xlsx');toas
 function generateVentaPDF(id){
 const v=ventas.find(x=>x.id===id);if(!v)return;
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('VENTA '+getVenSerieStr(v.numero||0),14,25);
 doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+v.fecha,14,33);
 doc.text('Estado: '+(v.estado||'Confirmada'),14,39);
@@ -3679,7 +3869,7 @@ XLSX.writeFile(wb,'partes-trabajo-'+new Date().toISOString().split('T')[0]+'.xls
 function generatePartePDF(id){
 const p=partes.find(x=>x.id===id);if(!p)return;
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('PARTE DE TRABAJO '+getPartSerieStr(p.numero||0),14,25);
 doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+p.fecha,14,33);
 doc.text('Estado: '+(p.estado||'Borrador'),14,39);
@@ -3736,7 +3926,7 @@ XLSX.writeFile(wb,'facturas-'+new Date().toISOString().split('T')[0]+'.xlsx');to
 function generatePresupuestoPDF(id){
 const p=presupuestos.find(x=>x.id===id);if(!p)return;
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('PRESUPUESTO '+getPresSerieStr(p.numero||0),14,25);
 doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+p.fecha,14,33);
 if(p.fechaValidez)doc.text('Validez: '+p.fechaValidez,14,39);
@@ -3761,7 +3951,7 @@ doc.save('presupuesto-'+getPresSerieStr(p.numero||0)+'.pdf');toast('PDF del pres
 function generateFacturaPDF(id){
 const f=facturas.find(x=>x.id===id);if(!f)return;
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('FACTURA '+getFacSerieStr(f.numero||0),14,25);
 doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+f.fecha,14,33);
 if(f.fechaVencimiento)doc.text('Vencimiento: '+f.fechaVencimiento,14,39);
@@ -3886,7 +4076,7 @@ hdr=['N Serie','Fecha','Empresa','Obra','Zona','Subcontrata','Material','Categor
 data=list.flatMap(m=>expandMed(m)).map(l=>[l.serie,l.fecha,l.empresa,l.obra,l.zona,l.subcontrata,l.material,l.categoria,l.cantidad,l.unidad]);
 }
 
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Control de Medicion - Obra',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text(title,14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES'),14,31);
 
@@ -3957,7 +4147,7 @@ const data=[...mediciones].sort((a,b)=>b.fecha.localeCompare(a.fecha)).flatMap(m
 const lines=m.lineas||(m.materialId?[{material:m.material,categoria:m.categoria,unidad:m.unidad,cantidad:m.cantidad}]:[]);
 return lines.map(l=>['N'+getSerieStr(m.serie||0),m.fecha,m.empresa||'-',m.obra||'-',l.material,l.categoria,l.cantidad,l.unidad]);
 });
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Mediciones',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total lineas: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -3968,7 +4158,7 @@ function exportPresupuestosPDF(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Cliente','Empresa','Obra','Estado','Subtotal','IVA','Total'];
 const data=[...presupuestos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(p=>[getPresSerieStr(p.numero||0),p.fecha,p.cliente||'-',p.empresa||'-',p.obra||'-',p.estado||'Borrador',(p.subtotal||0).toFixed(2),(p.iva||0).toFixed(2),(p.total||0).toFixed(2)]);
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Presupuestos',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -3979,7 +4169,7 @@ function exportFacturasPDF(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Vencimiento','Cliente','Empresa','Obra','Estado','Subtotal','IVA','Total'];
 const data=[...facturas].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(f=>[getFacSerieStr(f.numero||0),f.fecha,f.fechaVencimiento||'-',f.cliente||'-',f.empresa||'-',f.obra||'-',f.estado||'Borrador',(f.subtotal||0).toFixed(2),(f.iva||0).toFixed(2),(f.total||0).toFixed(2)]);
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Facturas',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -3991,7 +4181,7 @@ const stockMap=computeStock();
 const hdr=['Material','Categoria','Unidad','Entradas','Salidas','Stock'];
 const data=materials.map(m=>[m.nombre,m.categoria,m.unidad,compras.filter(c=>c.estado!=='Anulada').flatMap(c=>c.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada').reduce((s,a)=>s+a.cantidad,0),ventas.filter(v=>v.estado!=='Anulada').flatMap(v=>v.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+partes.filter(p=>p.estado==='Realizado').flatMap(p=>p.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida').reduce((s,a)=>s+a.cantidad,0),stockMap[m.id]||0]);
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Almacen / Stock',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total materiales: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -4002,7 +4192,7 @@ function exportComprasPDF(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Proveedor','Estado','Subtotal','IVA','Total'];
 const data=[...compras].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(c=>[getCompSerieStr(c.numero||0),c.fecha,c.proveedor||'-',c.estado||'Recibida',(c.subtotal||0).toFixed(2),(c.iva||0).toFixed(2),(c.total||0).toFixed(2)]);
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Compras',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -4013,7 +4203,7 @@ function exportPartesPDF(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Empleado','Obra','Horas','Trabajos','Estado','Subtotal','IVA','Total'];
 const data=[...partes].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(p=>[getPartSerieStr(p.numero||0),p.fecha,p.empleado||'-',p.obra||'-',p.horas||0,p.descripcion||'',p.estado||'Borrador',(p.subtotal||0).toFixed(2),(p.iva||0).toFixed(2),(p.total||0).toFixed(2)]);
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Partes de Trabajo',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},columnStyles:{5:{cellWidth:60}},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -4024,7 +4214,7 @@ function exportVentasPDF(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Destino','Cliente/Obra','Estado','Subtotal','IVA','Total'];
 const data=[...ventas].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(v=>[getVenSerieStr(v.numero||0),v.fecha,v.destino==='obra'?'Obra':'Cliente',v.destino==='obra'?(v.obra||'-'):(v.cliente||'-'),v.estado||'Confirmada',(v.subtotal||0).toFixed(2),(v.iva||0).toFixed(2),(v.total||0).toFixed(2)]);
-doc.setFontSize(16);doc.setTextColor(2,136,209);doc.text('Gestion Empresa',14,15);
+drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Ventas',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
@@ -4044,6 +4234,8 @@ if(savedVersion!==APP_VERSION)localStorage.setItem('app_version',APP_VERSION);
 materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
 mediciones = JSON.parse(localStorage.getItem('med_data') || '[]');
 empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
+misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
+empresaActivaId = localStorage.getItem('mie_activa') || '';
 obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
 presupuestos = JSON.parse(localStorage.getItem('pres_data') || '[]');
 facturas = JSON.parse(localStorage.getItem('fac_data') || '[]');
@@ -4210,6 +4402,8 @@ r.classList.remove('show');
 });
 });
 renderDashboard();
+renderSidebarEmpresa();
+renderPrintHeader();
 if('serviceWorker' in navigator){
   if(IS_DESKTOP){
     // Escritorio (EXE): no se usa Service Worker porque la app siempre se sirve
