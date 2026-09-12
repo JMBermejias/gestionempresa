@@ -390,7 +390,6 @@ class Handler(BaseHTTPRequestHandler):
                 if not launched:
                     self._send_json(500, {'error': 'No se pudo lanzar el actualizador (pkexec/sudo no disponibles). Aplica la actualizacion manualmente con: sudo dpkg -i %s' % new})
                     return True
-                threading.Timer(2.0, lambda: os._exit(0)).start()
                 self._send_json(200, {
                     'ok': True,
                     'message': 'Actualizacion aplicada. Si se solicita, introduce tu contrasena. La aplicacion se cerrara y se volvera a abrir sola con la nueva version.',
@@ -495,6 +494,7 @@ class Handler(BaseHTTPRequestHandler):
         display = os.environ.get('DISPLAY', '')
         xdg_rt = os.environ.get('XDG_RUNTIME_DIR', '')
         dbus_addr = os.environ.get('DBUS_SESSION_BUS_ADDRESS', '')
+        xauth = os.environ.get('XAUTHORITY', '')
         env_args = ['REAL_USER=%s' % real_user]
         if display:
             env_args.append('DISPLAY=%s' % display)
@@ -502,23 +502,46 @@ class Handler(BaseHTTPRequestHandler):
             env_args.append('XDG_RUNTIME_DIR=%s' % xdg_rt)
         if dbus_addr:
             env_args.append('DBUS_SESSION_BUS_ADDRESS=%s' % dbus_addr)
+        if xauth:
+            env_args.append('XAUTHORITY=%s' % xauth)
         if shutil.which('pkexec'):
             subprocess.Popen(['pkexec', '/usr/bin/env'] + env_args + ['/bin/sh', sh])
+            self._start_linux_watch(sh, logf)
             return True
         if shutil.which('gksudo'):
             subprocess.Popen(['gksudo', '/bin/sh', sh])
+            self._start_linux_watch(sh, logf)
             return True
         if shutil.which('kdesudo'):
             subprocess.Popen(['kdesudo', '--', '/bin/sh', sh])
+            self._start_linux_watch(sh, logf)
             return True
         if shutil.which('sudo'):
             try:
                 subprocess.run(['sudo', '-n', 'true'], timeout=5)
                 subprocess.Popen(['sudo', '-n', '/bin/sh', sh])
+                self._start_linux_watch(sh, logf)
                 return True
             except Exception:
                 return False
         return False
+
+    def _start_linux_watch(self, sh, logf):
+        def _watcher():
+            while True:
+                started = False
+                try:
+                    started = os.path.exists(logf) and os.path.getsize(logf) > 0
+                except OSError:
+                    started = False
+                if started:
+                    break
+                if not os.path.exists(sh) and not started:
+                    return
+                time.sleep(1)
+            time.sleep(2)
+            os._exit(0)
+        threading.Thread(target=_watcher, daemon=True).start()
 
     def _handle_api_app(self, path, authed):
         if not path.startswith('/api/app'):

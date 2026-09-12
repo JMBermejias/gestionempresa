@@ -40,6 +40,11 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 20px;border:none;background:transparent;color:#fff;cursor:pointer;font-size:.9rem;transition:all .2s;text-align:left}
 .nav-btn:hover,.nav-btn.active{background:rgba(255,255,255,0.15)}
 .nav-btn .icon{width:20px;text-align:center;font-size:1.1rem}
+.nav-group .nav-caret{margin-left:auto;transition:transform .3s ease}
+.nav-group.open>.nav-caret{transform:rotate(180deg)}
+.nav-sub{overflow:hidden;max-height:0;transition:max-height .3s ease;border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-sub.open{max-height:700px}
+.nav-sub .nav-btn{padding-left:46px;padding-top:9px;padding-bottom:9px;font-size:.85rem}
 .main{margin-left:260px;flex:1;padding:30px;max-width:1200px}
 .page{display:none;animation:fadeIn .3s}
 .page.active{display:block}
@@ -223,27 +228,39 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <label style="font-size:.72rem;display:block;color:#fff;opacity:.85;margin-bottom:4px">&#128205; Empresa de trabajo</label>
 <select id="sidebar-empresa-select" onchange="setEmpresaActiva(this.value)" title="Empresa que aparecera en tus documentos" style="width:100%;background:#fff;color:#333;border-radius:6px;padding:4px 6px;font-size:.8rem"></select>
 </div>
-<button class="nav-btn active" onclick="showPage('dashboard')"><span class="icon">&#128202;</span>Panel Principal</button>
-<button class="nav-btn" onclick="showPage('miempresa')"><span class="icon">&#127970;</span>Mi Empresa</button>
-<button class="nav-btn" onclick="showPage('obras')"><span class="icon">&#127959;</span>Obras</button>
-<button class="nav-btn" onclick="showPage('zonas')"><span class="icon">&#128205;</span>Zonas</button>
-<button class="nav-btn" onclick="showPage('empresas')"><span class="icon">&#127970;</span>Empresas Instaladoras</button>
-<button class="nav-btn" onclick="showPage('subcontratas')"><span class="icon">&#128188;</span>Subcontratas</button>
-<button class="nav-btn" onclick="showPage('clientes')"><span class="icon">&#128100;</span>Clientes</button>
-<button class="nav-btn" onclick="showPage('proveedores')"><span class="icon">&#128666;</span>Proveedores</button>
-<button class="nav-btn" onclick="showPage('empleados')"><span class="icon">&#129489;</span>Empleados</button>
-<button class="nav-btn" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
-<button class="nav-btn" onclick="showPage('categorias')"><span class="icon">&#128220;</span>Categorias</button>
-<button class="nav-btn" onclick="showPage('almacen')"><span class="icon">&#127981;</span>Almacen / Stock</button>
-<button class="nav-btn" onclick="showPage('almacenes')"><span class="icon">&#127968;</span>Almacenes</button>
-<button class="nav-btn" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
-<button class="nav-btn" onclick="showPage('partes')"><span class="icon">&#128203;</span>Partes de Trabajo</button>
-<button class="nav-btn" onclick="showPage('compras')"><span class="icon">&#128722;</span>Compras</button>
-<button class="nav-btn" onclick="showPage('ventas')"><span class="icon">&#128176;</span>Ventas</button>
-<button class="nav-btn" onclick="showPage('presupuestos')"><span class="icon">&#128203;</span>Presupuestos</button>
-<button class="nav-btn" onclick="showPage('facturas')"><span class="icon">&#128176;</span>Facturas</button>
-<button class="nav-btn" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
-<button class="nav-btn" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
+<button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')"><span class="icon">&#128202;</span>Panel Principal</button>
+<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127970;</span>Mi Empresa<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub open">
+<button class="nav-btn" data-page="miempresa" onclick="showPage('miempresa')"><span class="icon">&#128205;</span>Mi Empresa</button>
+<button class="nav-btn" data-page="empresas" onclick="showPage('empresas')"><span class="icon">&#127970;</span>Empresas Instaladoras</button>
+<button class="nav-btn" data-page="subcontratas" onclick="showPage('subcontratas')"><span class="icon">&#128188;</span>Subcontratas</button>
+<button class="nav-btn" data-page="clientes" onclick="showPage('clientes')"><span class="icon">&#128100;</span>Clientes</button>
+<button class="nav-btn" data-page="proveedores" onclick="showPage('proveedores')"><span class="icon">&#128666;</span>Proveedores</button>
+<button class="nav-btn" data-page="empleados" onclick="showPage('empleados')"><span class="icon">&#129489;</span>Empleados</button>
+</div>
+<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127959;</span>Obras<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub open">
+<button class="nav-btn" data-page="obras" onclick="showPage('obras')"><span class="icon">&#127959;</span>Obras</button>
+<button class="nav-btn" data-page="zonas" onclick="showPage('zonas')"><span class="icon">&#128205;</span>Zonas</button>
+</div>
+<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127981;</span>Almacen<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub open">
+<button class="nav-btn" data-page="almacen" onclick="showPage('almacen')"><span class="icon">&#127981;</span>Almacen / Stock</button>
+<button class="nav-btn" data-page="almacenes" onclick="showPage('almacenes')"><span class="icon">&#127968;</span>Almacenes</button>
+<button class="nav-btn" data-page="categorias" onclick="showPage('categorias')"><span class="icon">&#128220;</span>Categorias</button>
+<button class="nav-btn" data-page="materiales" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
+</div>
+<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#128194;</span>Gestion<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub open">
+<button class="nav-btn" data-page="mediciones" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
+<button class="nav-btn" data-page="partes" onclick="showPage('partes')"><span class="icon">&#128203;</span>Partes de Trabajo</button>
+<button class="nav-btn" data-page="compras" onclick="showPage('compras')"><span class="icon">&#128722;</span>Compras</button>
+<button class="nav-btn" data-page="ventas" onclick="showPage('ventas')"><span class="icon">&#128176;</span>Ventas</button>
+<button class="nav-btn" data-page="presupuestos" onclick="showPage('presupuestos')"><span class="icon">&#128203;</span>Presupuestos</button>
+<button class="nav-btn" data-page="facturas" onclick="showPage('facturas')"><span class="icon">&#128176;</span>Facturas</button>
+</div>
+<button class="nav-btn" data-page="estadisticas" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
+<button class="nav-btn" data-page="reportes" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
 <button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
 <button class="nav-btn" onclick="doLogout()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128682;</span>Salir (cerrar sesion)</button>
 <button class="nav-btn" onclick="doQuit()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128683;</span>Cerrar aplicacion</button>
@@ -1901,14 +1918,21 @@ function renderAll(){
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
+function toggleNavGroup(btn){
+const sub=btn.nextElementSibling;
+if(sub&&sub.classList.contains('nav-sub')){sub.classList.toggle('open');btn.classList.toggle('open')}
+}
+
 function showPage(id){
 populateCategoriaSelects();populateAlmacenSelect('alm-almacen');
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById('page-'+id).classList.add('active');
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-const pages=['dashboard','miempresa','obras','zonas','empresas','subcontratas','clientes','proveedores','empleados','materiales','categorias','almacen','almacenes','mediciones','partes','compras','ventas','presupuestos','facturas','estadisticas','reportes'];
-const idx=pages.indexOf(id);
-if(idx>=0)document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+document.querySelectorAll('.nav-btn[data-page="'+id+'"]').forEach(b=>{
+b.classList.add('active');
+const sub=b.closest('.nav-sub');
+if(sub){sub.classList.add('open');const grp=sub.previousElementSibling;if(grp&&grp.classList.contains('nav-group'))grp.classList.add('open')}
+});
 document.querySelector('.sidebar').classList.remove('open');
 if(id==='dashboard')renderDashboard();
 if(id==='miempresa')renderMiEmpresas();
