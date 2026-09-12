@@ -229,8 +229,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="sidebar-empresa-select" onchange="setEmpresaActiva(this.value)" title="Empresa que aparecera en tus documentos" style="width:100%;background:#fff;color:#333;border-radius:6px;padding:4px 6px;font-size:.8rem"></select>
 </div>
 <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')"><span class="icon">&#128202;</span>Panel Principal</button>
-<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127970;</span>Mi Empresa<span class="nav-caret">&#9660;</span></button>
-<div class="nav-sub open">
+<button class="nav-btn nav-group" onclick="toggleNavGroup(this)"><span class="icon">&#127970;</span>Mi Empresa<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub">
 <button class="nav-btn" data-page="miempresa" onclick="showPage('miempresa')"><span class="icon">&#128205;</span>Mi Empresa</button>
 <button class="nav-btn" data-page="empresas" onclick="showPage('empresas')"><span class="icon">&#127970;</span>Empresas Instaladoras</button>
 <button class="nav-btn" data-page="subcontratas" onclick="showPage('subcontratas')"><span class="icon">&#128188;</span>Subcontratas</button>
@@ -238,20 +238,20 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" data-page="proveedores" onclick="showPage('proveedores')"><span class="icon">&#128666;</span>Proveedores</button>
 <button class="nav-btn" data-page="empleados" onclick="showPage('empleados')"><span class="icon">&#129489;</span>Empleados</button>
 </div>
-<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127959;</span>Obras<span class="nav-caret">&#9660;</span></button>
-<div class="nav-sub open">
+<button class="nav-btn nav-group" onclick="toggleNavGroup(this)"><span class="icon">&#127959;</span>Obras<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub">
 <button class="nav-btn" data-page="obras" onclick="showPage('obras')"><span class="icon">&#127959;</span>Obras</button>
 <button class="nav-btn" data-page="zonas" onclick="showPage('zonas')"><span class="icon">&#128205;</span>Zonas</button>
 </div>
-<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#127981;</span>Almacen<span class="nav-caret">&#9660;</span></button>
-<div class="nav-sub open">
+<button class="nav-btn nav-group" onclick="toggleNavGroup(this)"><span class="icon">&#127981;</span>Almacen<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub">
 <button class="nav-btn" data-page="almacen" onclick="showPage('almacen')"><span class="icon">&#127981;</span>Almacen / Stock</button>
 <button class="nav-btn" data-page="almacenes" onclick="showPage('almacenes')"><span class="icon">&#127968;</span>Almacenes</button>
 <button class="nav-btn" data-page="categorias" onclick="showPage('categorias')"><span class="icon">&#128220;</span>Categorias</button>
 <button class="nav-btn" data-page="materiales" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
 </div>
-<button class="nav-btn nav-group open" onclick="toggleNavGroup(this)"><span class="icon">&#128194;</span>Gestion<span class="nav-caret">&#9660;</span></button>
-<div class="nav-sub open">
+<button class="nav-btn nav-group" onclick="toggleNavGroup(this)"><span class="icon">&#128194;</span>Gestion<span class="nav-caret">&#9660;</span></button>
+<div class="nav-sub">
 <button class="nav-btn" data-page="mediciones" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
 <button class="nav-btn" data-page="partes" onclick="showPage('partes')"><span class="icon">&#128203;</span>Partes de Trabajo</button>
 <button class="nav-btn" data-page="compras" onclick="showPage('compras')"><span class="icon">&#128722;</span>Compras</button>
@@ -1440,6 +1440,7 @@ let _authToken=localStorage.getItem('mo_token')||'';
 let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8081';
 let _authRetries=0;let _authConfigured=false;
+let _cloudSync=localStorage.getItem('cloud_sync')!==null?localStorage.getItem('cloud_sync')==='1':!IS_DESKTOP;
 const FB_CONFIG={apiKey:"AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k",authDomain:"gestionempresa-2026.firebaseapp.com",databaseURL:"https://gestionempresa-2026-default-rtdb.firebaseio.com",projectId:"gestionempresa-2026",storageBucket:"gestionempresa-2026.firebasestorage.app",messagingSenderId:"828319600246",appId:"1:828319600246:web:ce7061e9108ffef2c1d957"};
 const APP_VERSION='v1.5.8';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
@@ -1574,6 +1575,7 @@ function save(){
 }
 
 function initSync(){
+  if(!_cloudSync){_fbConnected=false;updateSyncStatus();return;}
   if(!FB_CONFIG.apiKey||!FB_CONFIG.databaseURL){_fbConnected=false;updateSyncStatus();return;}
   try{
     firebase.initializeApp(FB_CONFIG);
@@ -1647,8 +1649,26 @@ function initSync(){
 function updateSyncStatus(){
   const el=document.getElementById('sync-status');
   if(!el)return;
+  if(!_cloudSync){el.textContent='v'+APP_VERSION+' | Local';el.className='sync-ok';return}
   if(_fbConnected){el.textContent='v'+APP_VERSION+' | Sincronizado';el.className='sync-ok'}
   else{el.textContent='v'+APP_VERSION+' | Sin conexion';el.className='sync-off'}
+}
+
+function updateCloudBtn(){
+const b=document.getElementById('cloud-sync-btn');
+if(!b)return;
+b.textContent=_cloudSync?'Nube: ON':'Nube: OFF';
+b.style.color=_cloudSync?'#2e7d32':'#c62828';
+}
+
+function toggleCloudSync(){
+_cloudSync=!_cloudSync;
+localStorage.setItem('cloud_sync',_cloudSync?'1':'0');
+if(_cloudSync){location.reload();return}
+try{if(_dbRef){_dbRef.off()}}catch(e){}
+_dbRef=null;_db=null;_fbConnected=false;
+updateSyncStatus();updateCloudBtn();
+toast('Modo local activado (sin nube)');
 }
 
 function authFetch(url,opts){
@@ -4859,6 +4879,7 @@ if('serviceWorker' in navigator){
   }
 }
 initSync();
+updateCloudBtn();
 if(IS_DESKTOP){
   checkAuthStatus();
 }else{
@@ -4867,7 +4888,8 @@ if(IS_DESKTOP){
 setTimeout(function(){fetch('/api/health',{cache:'no-store'}).then(r=>{if(r.ok)updateCheck()}).catch(()=>{})},3000);
 </script>
 <footer class="app-footer">
-  <span id="sync-status" class="sync-off">Sin conexion</span>
+  <span id="sync-status" class="sync-ok">Local</span>
+  <button id="cloud-sync-btn" onclick="toggleCloudSync()" title="Activar o desactivar la sincronizacion con la nube (Firebase)" style="background:rgba(0,0,0,.06);border:1px solid var(--border);border-radius:20px;padding:3px 12px;font-size:.75rem;cursor:pointer;font-weight:600"></button>
   <span>© 2026 JMBernabeu</span>
   <span>Software libre bajo la <a href="LICENSE" target="_blank" rel="noopener">Licencia Pública General de GNU v3 o posterior</a></span>
 </footer>
