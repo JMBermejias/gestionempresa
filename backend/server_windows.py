@@ -4,12 +4,16 @@
 # Autenticacion + Actualizaciones automaticas desde GitHub Releases
 # Copyright (C) 2026 JMBernabeu - GPL-3.0-or-later
 import base64
+import getpass
 import hashlib
 import hmac
 import json
 import os
+import pwd
 import re
+import shutil
 import sqlite3
+import subprocess
 import sys
 import threading
 import time
@@ -377,6 +381,21 @@ class Handler(BaseHTTPRequestHandler):
             if not os.path.exists(new):
                 self._send_json(400, {'error': 'Primero descarga la actualizacion'})
                 return True
+            if sys.platform.startswith('linux'):
+                try:
+                    launched = self._launch_linux_updater(new)
+                except Exception as e:
+                    self._send_json(500, {'error': 'No se pudo lanzar el actualizador: %s' % e})
+                    return True
+                if not launched:
+                    self._send_json(500, {'error': 'No se pudo lanzar el actualizador (pkexec/sudo no disponibles). Aplica la actualizacion manualmente con: sudo dpkg -i %s' % new})
+                    return True
+                threading.Timer(2.0, lambda: os._exit(0)).start()
+                self._send_json(200, {
+                    'ok': True,
+                    'message': 'Actualizacion aplicada. Si se solicita, introduce tu contrasena. La aplicacion se cerrara y se volvera a abrir sola con la nueva version.',
+                })
+                return True
             target = os.path.join(BASE_DIR, EXE_NAME)
             if os.path.abspath(new) == os.path.abspath(target):
                 self._send_json(200, {'ok': True, 'message': 'La aplicacion ya esta actualizada.'})
@@ -432,6 +451,73 @@ class Handler(BaseHTTPRequestHandler):
             new = os.path.join(UPDATES_DIR, EXE_NAME)
             self._send_json(200, {'downloaded': os.path.exists(new)})
             return True
+        return False
+
+    def _launch_linux_updater(self, new_deb):
+        os.makedirs(UPDATES_DIR, exist_ok=True)
+        logf = os.path.join(UPDATES_DIR, 'update_log.txt')
+        sh = os.path.join(UPDATES_DIR, 'apply_update.sh')
+        try:
+            real_user = pwd.getpwuid(os.getuid()).pw_name
+        except Exception:
+            real_user = getpass.getuser()
+        script = (
+            '#!/bin/sh\n'
+            'LOG="%s"\n'
+            'DEB="%s"\n'
+            'REAL_USER="%s"\n'
+            'echo "[$(date +%%F_%%T)] Inicio actualizacion" > "$LOG"\n'
+            'echo "Esperando cierre de la aplicacion..." >> "$LOG"\n'
+            'i=0\n'
+            'while pgrep -f gestion-empresa-bin >/dev/null 2>&1; do\n'
+            '  i=$((i + 1))\n'
+            '  if [ "$i" -ge 20 ]; then break; fi\n'
+            '  sleep 1\n'
+            'done\n'
+            'pkill -f gestion-empresa-bin >/dev/null 2>&1 || true\n'
+            'sleep 1\n'
+            'echo "Instalando nueva version..." >> "$LOG"\n'
+            'dpkg -i "$DEB" >> "$LOG" 2>&1\n'
+            'echo "[$(date +%%F_%%T)] Instalacion finalizada" >> "$LOG"\n'
+            'nohup /usr/bin/gestion-empresa-bin >/dev/null 2>&1 &\n'
+            'sleep 2\n'
+            'if [ -n "$REAL_USER" ] && command -v su >/dev/null 2>&1 && [ "$(id -u)" != "0" ]; then\n'
+            '  su "$REAL_USER" -c \'xdg-open "http://127.0.0.1:8081"\' >/dev/null 2>&1 || true\n'
+            'else\n'
+            '  xdg-open "http://127.0.0.1:8081" >/dev/null 2>&1 || true\n'
+            'fi\n'
+            'rm -f "$0"\n'
+            'exit 0\n'
+        ) % (logf, new_deb, real_user)
+        with open(sh, 'w') as f:
+            f.write(script)
+        os.chmod(sh, 0o755)
+        display = os.environ.get('DISPLAY', '')
+        xdg_rt = os.environ.get('XDG_RUNTIME_DIR', '')
+        dbus_addr = os.environ.get('DBUS_SESSION_BUS_ADDRESS', '')
+        env_args = ['REAL_USER=%s' % real_user]
+        if display:
+            env_args.append('DISPLAY=%s' % display)
+        if xdg_rt:
+            env_args.append('XDG_RUNTIME_DIR=%s' % xdg_rt)
+        if dbus_addr:
+            env_args.append('DBUS_SESSION_BUS_ADDRESS=%s' % dbus_addr)
+        if shutil.which('pkexec'):
+            subprocess.Popen(['pkexec', '/usr/bin/env'] + env_args + ['/bin/sh', sh])
+            return True
+        if shutil.which('gksudo'):
+            subprocess.Popen(['gksudo', '/bin/sh', sh])
+            return True
+        if shutil.which('kdesudo'):
+            subprocess.Popen(['kdesudo', '--', '/bin/sh', sh])
+            return True
+        if shutil.which('sudo'):
+            try:
+                subprocess.run(['sudo', '-n', 'true'], timeout=5)
+                subprocess.Popen(['sudo', '-n', '/bin/sh', sh])
+                return True
+            except Exception:
+                return False
         return False
 
     def _handle_api_app(self, path, authed):
