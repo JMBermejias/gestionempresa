@@ -258,12 +258,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="grid grid-5" id="stats-cards"></div>
 <div class="grid grid-2" style="margin-top:20px">
 <div class="card">
-<h3 style="color:var(--primary-dark);margin-bottom:15px">Mediciones Recientes</h3>
-<div class="table-wrap"><table><thead><tr><th>N&ordm;/Fecha</th><th>Materiales</th><th>Cant.</th><th>Empresa</th><th>Obra</th></tr></thead><tbody id="recent-list"></tbody></table></div>
+<h3 style="color:var(--primary-dark);margin-bottom:15px">Ultimas Compras</h3>
+<div class="table-wrap"><table><thead><tr><th>N&ordm;/Fecha</th><th>Proveedor</th><th>Estado</th><th>Total</th></tr></thead><tbody id="recent-compras-list"></tbody></table></div>
 </div>
 <div class="card">
-<h3 style="color:var(--primary-dark);margin-bottom:15px">Materiales por Categoria</h3>
-<div id="cat-bars" style="padding:10px"></div>
+<h3 style="color:var(--primary-dark);margin-bottom:15px">Ultimas Ventas</h3>
+<div class="table-wrap"><table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente/Obra</th><th>Estado</th><th>Total</th></tr></thead><tbody id="recent-ventas-list"></tbody></table></div>
 </div>
 </div>
 </div>
@@ -2859,9 +2859,12 @@ save();closeModal('modal-categoria');renderCategorias();populateCategoriaSelects
 
 function deleteCategoria(nombre){
 const count=materials.filter(m=>m.categoria===nombre).length;
-if(count>0){alert('No se puede eliminar: '+count+' material(es) usan esta categoria. Reasigna esos materiales primero.');return}
-if(!confirm('Eliminar la categoria "'+nombre+'"?'))return;
+let msg='Eliminar la categoria "'+nombre+'"';
+if(count>0){msg+='? '+count+' material(es) usan esta categoria y se quedaran sin categoria.';if(!confirm(msg))return}
+else{if(!confirm(msg+'?'))return}
 categorias=categorias.filter(c=>catNameOf(c)!==nombre);
+materials.forEach(m=>{if(m.categoria===nombre)m.categoria=''});
+[mediciones,presupuestos,facturas,compras,ventas,partes].forEach(docs=>docs.forEach(d=>{(d.lineas||[]).forEach(l=>{if(l.categoria===nombre)l.categoria=''})}));
 save();renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria eliminada');
 }
 
@@ -3120,18 +3123,10 @@ document.getElementById('stats-cards').innerHTML=`
 <div class="stat-card" style="background:linear-gradient(135deg,#7E57C2,#B39DDB);cursor:pointer" onclick="showPage('empleados')"><div class="stat-icon">&#129489;</div><div class="stat-value">${empleados.length}</div><div class="stat-label">Empleados</div></div>
 <div class="stat-card" style="background:linear-gradient(135deg,#00897B,#4DB6AC);cursor:pointer" onclick="showPage('almacen')"><div class="stat-icon">&#127981;</div><div class="stat-value">${Object.values(computeStock()).filter(v=>v>0).length}</div><div class="stat-label">Almacen (Con Stock)</div></div>
 <div class="stat-card" style="background:linear-gradient(135deg,#00695C,#26A69A);cursor:pointer" onclick="showPage('partes')"><div class="stat-icon">&#128203;</div><div class="stat-value">${partes.length}</div><div class="stat-label">Partes de Trabajo</div></div>`;
-const recent=[...mediciones].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
-document.getElementById('recent-list').innerHTML=recent.map(m=>{
-const lines=m.lineas||(m.materialId?[{material:m.material,cantidad:m.cantidad,unidad:m.unidad}]:[]);
-const matText=lines.map(l=>l.material+' ('+l.cantidad+' '+l.unidad+')').join(', ');
-return`<tr><td><strong>${getSerieStr(m.serie||0)}</strong><br><small>${m.fecha}</small></td><td style="font-size:.8rem;max-width:250px;overflow:hidden;text-overflow:ellipsis">${matText}</td><td>${m.empresa||'-'}</td><td>${m.obra||'-'}</td></tr>`
-}).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">Sin datos</td></tr>';
-const cats=categorias.map((c,i)=>({n:catNameOf(c),c:['#4FC3F7','#66BB6A','#29B6F6','#FFA726','#EF5350'][i%5]}));
-const maxMat=Math.max(...cats.map(c=>materials.filter(m=>m.categoria===c.n).length),1);
-document.getElementById('cat-bars').innerHTML=cats.map(c=>{
-const count=materials.filter(m=>m.categoria===c.n).length;
-const pct=Math.round((count/maxMat)*100);
-return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="width:80px;font-size:.8rem">${c.n}</span><div style="flex:1;height:24px;background:#E1F5FE;border-radius:12px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${c.c};border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:600">${count}</div></div></div>`}).join('');
+const compRec=[...compras].filter(c=>c.estado!=='Anulada').sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
+document.getElementById('recent-compras-list').innerHTML=compRec.map(c=>`<tr><td><strong>${getCompSerieStr(c.numero||0)}</strong><br><small>${c.fecha}</small></td><td>${c.proveedor||'-'}</td><td>${c.estado||'Recibida'}</td><td style="text-align:right"><strong>${fmtPrecio(c.total||0)} &euro;</strong></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">Sin datos</td></tr>';
+const ventRec=[...ventas].filter(v=>v.estado!=='Anulada').sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
+document.getElementById('recent-ventas-list').innerHTML=ventRec.map(v=>`<tr><td><strong>${getVenSerieStr(v.numero||0)}</strong><br><small>${v.fecha}</small></td><td>${v.destino==='obra'?(v.obra||'-'):(v.cliente||'-')}</td><td>${v.estado||'Confirmada'}</td><td style="text-align:right"><strong>${fmtPrecio(v.total||0)} &euro;</strong></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">Sin datos</td></tr>';
 }
 
 function facturacionGroups(fDesde,fHasta){
