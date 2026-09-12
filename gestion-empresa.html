@@ -1522,9 +1522,15 @@ return T[c]||'clim';
 }
 function migrateData(){
 if(!Array.isArray(categorias))categorias=[];
+if(localStorage.getItem('cat2_data')===null){
 ['Electricidad','Fontaneria','Calefaccion','Climatizacion','PCI'].forEach(n=>{if(!categorias.some(c=>(typeof c==='string'?c:c.nombre)===n))categorias.push(n)});
+if(categorias.length>0)localStorage.setItem('cat2_data',JSON.stringify(categorias));
+}
 if(!Array.isArray(almacenes))almacenes=[];
-if(!almacenes.some(a=>a&&a.id===DEFAULT_ALMACEN_ID))almacenes.unshift({id:DEFAULT_ALMACEN_ID,nombre:'Almacen Principal',ubicacion:'',notas:'',fechaCreacion:new Date().toISOString().split('T')[0]});
+if(localStorage.getItem('alm2_data')===null&&!almacenes.some(a=>a&&a.id===DEFAULT_ALMACEN_ID)){
+almacenes.unshift({id:DEFAULT_ALMACEN_ID,nombre:'Almacen Principal',ubicacion:'',notas:'',fechaCreacion:new Date().toISOString().split('T')[0]});
+localStorage.setItem('alm2_data',JSON.stringify(almacenes));
+}
 [compras,ventas,partes,almacen].forEach(docs=>(docs||[]).forEach(d=>{if(d&&!d.almacenId)d.almacenId=DEFAULT_ALMACEN_ID}));
 }
 
