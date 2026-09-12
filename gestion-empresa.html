@@ -233,7 +233,9 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" onclick="showPage('proveedores')"><span class="icon">&#128666;</span>Proveedores</button>
 <button class="nav-btn" onclick="showPage('empleados')"><span class="icon">&#129489;</span>Empleados</button>
 <button class="nav-btn" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
+<button class="nav-btn" onclick="showPage('categorias')"><span class="icon">&#128220;</span>Categorias</button>
 <button class="nav-btn" onclick="showPage('almacen')"><span class="icon">&#127981;</span>Almacen / Stock</button>
+<button class="nav-btn" onclick="showPage('almacenes')"><span class="icon">&#127968;</span>Almacenes</button>
 <button class="nav-btn" onclick="showPage('mediciones')"><span class="icon">&#128221;</span>Mediciones</button>
 <button class="nav-btn" onclick="showPage('partes')"><span class="icon">&#128203;</span>Partes de Trabajo</button>
 <button class="nav-btn" onclick="showPage('compras')"><span class="icon">&#128722;</span>Compras</button>
@@ -388,8 +390,25 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="filter-chips" id="mat-filters"></div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>Categoria</th><th>Unidad</th><th>Stock</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>Categoria</th><th>Unidad</th><th>Coste</th><th>PVP</th><th>P. Venta</th><th>Stock</th><th>Acciones</th></tr></thead>
 <tbody id="materials-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- CATEGORIAS -->
+<div id="page-categorias" class="page">
+<div class="page-header">
+<h1>&#128220; Categorias de Materiales</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+<button class="btn btn-primary" onclick="openCategoriaModal()">+ Nueva Categoria</button>
+</div>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>Categoria</th><th>Materiales</th><th>Acciones</th></tr></thead>
+<tbody id="categorias-list"></tbody></table>
 </div>
 </div>
 </div>
@@ -413,7 +432,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="filter-empresa-med" onchange="renderMediciones()"><option value="">Todas las empresas</option></select>
 <select id="filter-obra-med" onchange="renderMediciones()"><option value="">Todas las obras</option></select>
 <select id="filter-zona-med" onchange="renderMediciones()"><option value="">Todas las zonas</option></select>
-<select id="filter-cat-med" onchange="renderMediciones()"><option value="">Todas las categorias</option><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="filter-cat-med" onchange="renderMediciones()"></select>
 <button class="btn btn-outline" onclick="clearMedFilters()" style="padding:6px 12px;font-size:.8rem">Limpiar</button>
 </div>
 <div class="card">
@@ -556,7 +575,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div id="alm-resumen" class="grid grid-4" style="margin-bottom:15px"></div>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:15px">
 <div class="filters" style="margin-bottom:0">
-<select id="alm-cat" onchange="renderAlmacen()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="all">Todas las categorias</option><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="alm-almacen" onchange="renderAlmacen()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<select id="alm-cat" onchange="renderAlmacen()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <input type="text" id="alm-search" placeholder="Buscar material..." oninput="renderAlmacen()" style="flex:1;min-width:180px;padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:.85rem;outline:none">
 <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--text-light);cursor:pointer"><input type="checkbox" id="alm-only-low" onchange="renderAlmacen()"> Solo stock bajo</label>
@@ -565,6 +585,23 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="table-wrap">
 <table><thead><tr><th>Material</th><th>Categoria</th><th>Unidad</th><th>Entradas</th><th>Salidas</th><th>Stock Actual</th><th>Acciones</th></tr></thead>
 <tbody id="almacen-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- ALMACENES -->
+<div id="page-almacenes" class="page">
+<div class="page-header">
+<h1>&#127981; Almacenes</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
+<button class="btn btn-primary" onclick="openAlmacenModal()">+ Nuevo Almacen</button>
+</div>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>Nombre</th><th>Ubicacion</th><th>Notas</th><th>Acciones</th></tr></thead>
+<tbody id="almacenes-list"></tbody></table>
 </div>
 </div>
 </div>
@@ -879,9 +916,24 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="hidden" id="mat-edit-id">
 <input type="hidden" id="mat-img-data">
 <div class="form-group"><label>Nombre</label><input type="text" id="mat-nombre" placeholder="Ej: Cable 2.5mm"></div>
-<div class="form-group"><label>Categoria</label><select id="mat-categoria"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select></div>
+<div class="form-group"><label>Categoria</label><select id="mat-categoria"></select></div>
 <div class="form-group"><label>Unidad</label><select id="mat-unidad"><option value="ml">Metros (ml)</option><option value="m2">Metros cuadrados (m2)</option><option value="m3">Metros cubicos (m3)</option><option value="ud">Unidad (ud)</option><option value="kg">Kilogramos (kg)</option><option value="l">Litros (l)</option><option value="bulto">Bulto</option><option value="caja">Caja</option><option value="rollo">Rollo</option><option value="juego">Juego</option><option value="par">Par</option><option value="set">Set</option></select></div>
 <div class="form-group"><label>Descripcion (opcional)</label><input type="text" id="mat-desc" placeholder="Descripcion breve"></div>
+<div class="form-group"><label>Precios</label>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center">
+<input type="number" id="mat-coste" step="0.01" min="0" placeholder="Coste" oninput="updateMatVentaPreview()" style="padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.85rem" title="Precio del proveedor / coste">
+<input type="number" id="mat-pvp" step="0.01" min="0" placeholder="PVP" style="padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.85rem" title="Precio de venta al publico">
+<input type="number" id="mat-incremento" step="0.1" min="0" placeholder="Inc. %" oninput="updateMatVentaPreview()" style="padding:8px 10px;border:2px solid var(--border);border-radius:8px;font-size:.85rem" title="Incremento en % sobre el coste">
+</div>
+<small style="color:var(--text-light);font-size:.72rem;line-height:1.4;display:block;margin-top:4px">Coste/Proveedor &middot; PVP &middot; Incremento % sobre el coste. <span id="mat-venta-preview" style="color:var(--primary-dark);font-weight:600"></span></small>
+</div>
+<div class="form-group"><label>Importar desde URL</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<input type="text" id="mat-url" placeholder="https://tienda.com/producto/..." style="flex:1;min-width:180px;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
+<button type="button" class="btn btn-success" onclick="importMatFromURL()" style="font-size:.8rem;padding:6px 12px;white-space:nowrap">&#128279; Importar</button>
+</div>
+<small style="color:var(--text-light);font-size:.72rem">Rellena nombre, foto y precio (coste) desde la pagina del producto. Puede fallar si la web no permite acceso.</small>
+</div>
 <div class="form-group"><label>Imagen del Material</label>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
 <button type="button" class="btn btn-primary" onclick="document.getElementById('mat-img-file').click()" style="font-size:.8rem;padding:6px 12px">&#128193; Desde archivo</button>
@@ -918,7 +970,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="text" id="med-mat-search" placeholder="Buscar material por nombre..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="med-mat-results"></div>
 </div>
-<select id="med-cat" onchange="filterMaterialsForMedicion()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="med-cat" onchange="filterMaterialsForMedicion()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
 <select id="med-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
@@ -964,14 +1016,15 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="text" id="pres-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="pres-mat-results"></div>
 </div>
-<select id="pres-cat" onchange="filterMaterialsForPres()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="pres-cat" onchange="filterMaterialsForPres()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<select id="pres-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<select id="pres-material" onchange="presMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="pres-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="pres-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <button class="btn btn-success" onclick="addPresLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
 </div>
+<div id="pres-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
 <div id="pres-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
 <div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
@@ -1017,14 +1070,15 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="text" id="fac-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="fac-mat-results"></div>
 </div>
-<select id="fac-cat" onchange="filterMaterialsForFac()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="fac-cat" onchange="filterMaterialsForFac()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<select id="fac-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<select id="fac-material" onchange="facMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="fac-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="fac-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <button class="btn btn-success" onclick="addFacLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
 </div>
+<div id="fac-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
 <div id="fac-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
 <div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
@@ -1141,12 +1195,41 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 </div>
 
+<!-- MODAL CATEGORIA -->
+<div class="modal-overlay" id="modal-categoria">
+<div class="modal">
+<h3 id="cat-modal-title">Nueva Categoria</h3>
+<input type="hidden" id="cat-edit-id">
+<div class="form-group"><label>Nombre *</label><input type="text" id="cat-nombre" placeholder="Ej: Electricidad"></div>
+<div class="modal-actions">
+<button class="btn btn-outline" onclick="closeModal('modal-categoria')">Cancelar</button>
+<button class="btn btn-primary" onclick="saveCategoria()">Guardar</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL ALMACEN -->
+<div class="modal-overlay" id="modal-almacen">
+<div class="modal">
+<h3 id="almacen-modal-title">Nuevo Almacen</h3>
+<input type="hidden" id="almacen-edit-id">
+<div class="form-group"><label>Nombre *</label><input type="text" id="almacen-nombre" placeholder="Ej: Almacen Principal"></div>
+<div class="form-group"><label>Ubicacion</label><input type="text" id="almacen-ubicacion" placeholder="Direccion / localidad"></div>
+<div class="form-group"><label>Notas</label><input type="text" id="almacen-notas" placeholder="Opcional"></div>
+<div class="modal-actions">
+<button class="btn btn-outline" onclick="closeModal('modal-almacen')">Cancelar</button>
+<button class="btn btn-primary" onclick="saveAlmacen()">Guardar</button>
+</div>
+</div>
+</div>
+
 <!-- MODAL AJUSTE ALMACEN -->
 <div class="modal-overlay" id="modal-ajuste">
 <div class="modal">
 <h3>Ajuste de Stock</h3>
 <input type="hidden" id="ajuste-mat-id">
 <div class="form-group"><label>Material</label><select id="ajuste-material" onchange="updateAjusteStockInfo()"></select></div>
+<div class="form-group"><label>Almacen *</label><select id="ajuste-almacen" onchange="updateAjusteStockInfo()"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Tipo</label><select id="ajuste-tipo" onchange="updateAjusteStockInfo()"><option value="entrada">Entrada (+)</option><option value="salida">Salida (-)</option></select></div>
 <div class="form-group"><label>Cantidad *</label><input type="number" id="ajuste-cantidad" step="0.01" min="0" oninput="updateAjusteStockInfo()" placeholder="0"></div>
@@ -1169,20 +1252,22 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Fecha *</label><input type="date" id="com-fecha"></div>
 <div class="form-group"><label>Proveedor *</label><select id="com-proveedor"></select></div>
 </div>
+<div class="form-group"><label>Almacen destino *</label><select id="com-almacen" onchange=""></select></div>
 <div style="background:#E1F5FE;border-radius:8px;padding:12px;margin-bottom:10px">
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
 <div style="flex:1;min-width:200px" class="search-picker">
 <input type="text" id="com-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="com-mat-results"></div>
 </div>
-<select id="com-cat" onchange="filterMaterialsForComp()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="com-cat" onchange="filterMaterialsForComp()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<select id="com-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<select id="com-material" onchange="comMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="com-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="com-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <button class="btn btn-success" onclick="addCompLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
 </div>
+<div id="com-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
 <div id="com-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
 <div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
@@ -1210,8 +1295,9 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Fecha *</label><input type="date" id="ven-fecha"></div>
 <div class="form-group"><label>Destino *</label><select id="ven-destino" onchange="toggleVentaDestino()"><option value="cliente">Cliente</option><option value="obra">Obra Propia</option></select></div>
 </div>
-<div class="form-group" id="ven-cliente-grp"><label>Cliente *</label><select id="ven-cliente"></select></div>
+<div class="form-group"><label>Cliente *</label><select id="ven-cliente"></select></div>
 <div class="form-group" id="ven-obra-grp" style="display:none"><label>Obra *</label><select id="ven-obra"></select></div>
+<div class="form-group"><label>Almacen origen *</label><select id="ven-almacen" onchange=""></select></div>
 <div class="form-group"><label>Subcontrata</label><select id="ven-subcontrata"></select></div>
 <div style="background:#E1F5FE;border-radius:8px;padding:12px;margin-bottom:10px">
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
@@ -1219,14 +1305,15 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="text" id="ven-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="ven-mat-results"></div>
 </div>
-<select id="ven-cat" onchange="filterMaterialsForVen()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="ven-cat" onchange="filterMaterialsForVen()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<select id="ven-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
+<select id="ven-material" onchange="venMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="ven-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="ven-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <button class="btn btn-success" onclick="addVenLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
 </div>
+<div id="ven-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
 <div id="ven-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
 <div style="display:flex;justify-content:flex-end;gap:20px;margin-bottom:10px;font-size:.9rem">
@@ -1254,6 +1341,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Fecha *</label><input type="date" id="par-fecha"></div>
 <div class="form-group"><label>Horas Trabajadas</label><input type="number" id="par-horas" step="0.5" min="0" placeholder="0"></div>
 </div>
+<div class="form-group"><label>Almacen origen *</label><select id="par-almacen" onchange=""></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Empleado *</label><select id="par-empleado"></select></div>
 <div class="form-group"><label>Obra *</label><select id="par-obra"></select></div>
@@ -1265,7 +1353,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="text" id="par-mat-search" placeholder="Buscar material..." autocomplete="off" style="width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <div class="search-picker-results" id="par-mat-results"></div>
 </div>
-<select id="par-cat" onchange="filterMaterialsForPar()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"><option value="Electricidad">Electricidad</option><option value="Fontaneria">Fontaneria</option><option value="Calefaccion">Calefaccion</option><option value="Climatizacion">Climatizacion</option><option value="PCI">PCI Contra Incendios</option></select>
+<select id="par-cat" onchange="filterMaterialsForPar()" style="padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 </div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
 <select id="par-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
@@ -1313,6 +1401,9 @@ let compras = JSON.parse(localStorage.getItem('com_data') || '[]');
 let ventas = JSON.parse(localStorage.getItem('ven_data') || '[]');
 let almacen = JSON.parse(localStorage.getItem('alm_data') || '[]');
 let partes = JSON.parse(localStorage.getItem('par_data') || '[]');
+let categorias = JSON.parse(localStorage.getItem('cat2_data') || '[]');
+let almacenes = JSON.parse(localStorage.getItem('alm2_data') || '[]');
+const DEFAULT_ALMACEN_ID='al_principal';
 let tempMedicionLineas = [];
 let tempPresLineas = [];
 let tempFacLineas = [];
@@ -1351,6 +1442,22 @@ if(m.img)return m.img;
 return _getIcon(m.categoria,m.nombre);
 }
 
+function getMaterialCoste(m){const c=parseFloat(m&&m.coste);return !isNaN(c)?c:0}
+function getMaterialPrecio(m){
+const c=getMaterialCoste(m);
+if(c>0){const i=parseFloat(m&&m.incremento);const inc=!isNaN(i)?i:0;return +(c*(1+inc/100)).toFixed(4)}
+const p=parseFloat(m&&m.pvp);return !isNaN(p)?p:0;
+}
+function fmtPrecio(v){v=+v||0;return v.toFixed(2)}
+function updateMatVentaPreview(){
+const el=document.getElementById('mat-venta-preview');if(!el)return;
+const c=parseFloat(document.getElementById('mat-coste').value||'0');
+if(!c||c<=0){el.textContent='Introduce un precio de coste';return}
+const i=parseFloat(document.getElementById('mat-incremento').value||'0');
+const inc=!isNaN(i)?i:0;
+el.textContent='Precio venta: '+(c*(1+inc/100)).toFixed(2)+' EUR';
+}
+
 function handleFoto(event,previewId,wrapId){
 const f=event.target.files[0];
 if(!f)return;
@@ -1364,6 +1471,45 @@ function clearFoto(previewId,wrapId){const img=document.getElementById(previewId
 function getFotoSrc(previewId,wrapId){const w=document.getElementById(wrapId);if(w&&w.style.display==='block')return document.getElementById(previewId).src;return ''}
 function setFotoPreview(previewId,wrapId,foto){const img=document.getElementById(previewId);const w=document.getElementById(wrapId);if(!foto){if(img)img.src='';if(w)w.style.display='none'}else{img.src=foto;w.style.display='block'}}
 function fotoCell(foto){return foto?'<img src="'+foto+'" style="width:38px;height:38px;object-fit:cover;border-radius:50%;border:2px solid var(--border);vertical-align:middle">':'<span style="color:var(--text-light)">-</span>'}
+
+function getDefaultAlmacen(){return almacenes.find(a=>a.id===DEFAULT_ALMACEN_ID)||almacenes[0]}
+function getAlmacenNombre(id){const a=almacenes.find(x=>x.id===id);return a?a.nombre:''}
+function catNameOf(c){return typeof c==='string'?c:(c&&c.nombre)}
+function catNames(){return categorias.map(catNameOf)}
+function popCatSelect(selectId,keepVal){
+const sel=document.getElementById(selectId);
+if(!sel)return;
+const cur=keepVal!==undefined?keepVal:sel.value;
+sel.innerHTML=categorias.map(c=>'<option value="'+catNameOf(c)+'">'+catNameOf(c)+'</option>').join('')||'<option value="">Sin categorias</option>';
+if(cur)sel.value=cur;
+}
+function populateCategoriaSelects(){
+['mat-categoria','med-cat','pres-cat','fac-cat','com-cat','ven-cat','par-cat'].forEach(id=>popCatSelect(id));
+const almCat=document.getElementById('alm-cat');if(almCat){const v=almCat.value;almCat.innerHTML='<option value="all">Todas las categorias</option>'+categorias.map(c=>'<option value="'+catNameOf(c)+'">'+catNameOf(c)+'</option>').join('');almCat.value=v;if(!almCat.value)almCat.value='all';}
+const fcm=document.getElementById('filter-cat-med');if(fcm){const v2=fcm.value;fcm.innerHTML='<option value="">Todas las categorias</option>'+categorias.map(c=>'<option value="'+catNameOf(c)+'">'+catNameOf(c)+'</option>').join('');if(v2)fcm.value=v2;}
+}
+function populateAlmacenSelect(selectId,keepVal){
+const sel=document.getElementById(selectId);
+if(!sel)return;
+const cur=keepVal!==undefined?keepVal:sel.value||DEFAULT_ALMACEN_ID;
+sel.innerHTML=almacenes.map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+if(cur)sel.value=almacenes.some(a=>a.id===cur)?cur:DEFAULT_ALMACEN_ID;
+}
+function catTagClass(c){
+const T={'Electricidad':'elec','PCI':'pci','Fontaneria':'font','Climatizacion':'clim'};
+return T[c]||'clim';
+}
+function catTagClass2(c){
+const T={'Electricidad':'elec','PCI':'pci','Fontaneria':'font','Calefaccion':'cal','Climatizacion':'clim'};
+return T[c]||'clim';
+}
+function migrateData(){
+if(!Array.isArray(categorias))categorias=[];
+['Electricidad','Fontaneria','Calefaccion','Climatizacion','PCI'].forEach(n=>{if(!categorias.some(c=>(typeof c==='string'?c:c.nombre)===n))categorias.push(n)});
+if(!Array.isArray(almacenes))almacenes=[];
+if(!almacenes.some(a=>a&&a.id===DEFAULT_ALMACEN_ID))almacenes.unshift({id:DEFAULT_ALMACEN_ID,nombre:'Almacen Principal',ubicacion:'',notas:'',fechaCreacion:new Date().toISOString().split('T')[0]});
+[compras,ventas,partes,almacen].forEach(docs=>(docs||[]).forEach(d=>{if(d&&!d.almacenId)d.almacenId=DEFAULT_ALMACEN_ID}));
+}
 
 function saveLocal(){
   localStorage.setItem('mat_data',JSON.stringify(materials));
@@ -1383,6 +1529,8 @@ function saveLocal(){
   localStorage.setItem('ven_data',JSON.stringify(ventas));
   localStorage.setItem('alm_data',JSON.stringify(almacen));
   localStorage.setItem('par_data',JSON.stringify(partes));
+  localStorage.setItem('cat2_data',JSON.stringify(categorias));
+  localStorage.setItem('alm2_data',JSON.stringify(almacenes));
   localStorage.setItem('med_serie_counter',medSerieCounter);
   localStorage.setItem('pres_serie_counter',presSerieCounter);
   localStorage.setItem('fac_serie_counter',facSerieCounter);
@@ -1393,7 +1541,7 @@ function saveLocal(){
 
 function save(){
   saveLocal();
-  const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes};
+  const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes,categorias,almacenes};
   if(_dbRef){
     _dbRef.set(payload).catch(e=>console.warn('Firebase save error',e));
   }
@@ -1432,6 +1580,9 @@ function initSync(){
         if(r.ventas)ventas=r.ventas;
         if(r.almacen)almacen=r.almacen;
         if(r.partes)partes=r.partes;
+        if(r.categorias)categorias=r.categorias;
+        if(r.almacenes)almacenes=r.almacenes;
+        migrateData();
         saveLocal();
         if(!_ready){toast('Datos sincronizados desde la nube');_ready=true;}
         renderAll();
@@ -1462,6 +1613,9 @@ function initSync(){
       if(data.almacen)         almacen      = data.almacen;
       if(data.empleados)       empleados    = data.empleados;
       if(data.partes)          partes       = data.partes;
+      if(data.categorias)      categorias   = data.categorias;
+      if(data.almacenes)       almacenes    = data.almacenes;
+      migrateData();
       saveLocal();renderAll();_ready=true;
     }).catch(()=>{});
   }
@@ -1717,6 +1871,7 @@ function doCheckUpdate(){
 }
 
 function renderAll(){
+  populateCategoriaSelects();populateAlmacenSelect('alm-almacen');
   const p=document.querySelector('.page.active');
   if(p){const id=p.id.replace('page-','');
     if(id==='dashboard')renderDashboard();
@@ -1725,6 +1880,7 @@ function renderAll(){
     if(id==='empresas')renderEmpresas();
     if(id==='subcontratas')renderSubcontratas();
     if(id==='materiales')renderMaterials();
+    if(id==='categorias')renderCategorias();
     if(id==='mediciones')renderMediciones();
     if(id==='presupuestos')renderPresupuestos();
     if(id==='facturas')renderFacturas();
@@ -1733,6 +1889,7 @@ function renderAll(){
     if(id==='proveedores')renderProveedores();
     if(id==='empleados')renderEmpleados();
     if(id==='almacen')renderAlmacen();
+    if(id==='almacenes')renderAlmacenes();
     if(id==='compras')renderCompras();
     if(id==='ventas')renderVentas();
     if(id==='partes')renderPartes();
@@ -1745,10 +1902,11 @@ function renderAll(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
 function showPage(id){
+populateCategoriaSelects();populateAlmacenSelect('alm-almacen');
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById('page-'+id).classList.add('active');
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-const pages=['dashboard','miempresa','obras','zonas','empresas','subcontratas','clientes','proveedores','empleados','materiales','almacen','mediciones','partes','compras','ventas','presupuestos','facturas','estadisticas','reportes'];
+const pages=['dashboard','miempresa','obras','zonas','empresas','subcontratas','clientes','proveedores','empleados','materiales','categorias','almacen','almacenes','mediciones','partes','compras','ventas','presupuestos','facturas','estadisticas','reportes'];
 const idx=pages.indexOf(id);
 if(idx>=0)document.querySelectorAll('.nav-btn')[idx].classList.add('active');
 document.querySelector('.sidebar').classList.remove('open');
@@ -1759,6 +1917,7 @@ if(id==='zonas')renderZonas();
 if(id==='empresas')renderEmpresas();
 if(id==='subcontratas')renderSubcontratas();
 if(id==='materiales')renderMaterials();
+if(id==='categorias')renderCategorias();
 if(id==='mediciones')renderMediciones();
 if(id==='presupuestos')renderPresupuestos();
 if(id==='facturas')renderFacturas();
@@ -1767,7 +1926,8 @@ if(id==='estadisticas')renderEstadisticas();
 if(id==='clientes')renderClientes();
 if(id==='proveedores')renderProveedores();
 if(id==='empleados')renderEmpleados();
-if(id==='almacen')renderAlmacen();
+if(id==='almacen'){populateAlmacenSelect('alm-almacen');renderAlmacen();}
+if(id==='almacenes')renderAlmacenes();
 if(id==='compras')renderCompras();
 if(id==='ventas')renderVentas();
 if(id==='partes')renderPartes();
@@ -1960,22 +2120,23 @@ if(!sel)return;
 sel.innerHTML='<option value="">Seleccionar empleado...</option>'+empleados.map(p=>`<option value="${p.id}">${p.nombre}${p.cargo?' ('+p.cargo+')':''}</option>`).join('');
 }
 
-function computeStock(ignoreVentaId,ignoreCompraId,ignoreParteId){
+function computeStock(almacenId,ignoreVentaId,ignoreCompraId,ignoreParteId){
 const map={};
+const match=d=>!almacenId||almacenId==='all'||(d.almacenId||DEFAULT_ALMACEN_ID)===almacenId;
 compras.forEach(c=>{
-if(c.id===ignoreCompraId||c.estado==='Anulada')return;
+if(!match(c)||c.id===ignoreCompraId||c.estado==='Anulada')return;
 (c.lineas||[]).forEach(l=>{if(l.materialId)map[l.materialId]=(map[l.materialId]||0)+l.cantidad});
 });
 ventas.forEach(v=>{
-if(v.id===ignoreVentaId||v.estado==='Anulada')return;
+if(!match(v)||v.id===ignoreVentaId||v.estado==='Anulada')return;
 (v.lineas||[]).forEach(l=>{if(l.materialId)map[l.materialId]=(map[l.materialId]||0)-l.cantidad});
 });
 partes.forEach(p=>{
-if(p.id===ignoreParteId||p.estado!=='Realizado')return;
+if(!match(p)||p.id===ignoreParteId||p.estado!=='Realizado')return;
 (p.lineas||[]).forEach(l=>{if(l.materialId)map[l.materialId]=(map[l.materialId]||0)-l.cantidad});
 });
 almacen.forEach(a=>{
-if(!a.materialId)return;
+if(!match(a)||!a.materialId)return;
 if(a.tipo==='entrada')map[a.materialId]=(map[a.materialId]||0)+a.cantidad;
 else map[a.materialId]=(map[a.materialId]||0)-a.cantidad;
 });
@@ -1985,14 +2146,17 @@ return map;
 function stockOf(matId){const m=computeStock();return m[matId]||0}
 
 function renderAlmacen(){
+const almSel=document.getElementById('alm-almacen').value;
+const almId=almSel==='all'?null:almSel;
 const cat=document.getElementById('alm-cat').value;
 const q=(document.getElementById('alm-search')?.value||'').toLowerCase();
 const onlyLow=document.getElementById('alm-only-low')?.checked;
-const stockMap=computeStock();
+const whMatch=d=>!almId||(d.almacenId||DEFAULT_ALMACEN_ID)===almId;
+const stockMap=computeStock(almId||'all');
 let list=materials.filter(m=>(cat==='all'||m.categoria===cat)&&(!q||m.nombre.toLowerCase().includes(q)));
 let rows=list.map(m=>{
-const entradas=compras.filter(c=>c.estado!=='Anulada'&&(c.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,c)=>(c.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada').reduce((s,a)=>s+a.cantidad,0);
-const salidas=ventas.filter(v=>v.estado!=='Anulada'&&(v.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,v)=>(v.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+partes.filter(p=>p.estado==='Realizado'&&(p.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,p)=>(p.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida').reduce((s,a)=>s+a.cantidad,0);
+const entradas=compras.filter(c=>c.estado!=='Anulada'&&whMatch(c)&&(c.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,c)=>(c.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0);
+const salidas=ventas.filter(v=>v.estado!=='Anulada'&&whMatch(v)&&(v.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,v)=>(v.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+partes.filter(p=>p.estado==='Realizado'&&whMatch(p)&&(p.lineas||[]).some(l=>l.materialId===m.id)).reduce((s,p)=>(p.lineas||[]).reduce((a,l)=>l.materialId===m.id?a+l.cantidad:a,s),0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0);
 const stock=stockMap[m.id]||0;
 return {m,entradas,salidas,stock};
 });
@@ -2001,7 +2165,7 @@ rows.sort((a,b)=>a.m.nombre.localeCompare(b.m.nombre));
 const totalRefs=materials.length;
 const withStock=materials.filter(m=>stockMap[m.id]>0).length;
 const sinStock=materials.filter(m=>!stockMap[m.id]).length;
-const movs=compras.filter(c=>c.estado!=='Anulada').length+ventas.filter(v=>v.estado!=='Anulada').length+partes.filter(p=>p.estado==='Realizado').length+almacen.length;
+const movs=compras.filter(c=>c.estado!=='Anulada'&&whMatch(c)).length+ventas.filter(v=>v.estado!=='Anulada'&&whMatch(v)).length+partes.filter(p=>p.estado==='Realizado'&&whMatch(p)).length+almacen.filter(whMatch).length;
 document.getElementById('alm-resumen').innerHTML=`
 <div class="card" style="text-align:center"><div style="font-size:1.5rem;color:var(--primary)">&#127981;</div><div style="font-size:1.3rem;font-weight:700">${totalRefs}</div><div style="font-size:.8rem;color:var(--text-light)">Referencias</div></div>
 <div class="card" style="text-align:center"><div style="font-size:1.5rem;color:var(--success)">&#9989;</div><div style="font-size:1.3rem;font-weight:700">${withStock}</div><div style="font-size:.8rem;color:var(--text-light)">Con Stock</div></div>
@@ -2012,7 +2176,7 @@ const imgSrc=getMaterialImg(r.m);
 const stockClass=r.stock<=0?'color:#EF5350;font-weight:800':r.stock<10?'color:#FFA726;font-weight:700':'';
 return`<tr>
 <td><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}<strong>${r.m.nombre}</strong></div></td>
-<td><span class="tag tag-${r.m.categoria==='Electricidad'?'elec':r.m.categoria==='PCI'?'pci':r.m.categoria==='Fontaneria'?'font':'clim'}">${r.m.categoria}</span></td>
+<td><span class="tag tag-${catTagClass(r.m.categoria)}">${r.m.categoria}</span></td>
 <td>${r.m.unidad}</td><td>${r.entradas}</td><td>${r.salidas}</td>
 <td style="${stockClass}">${r.stock} ${r.m.unidad}</td>
 <td><button class="btn btn-warning" onclick="openAjusteModal('${r.m.id}')" style="padding:5px 10px;font-size:.75rem">Ajustar</button></td>
@@ -2027,12 +2191,14 @@ const tipo=document.getElementById('ajuste-tipo').value;
 const cant=parseFloat(document.getElementById('ajuste-cantidad').value)||0;
 if(!materialId){el.textContent='Selecciona un material';return}
 const mat=materials.find(m=>m.id===materialId);
-const actual=computeStock()[materialId]||0;
+const almId=document.getElementById('ajuste-almacen').value;
+const actual=computeStock(almId)[materialId]||0;
 const resultado=tipo==='entrada'?actual+cant:actual-cant;
-el.innerHTML='Stock actual: <strong>'+actual+' '+mat.unidad+'</strong> &rarr; con esta '+tipo+' quedara: <strong>'+resultado+' '+mat.unidad+'</strong>'+(resultado<0?' <span style="color:#C62828">(aviso: stock negativo)</span>':'');
+el.innerHTML='Stock actual en <strong>'+getAlmacenNombre(almId)+'</strong>: <strong>'+actual+' '+mat.unidad+'</strong> &rarr; con esta '+tipo+' quedara: <strong>'+resultado+' '+mat.unidad+'</strong>'+(resultado<0?' <span style="color:#C62828">(aviso: stock negativo)</span>':'');
 }
 
 function openAjusteModal(matId){
+populateAlmacenSelect('ajuste-almacen',document.getElementById('alm-almacen').value!=='all'?document.getElementById('alm-almacen').value:undefined);
 const sel=document.getElementById('ajuste-material');
 sel.innerHTML=materials.map(m=>`<option value="${m.id}">${m.nombre} (${m.unidad})</option>`).join('');
 document.getElementById('ajuste-mat-id').value=matId||'';
@@ -2051,7 +2217,7 @@ const cantidad=parseFloat(document.getElementById('ajuste-cantidad').value);
 if(!materialId){alert('Selecciona un material');return}
 if(!cantidad||cantidad<=0){alert('Introduce una cantidad valida');return}
 const mat=materials.find(x=>x.id===materialId);
-almacen.push({id:'aj_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),materialId,material:mat?mat.nombre:'',tipo,cantidad,motivo:document.getElementById('ajuste-motivo').value.trim()||'',fecha:new Date().toISOString().split('T')[0]});
+almacen.push({id:'aj_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),materialId,material:mat?mat.nombre:'',tipo,cantidad,motivo:document.getElementById('ajuste-motivo').value.trim()||'',fecha:new Date().toISOString().split('T')[0],almacenId:document.getElementById('ajuste-almacen').value||DEFAULT_ALMACEN_ID});
 save();closeModal('modal-ajuste');renderAlmacen();renderMaterials();toast('Ajuste de stock guardado');
 }
 
@@ -2062,9 +2228,12 @@ save();renderAlmacen();renderMaterials();toast('Ajuste eliminado');
 }
 
 function exportAlmacenExcel(){
-const stockMap=computeStock();
+const almSel=document.getElementById('alm-almacen')?.value||'all';
+const almId=almSel==='all'?null:almSel;
+const whMatch=d=>!almId||(d.almacenId||DEFAULT_ALMACEN_ID)===almId;
+const stockMap=computeStock(almId||'all');
 const headers=['Material','Categoria','Unidad','Entradas','Salidas','Stock'];
-const data=materials.map(m=>({Material:m.nombre,Categoria:m.categoria,Unidad:m.unidad,Entradas:compras.filter(c=>c.estado!=='Anulada').flatMap(c=>c.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada').reduce((s,a)=>s+a.cantidad,0),Salidas:ventas.filter(v=>v.estado!=='Anulada').flatMap(v=>v.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+partes.filter(p=>p.estado==='Realizado').flatMap(p=>p.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida').reduce((s,a)=>s+a.cantidad,0),Stock:stockMap[m.id]||0}));
+const data=materials.map(m=>({Material:m.nombre,Categoria:m.categoria,Unidad:m.unidad,Entradas:compras.filter(c=>c.estado!=='Anulada'&&whMatch(c)).flatMap(c=>c.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0),Salidas:ventas.filter(v=>v.estado!=='Anulada'&&whMatch(v)).flatMap(v=>v.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+partes.filter(p=>p.estado==='Realizado'&&whMatch(p)).flatMap(p=>p.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0),Stock:stockMap[m.id]||0}));
 const wsData=[headers,...data.map(d=>Object.values(d))];
 const ws=XLSX.utils.aoa_to_sheet(wsData);ws['!cols']=[{wch:40},{wch:15},{wch:10},{wch:10},{wch:10},{wch:10}];
 const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Almacen');
@@ -2123,7 +2292,7 @@ const q=(document.getElementById('emp-search')?.value||'').toLowerCase();
 const list=empresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.especialidad||'').toLowerCase().includes(q)||(e.contacto||'').toLowerCase().includes(q));
 document.getElementById('empresas-list').innerHTML=list.length?list.map(e=>`<tr>
 <td><strong>${e.nombre}</strong></td>
-<td><span class="tag tag-${e.especialidad==='Electricidad'?'elec':e.especialidad==='PCI'?'pci':e.especialidad==='Fontaneria'?'font':e.especialidad==='Climatizacion'?'clim':'cal'}">${e.especialidad}</span></td>
+<td><span class="tag tag-${catTagClass2(e.especialidad)}">${e.especialidad}</span></td>
 <td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${fotoCell(e.foto)}</td>
 <td><button class="btn btn-outline" onclick="showEmpresaTrabajos('${e.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
@@ -2478,9 +2647,13 @@ function openMaterialModal(id){
 document.getElementById('mat-edit-id').value='';
 document.getElementById('mat-modal-title').textContent='Nuevo Material';
 document.getElementById('mat-nombre').value='';
-document.getElementById('mat-categoria').value='Electricidad';
+popCatSelect('mat-categoria','Electricidad');
 document.getElementById('mat-unidad').value='ud';
 document.getElementById('mat-desc').value='';
+document.getElementById('mat-coste').value='';
+document.getElementById('mat-pvp').value='';
+document.getElementById('mat-incremento').value='';
+document.getElementById('mat-venta-preview').textContent='';
 document.getElementById('mat-img-data').value='';
 document.getElementById('mat-img-file').value='';
 document.getElementById('mat-img-camera').value='';
@@ -2493,9 +2666,13 @@ const m=materials.find(x=>x.id===id);
 document.getElementById('mat-edit-id').value=id;
 document.getElementById('mat-modal-title').textContent='Editar Material';
 document.getElementById('mat-nombre').value=m.nombre;
-document.getElementById('mat-categoria').value=m.categoria;
+popCatSelect('mat-categoria',m.categoria||'Electricidad');
 document.getElementById('mat-unidad').value=m.unidad;
 document.getElementById('mat-desc').value=m.desc||'';
+document.getElementById('mat-coste').value=m.coste||'';
+document.getElementById('mat-pvp').value=m.pvp||'';
+document.getElementById('mat-incremento').value=m.incremento||'';
+updateMatVentaPreview();
 document.getElementById('mat-img-data').value=m.img||'';
 document.getElementById('mat-img-file').value='';
 document.getElementById('mat-img-camera').value='';
@@ -2547,14 +2724,192 @@ document.getElementById('mat-img-camera').value='';
 document.getElementById('mat-img-preview').style.display='none';
 }
 
+function extractPriceFromHtml(html){
+const doc=new DOMParser().parseFromString(html,'text/html');
+let price='';
+const metas=['meta[property="product:price:amount"]','meta[name="product:price:amount"]','meta[property="og:price:amount"]','meta[name="og:price:amount"]','meta[itemprop="price"]'];
+for(const sel of metas){const m=doc.querySelector(sel);if(m&&m.content){price=m.content.trim();break}}
+if(!price){
+const scripts=doc.querySelectorAll('script[type="application/ld+json"]');
+outer: for(const s of scripts){try{
+const data=JSON.parse(s.textContent);
+const found=(function search(o){if(!o||typeof o!=='object')return null;if(o['@type']==='Product'&&o.offers){const off=Array.isArray(o.offers)?o.offers[0]:o.offers;if(off&&off.price!=null)return off.price}if(o['@type']==='Offer'&&o.price!=null)return o.price;const vals=Array.isArray(o)?o:Object.values(o);for(const v of vals){const r=search(v);if(r!=null)return r}return null;})(data);
+if(found!=null){price=String(found);break outer;}
+}catch(e){}}
+}
+if(!price){
+const m=html.match(/itemprop="price"[^>]*content="([\d.,]+)"/)||html.match(/(?:precio|price|pvp)[^\d€\n]{0,20}([\d.,]{2,})\s*(?:€|eur|euro)?/i);
+if(m)price=m[1]||m[0];
+}
+if(!price)return null;
+const cleaned=price.replace(/[^\d.,]/g,'');
+if(!cleaned)return null;
+const hasDot=cleaned.includes('.')&&!cleaned.includes(',');
+if(hasDot){const last=cleaned.split('.').pop();if(last.length===2)return parseFloat(cleaned.replace(/,/g,''))}
+const hasComa=cleaned.includes(',')&&!cleaned.includes('.');
+if(hasComa){const last=cleaned.split(',').pop();if(last.length===2)return parseFloat(cleaned.replace(/\./g,'').replace(',','.'))}
+const asFloat=parseFloat(cleaned.replace(/\./g,'').replace(',','.'));
+return !isNaN(asFloat)?asFloat:null;
+}
+
+function importMatFromURL(){
+const url=document.getElementById('mat-url').value.trim();
+if(!url){alert('Pega una URL del producto');return}
+if(!/^https?:\/\//i.test(url)){alert('La URL debe empezar por http:// o https://');return}
+toast('Importando desde la web...');
+const prox='https://api.allorigins.win/raw?url='+encodeURIComponent(url);
+const fetchText=()=>fetch(prox).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).catch(()=>fetch(url).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}));
+fetchText().then(html=>{
+const doc=new DOMParser().parseFromString(html,'text/html');
+let title=(doc.querySelector('title')?.textContent||'').trim();
+const og=doc.querySelector('meta[property="og:image"]')?.content||doc.querySelector('meta[name="og:image"]')?.content||'';
+const h1=(doc.querySelector('h1')?.textContent||'').trim();
+let nombre=title;
+if(h1&&h1.length>3&&(h1.length<title.length||!nombre))nombre=h1;
+if(nombre){
+const re=/\s*[|\-–—]\s*(es |español)?[^|\-–—]{3,}$/i;
+if(nombre.length>40&&re.test(nombre)){nombre=nombre.replace(re,'').trim()}
+if(nombre.length>90)nombre=nombre.substring(0,90);
+document.getElementById('mat-nombre').value=nombre;
+}
+const precio=extractPriceFromHtml(html);
+if(precio){
+document.getElementById('mat-coste').value=precio;
+updateMatVentaPreview();
+}
+if(og){
+const abs=/^https?:\/\//i.test(og)?og:new URL(og,url).href;
+fetch(abs).then(r=>r.blob()).then(blob=>{
+if(blob.size>100){const reader=new FileReader();reader.onload=()=>{
+const img=new Image();img.onload=()=>{
+const canvas=document.createElement('canvas');const maxSize=400;
+let w=img.width,h=img.height;
+if(w>maxSize||h>maxSize){if(w>h){h=Math.round(h*maxSize/w);w=maxSize}else{w=Math.round(w*maxSize/h);h=maxSize}}
+canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+const dataUrl=canvas.toDataURL('image/jpeg',0.8);
+document.getElementById('mat-img-data').value=dataUrl;
+document.getElementById('mat-img-thumb').src=dataUrl;
+document.getElementById('mat-img-name').textContent='Imagen importada de la web';
+document.getElementById('mat-img-preview').style.display='block';
+};img.src=reader.result;
+};reader.readAsDataURL(blob);}
+else document.getElementById('mat-img-name').textContent='Sin imagen disponible';
+}).catch(()=>{});
+}
+toast('Material importado desde la URL');
+}).catch(()=>{alert('No se pudo importar desde esa URL. La web puede bloquear el acceso.');});
+}
+
 function saveMaterial(){
 const nombre=document.getElementById('mat-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre');return}
-const data={nombre,categoria:document.getElementById('mat-categoria').value,unidad:document.getElementById('mat-unidad').value,desc:document.getElementById('mat-desc').value.trim(),img:document.getElementById('mat-img-data').value};
+const data={nombre,categoria:document.getElementById('mat-categoria').value,unidad:document.getElementById('mat-unidad').value,desc:document.getElementById('mat-desc').value.trim(),img:document.getElementById('mat-img-data').value,coste:parseFloat(document.getElementById('mat-coste').value)||0,pvp:parseFloat(document.getElementById('mat-pvp').value)||0,incremento:parseFloat(document.getElementById('mat-incremento').value)||0};
 const editId=document.getElementById('mat-edit-id').value;
 if(editId){const idx=materials.findIndex(x=>x.id===editId);materials[idx]={...materials[idx],...data}}
 else{data.id='m_'+Date.now();materials.push(data)}
-save();closeModal('modal-material');renderMaterials();toast('Material guardado');
+save();closeModal('modal-material');renderMaterials();renderAlmacen();toast('Material guardado');
+}
+
+function renderCategorias(){
+document.getElementById('categorias-list').innerHTML=categorias.length?categorias.map(c=>{
+const nombre=catNameOf(c);
+const count=materials.filter(m=>m.categoria===nombre).length;
+return`<tr>
+<td><span class="tag tag-${catTagClass(nombre)}">${nombre}</span></td>
+<td>${count}</td>
+<td><button class="btn btn-warning" onclick="editCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
+</tr>`}).join(''):'<tr><td colspan="3" style="text-align:center;padding:30px;color:var(--text-light)">No hay categorias</td></tr>';
+}
+
+function openCategoriaModal(){
+document.getElementById('cat-edit-id').value='';
+document.getElementById('cat-modal-title').textContent='Nueva Categoria';
+document.getElementById('cat-nombre').value='';
+openModal('modal-categoria');
+}
+
+function editCategoria(nombre){
+document.getElementById('cat-edit-id').value=nombre;
+document.getElementById('cat-modal-title').textContent='Editar Categoria';
+document.getElementById('cat-nombre').value=nombre;
+openModal('modal-categoria');
+}
+
+function saveCategoria(){
+const nombre=document.getElementById('cat-nombre').value.trim();
+if(!nombre){alert('Introduce un nombre de categoria');return}
+const editNombre=document.getElementById('cat-edit-id').value;
+if(editNombre&&editNombre!==nombre&&materials.some(m=>m.categoria===editNombre)){
+if(!confirm('Al renombrar, los materiales con la categoria "'+editNombre+'" se moveran a "'+nombre+'". Continuar?'))return;
+}
+if(editNombre){
+const idx=categorias.findIndex(c=>catNameOf(c)===editNombre);
+if(idx>=0)categorias[idx]=(typeof categorias[idx]==='string'?nombre:{nombre});
+if(editNombre!==nombre){
+materials.forEach(m=>{if(m.categoria===editNombre)m.categoria=nombre});
+[mediciones,presupuestos,facturas,compras,ventas,partes].forEach(docs=>docs.forEach(d=>{(d.lineas||[]).forEach(l=>{if(l.categoria===editNombre)l.categoria=nombre})}));
+}
+}
+else{
+if(categorias.some(c=>catNameOf(c)===nombre)){alert('Esa categoria ya existe');return}
+categorias.push(nombre);
+}
+save();closeModal('modal-categoria');renderCategorias();populateCategoriaSelects();toast('Categoria guardada');
+}
+
+function deleteCategoria(nombre){
+const count=materials.filter(m=>m.categoria===nombre).length;
+if(count>0){alert('No se puede eliminar: '+count+' material(es) usan esta categoria. Reasigna esos materiales primero.');return}
+if(!confirm('Eliminar la categoria "'+nombre+'"?'))return;
+categorias=categorias.filter(c=>catNameOf(c)!==nombre);
+save();renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria eliminada');
+}
+
+function renderAlmacenes(){
+document.getElementById('almacenes-list').innerHTML=almacenes.length?almacenes.map(a=>`<tr>
+<td><strong>${a.nombre}</strong></td>
+<td>${a.ubicacion||'-'}</td><td>${a.notas||'-'}</td>
+<td><button class="btn btn-warning" onclick="editAlmacen('${a.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteAlmacen('${a.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
+</tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light)">No hay almacenes creados</td></tr>';
+}
+
+function openAlmacenModal(){
+document.getElementById('almacen-edit-id').value='';
+document.getElementById('almacen-modal-title').textContent='Nuevo Almacen';
+document.getElementById('almacen-nombre').value='';
+document.getElementById('almacen-ubicacion').value='';
+document.getElementById('almacen-notas').value='';
+openModal('modal-almacen');
+}
+
+function editAlmacen(id){
+const a=almacenes.find(x=>x.id===id);
+if(!a)return;
+document.getElementById('almacen-edit-id').value=id;
+document.getElementById('almacen-modal-title').textContent='Editar Almacen';
+document.getElementById('almacen-nombre').value=a.nombre;
+document.getElementById('almacen-ubicacion').value=a.ubicacion||'';
+document.getElementById('almacen-notas').value=a.notas||'';
+openModal('modal-almacen');
+}
+
+function saveAlmacen(){
+const nombre=document.getElementById('almacen-nombre').value.trim();
+if(!nombre){alert('Introduce un nombre de almacen');return}
+const data={nombre,ubicacion:document.getElementById('almacen-ubicacion').value.trim(),notas:document.getElementById('almacen-notas').value.trim()};
+const editId=document.getElementById('almacen-edit-id').value;
+if(editId){const idx=almacenes.findIndex(x=>x.id===editId);almacenes[idx]={...almacenes[idx],...data}}
+else{data.id='al_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);data.fechaCreacion=new Date().toISOString().split('T')[0];almacenes.push(data)}
+save();closeModal('modal-almacen');renderAlmacenes();populateAlmacenSelect('alm-almacen');toast('Almacen guardado');
+}
+
+function deleteAlmacen(id){
+if(id===DEFAULT_ALMACEN_ID){alert('No se puede eliminar el almacen principal por defecto');return}
+const usados=compras.some(c=>(c.almacenId||DEFAULT_ALMACEN_ID)===id)||ventas.some(v=>(v.almacenId||DEFAULT_ALMACEN_ID)===id)||partes.some(p=>(p.almacenId||DEFAULT_ALMACEN_ID)===id)||almacen.some(a=>a.almacenId===id);
+if(usados){alert('No se puede eliminar: hay movimientos (compras, ventas, partes o ajustes) asignados a este almacen.');return}
+if(!confirm('Eliminar el almacen?'))return;
+almacenes=almacenes.filter(x=>x.id!==id);
+save();renderAlmacenes();populateAlmacenSelect('alm-almacen');toast('Almacen eliminado');
 }
 
 function deleteMaterial(id){
@@ -2567,17 +2922,20 @@ function renderMaterials(){
 const q=(document.getElementById('mat-search')?.value||'').toLowerCase();
 const list=materials.filter(m=>(matFilter==='all'||m.categoria===matFilter)&&(!q||m.nombre.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q)));
 document.getElementById('mat-filters').innerHTML=
-['all','Electricidad','Fontaneria','Calefaccion','Climatizacion','PCI'].map(f=>
-`<button class="chip ${matFilter===f?'active':''}" onclick="matFilter='${f}';renderMaterials()">${f==='all'?'Todas':f==='PCI'?'PCI Contra Incendios':f}</button>`).join('')+(q?` <span style="color:var(--text-light);font-size:.8rem;margin-left:8px">${list.length} resultado${list.length!==1?'s':''}</span>`:'');
+['all',...catNames()].map(f=>
+`<button class="chip ${matFilter===f?'active':''}" onclick="matFilter='${f}';renderMaterials()">${f==='all'?'Todas':f}</button>`).join('')+(q?` <span style="color:var(--text-light);font-size:.8rem;margin-left:8px">${list.length} resultado${list.length!==1?'s':''}</span>`:'');
 document.getElementById('materials-list').innerHTML=list.length?list.map(m=>{
 const stock=computeStock()[m.id]||0;
 return`<tr>
 <td><div class="mat-name-cell"><img class="mat-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="mat-name-text"><strong>${m.nombre}</strong>${m.desc?'<br><small style="color:var(--text-light)">'+m.desc+'</small>':''}</div></div></td>
-<td><span class="tag tag-${m.categoria==='Electricidad'?'elec':m.categoria==='PCI'?'pci':m.categoria==='Fontaneria'?'font':'clim'}">${m.categoria}</span></td>
+<td><span class="tag tag-${catTagClass(m.categoria)}">${m.categoria}</span></td>
 <td>${m.unidad}</td>
+<td>${getMaterialCoste(m)>0?'<span style="color:var(--text-light)">'+fmtPrecio(getMaterialCoste(m))+' &euro;</span>':'<span style="color:var(--text-light)">-</span>'}</td>
+<td>${m.pvp>0?fmtPrecio(m.pvp)+' &euro;':'<span style="color:var(--text-light)">-</span>'}</td>
+<td><strong>${fmtPrecio(getMaterialPrecio(m))} &euro;</strong></td>
 <td style="cursor:pointer" title="Ajustar stock del material" onclick="openAjusteModal('${m.id}')">${stock>0?'<strong style="color:#2E7D32">'+stock+'</strong>':stock<0?'<strong style="color:#C62828">'+stock+'</strong>':'<span style="color:var(--text-light)">0</span>'} ${m.unidad} <span style="font-size:.7rem;color:var(--primary)">+/-</span></td>
 <td><button class="btn btn-success" onclick="openAjusteModal('${m.id}')" style="padding:5px 10px;font-size:.7rem">+/- Stock</button> <button class="btn btn-warning" onclick="editMaterial('${m.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteMaterial('${m.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`}).join(''):'<tr><td colspan="5" class="empty-state"><div class="empty-icon">&#128230;</div><p>No hay materiales registrados</p></td></tr>';
+</tr>`}).join(''):'<tr><td colspan="8" class="empty-state"><div class="empty-icon">&#128230;</div><p>No hay materiales registrados</p></td></tr>';
 }
 
 
@@ -2586,7 +2944,7 @@ function openMedicionModal(){
 document.getElementById('med-edit-id').value='';
 document.getElementById('med-modal-title').textContent='Nueva Medicion';
 document.getElementById('med-fecha').value=new Date().toISOString().split('T')[0];
-document.getElementById('med-cat').value='Electricidad';
+popCatSelect('med-cat','Electricidad');
 document.getElementById('med-cantidad').value='';
 document.getElementById('med-obs').value='';
 document.getElementById('med-mat-search').value='';
@@ -2656,7 +3014,7 @@ renderTempMedLineas();
 
 function renderTempMedLineas(){
 const container=document.getElementById('med-lineas');
-container.innerHTML=tempMedicionLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Unidad</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempMedicionLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.unidad}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempMedLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+container.innerHTML=tempMedicionLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Unidad</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempMedicionLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.unidad}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempMedLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
 function editMedicion(id){
@@ -2672,7 +3030,7 @@ populateZonaSelect('med-zona',m.obraId);
 document.getElementById('med-zona').value=m.zonaId||'';
 populateSubcontrataSelect('med-subcontrata');
 document.getElementById('med-subcontrata').value=m.subcontrataId||'';
-document.getElementById('med-cat').value='Electricidad';
+popCatSelect('med-cat','Electricidad');
 filterMaterialsForMedicion();
 const lines=m.lineas||(m.materialId?[{materialId:m.materialId,material:m.material,categoria:m.categoria,unidad:m.unidad,cantidad:m.cantidad}]:[]);
 tempMedicionLineas=lines.map(l=>({...l}));
@@ -2733,7 +3091,7 @@ document.getElementById('mediciones-list').innerHTML=
 const lines=m.lineas||(m.materialId?[{materialId:m.materialId,material:m.material,categoria:m.categoria,unidad:m.unidad,cantidad:m.cantidad}]:[]);
 const matNames=lines.map(l=>'<span style="font-size:.8rem">'+l.material+' <strong>'+l.cantidad+'</strong> '+l.unidad+'</span>').join('<br>');
 const cats=[...new Set(lines.map(l=>l.categoria))];
-const tags=cats.map(c=>'<span class="tag tag-'+(c==='Electricidad'?'elec':c==='PCI'?'pci':c==='Fontaneria'?'font':c==='Climatizacion'?'clim':'cal')+'" style="margin:1px">'+c+'</span>').join(' ');
+const tags=cats.map(c=>'<span class="tag tag-'+catTagClass2(c)+'" style="margin:1px">'+c+'</span>').join(' ');
 return`<tr>
 <td><span style="font-weight:700;color:var(--primary-dark)">N&ordm;${getSerieStr(m.serie||0)}</span><br><small style="color:var(--text-light)">${m.fecha}</small></td><td>${m.empresa||'-'}</td><td>${m.obra||'-'}</td><td>${m.zona||'-'}</td><td>${matNames}</td>
 <td>${tags}</td>
@@ -2768,7 +3126,7 @@ const lines=m.lineas||(m.materialId?[{material:m.material,cantidad:m.cantidad,un
 const matText=lines.map(l=>l.material+' ('+l.cantidad+' '+l.unidad+')').join(', ');
 return`<tr><td><strong>${getSerieStr(m.serie||0)}</strong><br><small>${m.fecha}</small></td><td style="font-size:.8rem;max-width:250px;overflow:hidden;text-overflow:ellipsis">${matText}</td><td>${m.empresa||'-'}</td><td>${m.obra||'-'}</td></tr>`
 }).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">Sin datos</td></tr>';
-const cats=[{n:'Electricidad',c:'#4FC3F7'},{n:'Fontaneria',c:'#66BB6A'},{n:'Calefaccion',c:'#29B6F6'},{n:'Climatizacion',c:'#FFA726'},{n:'PCI',c:'#EF5350'}];
+const cats=categorias.map((c,i)=>({n:catNameOf(c),c:['#4FC3F7','#66BB6A','#29B6F6','#FFA726','#EF5350'][i%5]}));
 const maxMat=Math.max(...cats.map(c=>materials.filter(m=>m.categoria===c.n).length),1);
 document.getElementById('cat-bars').innerHTML=cats.map(c=>{
 const count=materials.filter(m=>m.categoria===c.n).length;
@@ -2965,7 +3323,18 @@ document.getElementById('pres-mat-results').classList.remove('show');
 document.getElementById('pres-cat').value=m.categoria;
 filterMaterialsForPres();
 document.getElementById('pres-material').value=m.id;
+presMaterialChanged();
 document.getElementById('pres-cantidad').focus();
+}
+
+function presMaterialChanged(){
+const id=document.getElementById('pres-material').value;
+const m=materials.find(x=>x.id===id);
+const p=getMaterialPrecio(m);
+const el=document.getElementById('pres-precio');
+if(p>0){el.value=p.toFixed(2)}
+const hint=document.getElementById('pres-precio-hint');
+if(hint){if(m){hint.textContent=(m.pvp>0?'PVP '+fmtPrecio(m.pvp)+' EUR · ':'')+'Coste '+fmtPrecio(getMaterialCoste(m))+' EUR · Inc. '+(m.incremento||0)+'% -> Venta '+fmtPrecio(getMaterialPrecio(m))+' EUR'}else{hint.textContent=''}}
 }
 
 function searchMaterialForFac(){
@@ -2985,7 +3354,18 @@ document.getElementById('fac-mat-results').classList.remove('show');
 document.getElementById('fac-cat').value=m.categoria;
 filterMaterialsForFac();
 document.getElementById('fac-material').value=m.id;
+facMaterialChanged();
 document.getElementById('fac-cantidad').focus();
+}
+
+function facMaterialChanged(){
+const id=document.getElementById('fac-material').value;
+const m=materials.find(x=>x.id===id);
+const p=getMaterialPrecio(m);
+const el=document.getElementById('fac-precio');
+if(p>0){el.value=p.toFixed(2)}
+const hint=document.getElementById('fac-precio-hint');
+if(hint){if(m){hint.textContent=(m.pvp>0?'PVP '+fmtPrecio(m.pvp)+' EUR · ':'')+'Coste '+fmtPrecio(getMaterialCoste(m))+' EUR · Inc. '+(m.incremento||0)+'% -> Venta '+fmtPrecio(getMaterialPrecio(m))+' EUR'}else{hint.textContent=''}}
 }
 
 function addPresLine(){
@@ -3011,7 +3391,7 @@ calcPresTotals();
 
 function renderTempPresLineas(){
 const container=document.getElementById('pres-lineas');
-container.innerHTML=tempPresLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPresLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempPresLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+container.innerHTML=tempPresLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPresLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempPresLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
 function addFacLine(){
@@ -3037,7 +3417,7 @@ calcFacTotals();
 
 function renderTempFacLineas(){
 const container=document.getElementById('fac-lineas');
-container.innerHTML=tempFacLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempFacLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempFacLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+container.innerHTML=tempFacLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempFacLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempFacLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
 function openPresupuestoModal(){
@@ -3046,7 +3426,7 @@ document.getElementById('pres-modal-title').textContent='Nuevo Presupuesto';
 document.getElementById('pres-fecha').value=new Date().toISOString().split('T')[0];
 const val=new Date();val.setDate(val.getDate()+30);
 document.getElementById('pres-validez').value=val.toISOString().split('T')[0];
-document.getElementById('pres-cat').value='Electricidad';
+popCatSelect('pres-cat','Electricidad');
 document.getElementById('pres-cantidad').value='';
 document.getElementById('pres-precio').value='';
 document.getElementById('pres-cliente').value='';
@@ -3086,7 +3466,7 @@ document.getElementById('pres-telefono').value=p.telefono||'';
 document.getElementById('pres-email').value=p.email||'';
 document.getElementById('pres-notas').value=p.notas||'';
 document.getElementById('pres-estado').value=p.estado||'Borrador';
-document.getElementById('pres-cat').value='Electricidad';
+popCatSelect('pres-cat','Electricidad');
 filterMaterialsForPres();
 tempPresLineas=(p.lineas||[]).map(l=>({...l}));
 document.getElementById('pres-iva-pct').textContent=p.ivaPorcentaje||21;
@@ -3150,7 +3530,7 @@ document.getElementById('fac-modal-title').textContent='Nueva Factura';
 document.getElementById('fac-fecha').value=new Date().toISOString().split('T')[0];
 const ven=new Date();ven.setDate(ven.getDate()+30);
 document.getElementById('fac-vencimiento').value=ven.toISOString().split('T')[0];
-document.getElementById('fac-cat').value='Electricidad';
+popCatSelect('fac-cat','Electricidad');
 document.getElementById('fac-cantidad').value='';
 document.getElementById('fac-precio').value='';
 document.getElementById('fac-cliente').value='';
@@ -3190,7 +3570,7 @@ document.getElementById('fac-telefono').value=f.telefono||'';
 document.getElementById('fac-email').value=f.email||'';
 document.getElementById('fac-notas').value=f.notas||'';
 document.getElementById('fac-estado').value=f.estado||'Borrador';
-document.getElementById('fac-cat').value='Electricidad';
+popCatSelect('fac-cat','Electricidad');
 filterMaterialsForFac();
 tempFacLineas=(f.lineas||[]).map(l=>({...l}));
 document.getElementById('fac-iva-pct').textContent=f.ivaPorcentaje||21;
@@ -3285,7 +3665,18 @@ document.getElementById('com-mat-results').classList.remove('show');
 document.getElementById('com-cat').value=m.categoria;
 filterMaterialsForComp();
 document.getElementById('com-material').value=m.id;
+comMaterialChanged();
 document.getElementById('com-cantidad').focus();
+}
+
+function comMaterialChanged(){
+const id=document.getElementById('com-material').value;
+const m=materials.find(x=>x.id===id);
+const c=getMaterialCoste(m);
+const el=document.getElementById('com-precio');
+if(c>0){el.value=c.toFixed(2)}
+const hint=document.getElementById('com-precio-hint');
+if(hint){hint.textContent=m?'Coste del material: '+fmtPrecio(getMaterialCoste(m))+' EUR (modificable)':''}
 }
 
 function addCompLine(){
@@ -3311,14 +3702,13 @@ calcCompTotals();
 
 function renderTempCompLineas(){
 const container=document.getElementById('com-lineas');
-container.innerHTML=tempCompLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempCompLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempCompLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+container.innerHTML=tempCompLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempCompLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempCompLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
 function openCompraModal(){
 document.getElementById('com-edit-id').value='';
 document.getElementById('com-modal-title').textContent='Nueva Compra';
 document.getElementById('com-fecha').value=new Date().toISOString().split('T')[0];
-document.getElementById('com-cat').value='Electricidad';
 document.getElementById('com-cantidad').value='';
 document.getElementById('com-precio').value='';
 document.getElementById('com-notas').value='';
@@ -3326,6 +3716,8 @@ document.getElementById('com-estado').value='Recibida';
 document.getElementById('com-mat-search').value='';
 tempCompLineas=[];
 populateProveedorSelect('com-proveedor');
+populateAlmacenSelect('com-almacen');
+popCatSelect('com-cat','Electricidad');
 filterMaterialsForComp();
 renderTempCompLineas();
 calcCompTotals();
@@ -3342,7 +3734,8 @@ populateProveedorSelect('com-proveedor');
 document.getElementById('com-proveedor').value=c.proveedorId||'';
 document.getElementById('com-notas').value=c.notas||'';
 document.getElementById('com-estado').value=c.estado||'Recibida';
-document.getElementById('com-cat').value='Electricidad';
+populateAlmacenSelect('com-almacen',c.almacenId||DEFAULT_ALMACEN_ID);
+popCatSelect('com-cat','Electricidad');
 filterMaterialsForComp();
 tempCompLineas=(c.lineas||[]).map(l=>({...l}));
 document.getElementById('com-iva-pct').textContent=c.ivaPorcentaje||21;
@@ -3364,7 +3757,7 @@ const ivaPct=parseFloat(document.getElementById('com-iva-pct')?.textContent||'21
 const iva=subtotal*ivaPct/100;
 const total=subtotal+iva;
 const editId=document.getElementById('com-edit-id').value;
-const data={fecha,proveedorId,proveedor:prov?prov.nombre:'',lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('com-estado').value,notas:document.getElementById('com-notas').value.trim()};
+const data={fecha,proveedorId,proveedor:prov?prov.nombre:'',almacenId:document.getElementById('com-almacen').value||DEFAULT_ALMACEN_ID,lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('com-estado').value,notas:document.getElementById('com-notas').value.trim()};
 if(editId){const idx=compras.findIndex(x=>x.id===editId);compras[idx]={...compras[idx],...data}}
 else{const numero=nextCompSerie();compras.push({id:'co_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempCompLineas=[];
@@ -3481,7 +3874,18 @@ document.getElementById('ven-mat-results').classList.remove('show');
 document.getElementById('ven-cat').value=m.categoria;
 filterMaterialsForVen();
 document.getElementById('ven-material').value=m.id;
+venMaterialChanged();
 document.getElementById('ven-cantidad').focus();
+}
+
+function venMaterialChanged(){
+const id=document.getElementById('ven-material').value;
+const m=materials.find(x=>x.id===id);
+const p=getMaterialPrecio(m);
+const el=document.getElementById('ven-precio');
+if(p>0){el.value=p.toFixed(2)}
+const hint=document.getElementById('ven-precio-hint');
+if(hint){if(m){hint.textContent=(m.pvp>0?'PVP '+fmtPrecio(m.pvp)+' EUR · ':'')+'Coste '+fmtPrecio(getMaterialCoste(m))+' EUR · Inc. '+(m.incremento||0)+'% -> Venta '+fmtPrecio(getMaterialPrecio(m))+' EUR'}else{hint.textContent=''}}
 }
 
 function addVenLine(){
@@ -3507,7 +3911,7 @@ calcVenTotals();
 
 function renderTempVenLineas(){
 const container=document.getElementById('ven-lineas');
-container.innerHTML=tempVenLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempVenLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempVenLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
+container.innerHTML=tempVenLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempVenLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempVenLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
 function openVentaModal(){
@@ -3516,7 +3920,6 @@ document.getElementById('ven-modal-title').textContent='Nueva Venta';
 document.getElementById('ven-fecha').value=new Date().toISOString().split('T')[0];
 document.getElementById('ven-destino').value='cliente';
 toggleVentaDestino();
-document.getElementById('ven-cat').value='Electricidad';
 document.getElementById('ven-cantidad').value='';
 document.getElementById('ven-precio').value='';
 document.getElementById('ven-notas').value='';
@@ -3526,6 +3929,8 @@ tempVenLineas=[];
 populateClienteSelect('ven-cliente');
 populateObraSelect('ven-obra');
 populateSubcontrataSelect('ven-subcontrata');
+populateAlmacenSelect('ven-almacen');
+popCatSelect('ven-cat','Electricidad');
 filterMaterialsForVen();
 renderTempVenLineas();
 calcVenTotals();
@@ -3548,7 +3953,8 @@ populateSubcontrataSelect('ven-subcontrata');
 document.getElementById('ven-subcontrata').value=v.subcontrataId||'';
 document.getElementById('ven-notas').value=v.notas||'';
 document.getElementById('ven-estado').value=v.estado||'Confirmada';
-document.getElementById('ven-cat').value='Electricidad';
+populateAlmacenSelect('ven-almacen',v.almacenId||DEFAULT_ALMACEN_ID);
+popCatSelect('ven-cat','Electricidad');
 filterMaterialsForVen();
 tempVenLineas=(v.lineas||[]).map(l=>({...l}));
 document.getElementById('ven-iva-pct').textContent=v.ivaPorcentaje||21;
@@ -3573,10 +3979,11 @@ if(!obraId){alert('Selecciona una obra');return}
 const ob=obras.find(o=>o.id===obraId);obra=ob?ob.nombre:'';
 }
 const editId=document.getElementById('ven-edit-id').value;
-const stockMap=computeStock(editId||null);
+const almId=document.getElementById('ven-almacen').value||DEFAULT_ALMACEN_ID;
+const stockMap=computeStock(almId,editId||null);
 for(const l of tempVenLineas){
 const available=stockMap[l.materialId]||0;
-if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'". Disponible: '+available+' '+l.unidad);return}
+if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" en '+getAlmacenNombre(almId)+'. Disponible: '+available+' '+l.unidad);return}
 }
 const lineas=tempVenLineas.map(l=>({materialId:l.materialId,material:l.material,categoria:l.categoria,unidad:l.unidad,cantidad:l.cantidad,precioUnitario:l.precioUnitario}));
 const subtotal=lineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
@@ -3589,14 +3996,14 @@ if(editId&&estado!=='Anulada'){
 const prev=ventas.find(x=>x.id===editId);
 if(prev&&prev.estado==='Anulada'){
 for(const l of lineas){
-const available=computeStock(editId||null)[l.materialId]||0;
-if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" al reactivar la venta. Disponible: '+available);return}
+const available=computeStock(almId,editId||null)[l.materialId]||0;
+if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" al reactivar la venta. Disponible: '+available+' '+getAlmacenNombre(almId));return}
 }
 }
 }
 const subId=document.getElementById('ven-subcontrata').value;
 const sub=subcontratas.find(s=>s.id===subId);
-const data={fecha,destino,clienteId,cliente,obraId,obra,subcontrataId:subId,subcontrata:sub?sub.nombre:'',lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,notas:document.getElementById('ven-notas').value.trim()};
+const data={fecha,destino,clienteId,cliente,obraId,obra,subcontrataId:subId,subcontrata:sub?sub.nombre:'',almacenId:almId,lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,notas:document.getElementById('ven-notas').value.trim()};
 if(editId){const idx=ventas.findIndex(x=>x.id===editId);ventas[idx]={...ventas[idx],...data}}
 else{const numero=nextVenSerie();ventas.push({id:'ve_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempVenLineas=[];
@@ -3740,7 +4147,7 @@ calcParTotals();
 
 function renderTempParLineas(){
 const container=document.getElementById('par-lineas');
-container.innerHTML=tempPartLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPartLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${l.categoria==='Electricidad'?'elec':l.categoria==='PCI'?'pci':l.categoria==='Fontaneria'?'font':'clim'}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempParLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usados en el trabajo (opcional)</p>';
+container.innerHTML=tempPartLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPartLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempParLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usados en el trabajo (opcional)</p>';
 }
 
 function openParteModal(){
@@ -3754,7 +4161,8 @@ document.getElementById('par-estado').value='Borrador';
 document.getElementById('par-mat-search').value='';
 populateEmpleadoSelect('par-empleado');
 populateObraSelect('par-obra');
-document.getElementById('par-cat').value='Electricidad';
+populateAlmacenSelect('par-almacen');
+popCatSelect('par-cat','Electricidad');
 filterMaterialsForPar();
 tempPartLineas=[];
 renderTempParLineas();
@@ -3776,7 +4184,8 @@ populateEmpleadoSelect('par-empleado');
 document.getElementById('par-empleado').value=p.empleadoId||'';
 populateObraSelect('par-obra');
 document.getElementById('par-obra').value=p.obraId||'';
-document.getElementById('par-cat').value='Electricidad';
+populateAlmacenSelect('par-almacen',p.almacenId||DEFAULT_ALMACEN_ID);
+popCatSelect('par-cat','Electricidad');
 filterMaterialsForPar();
 document.getElementById('par-iva-pct').textContent=p.ivaPorcentaje||21;
 tempPartLineas=(p.lineas||[]).map(l=>({...l}));
@@ -3804,14 +4213,15 @@ const iva=subtotal*ivaPct/100;
 const total=subtotal+iva;
 const estado=document.getElementById('par-estado').value;
 const editId=document.getElementById('par-edit-id').value;
+const almId=document.getElementById('par-almacen').value||DEFAULT_ALMACEN_ID;
 if(estado==='Realizado'){
-const stockMap=computeStock(null,null,editId||null);
+const stockMap=computeStock(almId,null,null,editId||null);
 for(const l of lineas){
 const available=stockMap[l.materialId]||0;
-if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" al pasar el parte a Realizado. Disponible: '+available+' '+l.unidad);return}
+if(available<l.cantidad){alert('Stock insuficiente de "'+l.material+'" en '+getAlmacenNombre(almId)+' al pasar el parte a Realizado. Disponible: '+available+' '+l.unidad);return}
 }
 }
-const data={fecha,empleadoId,empleado:emp?emp.nombre:'',obraId,obra:ob?ob.nombre:'',descripcion,horas,lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,notas:document.getElementById('par-notas').value.trim()};
+const data={fecha,empleadoId,empleado:emp?emp.nombre:'',obraId,obra:ob?ob.nombre:'',descripcion,horas,lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado,almacenId:almId,notas:document.getElementById('par-notas').value.trim()};
 if(editId){const idx=partes.findIndex(x=>x.id===editId);partes[idx]={...partes[idx],...data}}
 else{const numero=nextPartSerie();partes.push({id:'pa_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempPartLineas=[];
@@ -4015,7 +4425,7 @@ const agg=aggregateMaterials(list);
 document.getElementById('rpt-material-totals').innerHTML=agg.length?agg.map(a=>{
 const mat=materials.find(x=>x.id===a.materialId);const imgSrc=mat?getMaterialImg(mat):'';
 return`<tr><td><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}<strong>${a.material}</strong></div></td>
-<td><span class="tag tag-${a.categoria==='Electricidad'?'elec':a.categoria==='PCI'?'pci':a.categoria==='Fontaneria'?'font':'clim'}">${a.categoria}</span></td>
+<td><span class="tag tag-${catTagClass(a.categoria)}">${a.categoria}</span></td>
 <td>${a.unidad}</td><td><strong>${a.total}</strong></td><td>${a.mediciones}</td></tr>`
 }).join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-light)">Sin datos</td></tr>';
 renderFacRpt();
@@ -4177,9 +4587,12 @@ doc.save('facturas-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF d
 }
 
 function exportAlmacenPDF(){
-const stockMap=computeStock();
+const almSel=document.getElementById('alm-almacen')?.value||'all';
+const almId=almSel==='all'?null:almSel;
+const whMatch=d=>!almId||(d.almacenId||DEFAULT_ALMACEN_ID)===almId;
+const stockMap=computeStock(almId||'all');
 const hdr=['Material','Categoria','Unidad','Entradas','Salidas','Stock'];
-const data=materials.map(m=>[m.nombre,m.categoria,m.unidad,compras.filter(c=>c.estado!=='Anulada').flatMap(c=>c.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada').reduce((s,a)=>s+a.cantidad,0),ventas.filter(v=>v.estado!=='Anulada').flatMap(v=>v.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+partes.filter(p=>p.estado==='Realizado').flatMap(p=>p.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida').reduce((s,a)=>s+a.cantidad,0),stockMap[m.id]||0]);
+const data=materials.map(m=>[m.nombre,m.categoria,m.unidad,compras.filter(c=>c.estado!=='Anulada'&&whMatch(c)).flatMap(c=>c.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='entrada'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0),ventas.filter(v=>v.estado!=='Anulada'&&whMatch(v)).flatMap(v=>v.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+partes.filter(p=>p.estado==='Realizado'&&whMatch(p)).flatMap(p=>p.lineas||[]).filter(l=>l.materialId===m.id).reduce((s,l)=>s+l.cantidad,0)+almacen.filter(a=>a.materialId===m.id&&a.tipo==='salida'&&whMatch(a)).reduce((s,a)=>s+a.cantidad,0),stockMap[m.id]||0]);
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Almacen / Stock',14,25);
@@ -4401,6 +4814,7 @@ r.classList.remove('show');
 }
 });
 });
+migrateData();
 renderDashboard();
 renderSidebarEmpresa();
 renderPrintHeader();
