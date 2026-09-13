@@ -941,6 +941,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="imp-tri-303" onchange="renderImpuestos()" style="padding:8px;border:2px solid var(--border);border-radius:8px"><option value="1">1T</option><option value="2">2T</option><option value="3">3T</option><option value="4">4T</option></select>
 <button class="btn btn-outline" onclick="copyImpuesto('303')">&#128203; Copiar borrador</button>
 <button class="btn btn-outline" onclick="exportImpuestoCSV('303')">&#128190; Exportar CSV</button>
+<button class="btn btn-outline" onclick="enviarImpuestoEmail('303')">&#9993; Enviar por email</button>
 </div>
 <div id="imp-out-303"></div>
 </div>
@@ -952,6 +953,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="imp-tri-130" onchange="renderImpuestos()" style="padding:8px;border:2px solid var(--border);border-radius:8px"><option value="1">1T</option><option value="2">2T</option><option value="3">3T</option><option value="4">4T</option></select>
 <button class="btn btn-outline" onclick="copyImpuesto('130')">&#128203; Copiar borrador</button>
 <button class="btn btn-outline" onclick="exportImpuestoCSV('130')">&#128190; Exportar CSV</button>
+<button class="btn btn-outline" onclick="enviarImpuestoEmail('130')">&#9993; Enviar por email</button>
 </div>
 <div id="imp-out-130"></div>
 </div>
@@ -962,6 +964,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="imp-anio-200" onchange="renderImpuestos()" style="padding:8px;border:2px solid var(--border);border-radius:8px"></select>
 <button class="btn btn-outline" onclick="copyImpuesto('200')">&#128203; Copiar borrador</button>
 <button class="btn btn-outline" onclick="exportImpuestoCSV('200')">&#128190; Exportar CSV</button>
+<button class="btn btn-outline" onclick="enviarImpuestoEmail('200')">&#9993; Enviar por email</button>
 </div>
 <div id="imp-out-200"></div>
 </div>
@@ -3876,7 +3879,7 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Aprobado:'background
 document.getElementById('presupuestos-list').innerHTML=
 (list.length?list.map(p=>{
 const total=(p.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPresSerieStr(p.numero||0)}</span><br><small style="color:var(--text-light)">${p.fecha}</small></td><td>${p.cliente||'-'}</td><td>${p.empresa||'-'}</td><td>${p.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[p.estado]||''}">${p.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editPresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deletePresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPresSerieStr(p.numero||0)}</span><br><small style="color:var(--text-light)">${p.fecha}</small></td><td>${p.cliente||'-'}</td><td>${p.empresa||'-'}</td><td>${p.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[p.estado]||''}">${p.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editPresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarPresupuestoEmail('${p.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deletePresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay presupuestos registrados</td></tr>');
 }
 
@@ -3980,7 +3983,7 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Enviada:'background:
 document.getElementById('facturas-list').innerHTML=
 (list.length?list.map(f=>{
 const total=(f.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarFacturaEmail('${f.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
 }
 
@@ -4737,6 +4740,52 @@ doc.text('IVA ('+(f.ivaPorcentaje||21)+'%): '+(f.iva||0).toFixed(2)+' EUR',120,f
 doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(f.total||0).toFixed(2)+' EUR',120,finalY+14);
 if(f.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+f.notas,14,finalY+22);}
 doc.save('factura-'+getFacSerieStr(f.numero||0)+'.pdf');toast('PDF de la factura generado');
+}
+
+function abrirCorreo(to,subj,body){
+const link='mailto:'+encodeURIComponent(to||'')+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+location.href=link;
+}
+function mailDocBody(d,serie,titulo){
+const emp=getEmpresaActiva();
+let t=(emp&&emp.nombre?emp.nombre:'Gestion Empresa')+'\n';
+if(emp){
+if(emp.nif)t+='NIF/CIF: '+emp.nif+'\n';
+if(emp.direccion)t+='Direccion: '+emp.direccion+'\n';
+if(emp.telefono)t+='Telefono: '+emp.telefono+'\n';
+if(emp.email)t+='Email: '+emp.email+'\n';
+}
+t+='\n'+titulo.toUpperCase()+' '+serie+'\n';
+t+='Fecha: '+d.fecha+'\n';
+if(d.fechaVencimiento)t+='Vencimiento: '+d.fechaVencimiento+'\n';
+if(d.fechaValidez)t+='Validez: '+d.fechaValidez+'\n';
+t+='Estado: '+(d.estado||'Borrador')+'\n';
+if(d.cliente)t+='Cliente: '+d.cliente+'\n';
+if(d.nif)t+='NIF/CIF: '+d.nif+'\n';
+if(d.empresa)t+='Empresa: '+d.empresa+'\n';
+if(d.obra)t+='Obra: '+d.obra+'\n';
+t+='\nMaterial | Categoria | Cantidad | Unidad | Precio/u | Subtotal\n';
+(d.lineas||[]).forEach(l=>{
+t+=(l.material||'')+' | '+(l.categoria||'')+' | '+(l.cantidad||0)+' | '+(l.unidad||'')+' | '+(l.precioUnitario||0).toFixed(2)+' EUR | '+(l.cantidad*(l.precioUnitario||0)).toFixed(2)+' EUR\n';
+});
+t+='\nSubtotal: '+(d.subtotal||0).toFixed(2)+' EUR\n';
+t+='IVA ('+(d.ivaPorcentaje||21)+'%): '+(d.iva||0).toFixed(2)+' EUR\n';
+t+='TOTAL: '+(d.total||0).toFixed(2)+' EUR\n';
+if(d.notas)t+='\nNotas: '+d.notas+'\n';
+t+='\nDocumento generado por Gestion Empresa. Adjunto la version en PDF.';
+return t;
+}
+function enviarPresupuestoEmail(id){
+const p=presupuestos.find(x=>x.id===id);if(!p)return;
+generatePresupuestoPDF(id);
+abrirCorreo(p.email,'Presupuesto '+getPresSerieStr(p.numero||0),mailDocBody(p,getPresSerieStr(p.numero||0),'Presupuesto'));
+toast('Correo abierto. Adjunta el PDF del presupuesto descargado.');
+}
+function enviarFacturaEmail(id){
+const f=facturas.find(x=>x.id===id);if(!f)return;
+generateFacturaPDF(id);
+abrirCorreo(f.email,'Factura '+getFacSerieStr(f.numero||0),mailDocBody(f,getFacSerieStr(f.numero||0),'Factura'));
+toast('Correo abierto. Adjunta el PDF de la factura descargado.');
 }
 
 
@@ -5842,6 +5891,20 @@ if(m==='303'){d=calcIVA303(document.getElementById('imp-anio-303').value,documen
 else if(m==='130'){d=calcIRPF130(document.getElementById('imp-anio-130').value,document.getElementById('imp-tri-130').value);rows=[['Modelo 130 - IRPF autonomos',d.periodo],[],['Concepto','Importe'],['Ingresos',d.ing],['Gastos',d.gas],['Resultado',d.resultado],['Pago fraccionado ('+d.porc+'%)',d.cuota]]}
 else{d=calcIS200(document.getElementById('imp-anio-200').value);rows=[['Modelo 200 - Impuesto Sociedades',d.periodo],[],['Concepto','Importe'],['Ingresos',d.ing],['Gastos',d.gas],['Resultado',d.resultado],['Cuota ('+d.porc+'%)',d.cuota]]}
 descargarCSV('impuesto_'+m+'.csv',rows);
+}
+function enviarImpuestoEmail(m){
+let d,subj;
+if(m==='303'){d=calcIVA303(document.getElementById('imp-anio-303').value,document.getElementById('imp-tri-303').value);subj='Modelo 303 - IVA - '+d.periodo}
+else if(m==='130'){d=calcIRPF130(document.getElementById('imp-anio-130').value,document.getElementById('imp-tri-130').value);subj='Modelo 130 - IRPF autonomos - '+d.periodo}
+else{d=calcIS200(document.getElementById('imp-anio-200').value);subj='Modelo 200 - Impuesto de Sociedades - '+d.periodo}
+const emp=getEmpresaActiva();
+let t=(emp&&emp.nombre?emp.nombre:'Gestion Empresa')+'\n\n';
+if(m==='303'){t+='BORRADOR ORIENTATIVO - MODELO 303 (IVA)\nPeriodo: '+d.periodo+'\n\n'+impAsRow('IVA devengado',d.baseRep,d.cuotaRep)+'\n'+impAsRow('IVA soportado',d.baseSop,d.cuotaSop)+'\n'+impAsRow('Resultado',null,d.resultado)+'\n'}
+else if(m==='130'){t+='BORRADOR ORIENTATIVO - MODELO 130 (IRPF autonomos)\nPeriodo: '+d.periodo+'\n\nIngresos: '+ctFmt(d.ing)+'\nGastos: '+ctFmt(d.gas)+'\nResultado: '+ctFmt(d.resultado)+'\nPago fraccionado ('+d.porc+'%): '+ctFmt(d.cuota)+'\n'}
+else{t+='BORRADOR ORIENTATIVO - MODELO 200 (Impuesto de Sociedades)\nPeriodo: '+d.periodo+'\n\nIngresos: '+ctFmt(d.ing)+'\nGastos: '+ctFmt(d.gas)+'\nResultado: '+ctFmt(d.resultado)+'\nCuota ('+d.porc+'%): '+ctFmt(d.cuota)+'\n'}
+t+='\nDocumento generado por la aplicacion. Orientativo: revisa los recuadros de tu declaracion antes de presentar.';
+abrirCorreo('',subj,t);
+toast('Correo abierto con el borrador del modelo '+m+'.');
 }
 function loadConfigContable(){
 ['ct-iva-compra','ct-iva-venta'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=contabilidad[i?'ivaVenta':'ivaCompra']||21});
