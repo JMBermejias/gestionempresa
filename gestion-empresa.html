@@ -300,7 +300,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
 <div class="page-header"><h1>&#128202; Panel Principal</h1></div>
-<div class="grid" id="stats-cards" style="grid-template-columns:1fr"></div>
+<div class="grid grid-4" id="stats-cards"></div>
 <div class="grid grid-2" style="margin-top:20px">
 <div class="card">
 <h3 style="color:var(--primary-dark);margin-bottom:15px">Ultimas Compras</h3>
@@ -3469,11 +3469,11 @@ const hoy=new Date().toISOString().split('T')[0];
 const mes=hoy.substring(0,7);
 const stock=computeStock();
 document.getElementById('stats-cards').innerHTML=[
-{icon:'&#127970;',color:'linear-gradient(135deg,#5C6BC0,#7986CB)',nombre:'Mi Empresa',info:clientes.length+' clientes · '+proveedores.length+' proveedores · '+empleados.length+' empleados',items:[['miempresa','&#128205;','Mi Empresa'],['empresas','&#127970;','Empresas Instaladoras'],['subcontratas','&#128188;','Subcontratas'],['clientes','&#128100;','Clientes'],['proveedores','&#128666;','Proveedores'],['empleados','&#129489;','Empleados']]},
-{icon:'&#128176;',color:'linear-gradient(135deg,#00695C,#26A69A)',nombre:'Contabilidad',info:apuntes.length+' apuntes · '+planCuentas.length+' cuentas',items:[['contabilidad','&#128202;','Panel Contable'],['plan-cuentas','&#128221;','Plan de Cuentas'],['diario','&#128203;','Diario / Apuntes'],['asis','&#9889;','Asientos Automaticos'],['mayor','&#128270;','Mayor'],['sumas','&#128221;','Sumas y Saldos'],['balsit','&#128176;','Balance de Situacion'],['pyg','&#129517;','Cuenta de Resultados'],['prevision','&#128197;','Prevision / Presupuesto'],['impuestos','&#128179;','Impuestos (303 / 130 / 200)']]},
-{icon:'&#127959;',color:'linear-gradient(135deg,#FF7043,#FFAB91)',nombre:'Obras',info:obras.length+' obras · '+mediciones.length+' mediciones · '+partes.length+' partes',items:[['obras','&#127959;','Obras'],['zonas','&#128205;','Zonas'],['mediciones','&#128221;','Mediciones'],['partes','&#128203;','Partes de Trabajo']]},
+{icon:'&#127970;',color:'linear-gradient(135deg,#5C6BC0,#7986CB)',nombre:'Mi Empresa',info:clientes.length+' clientes<br>'+proveedores.length+' proveedores<br>'+empleados.length+' empleados',items:[['miempresa','&#128205;','Mi Empresa'],['empresas','&#127970;','Empresas Instaladoras'],['subcontratas','&#128188;','Subcontratas'],['clientes','&#128100;','Clientes'],['proveedores','&#128666;','Proveedores'],['empleados','&#129489;','Empleados']]},
+{icon:'&#128176;',color:'linear-gradient(135deg,#00695C,#26A69A)',nombre:'Contabilidad',info:apuntes.length+' apuntes<br>'+planCuentas.length+' cuentas',items:[['contabilidad','&#128202;','Panel Contable'],['plan-cuentas','&#128221;','Plan de Cuentas'],['diario','&#128203;','Diario / Apuntes'],['asis','&#9889;','Asientos Automaticos'],['mayor','&#128270;','Mayor'],['sumas','&#128221;','Sumas y Saldos'],['balsit','&#128176;','Balance de Situacion'],['pyg','&#129517;','Cuenta de Resultados'],['prevision','&#128197;','Prevision / Presupuesto'],['impuestos','&#128179;','Impuestos (303 / 130 / 200)']]},
+{icon:'&#127959;',color:'linear-gradient(135deg,#FF7043,#FFAB91)',nombre:'Obras',info:obras.length+' obras<br>'+mediciones.length+' mediciones<br>'+partes.length+' partes',items:[['obras','&#127959;','Obras'],['zonas','&#128205;','Zonas'],['mediciones','&#128221;','Mediciones'],['partes','&#128203;','Partes de Trabajo']]},
 {icon:'&#127981;',color:'linear-gradient(135deg,#00897B,#4DB6AC)',nombre:'Almacen',info:Object.keys(stock).filter(k=>stock[k]>0).length+' materiales con stock',items:[['almacen','&#127981;','Almacen / Stock'],['almacenes','&#127968;','Almacenes'],['categorias','&#128220;','Categorias'],['materiales','&#128230;','Materiales']]},
-{icon:'&#128194;',color:'linear-gradient(135deg,#0288D1,#4FC3F7)',nombre:'Gestion',info:ventas.length+' ventas · '+compras.length+' compras · '+facturas.length+' facturas',items:[['compras','&#128722;','Compras'],['ventas','&#128176;','Ventas'],['presupuestos','&#128203;','Presupuestos'],['facturas','&#128176;','Facturas']]}
+{icon:'&#128194;',color:'linear-gradient(135deg,#0288D1,#4FC3F7)',nombre:'Gestion',info:ventas.length+' ventas<br>'+compras.length+' compras<br>'+facturas.length+' facturas',items:[['compras','&#128722;','Compras'],['ventas','&#128176;','Ventas'],['presupuestos','&#128203;','Presupuestos'],['facturas','&#128176;','Facturas']]}
 ].map(d=>'<div class="dept-card">'
 +'<div class="dept-head" style="border-top:4px solid '+d.color+'" onclick="toggleDept(this)">'
 +'<span class="dept-icon" style="background:'+d.color+'">'+d.icon+'</span>'
