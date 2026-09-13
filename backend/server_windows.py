@@ -446,7 +446,7 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json(500, {'error': 'No se pudo lanzar el actualizador: %s' % e})
                     return True
                 if not launched:
-                    self._send_json(500, {'error': 'No se pudo lanzar el actualizador (pkexec/sudo no disponibles). Aplica la actualizacion manualmente con: sudo dpkg -i %s' % new})
+                    self._send_json(500, {'error': 'El asistente de permisos (pkexec) se cerro sin ejecutar nada y no pudo relanzarse. Instala la actualizacion manualmente, copia y pega en un terminal:\nsudo dpkg -i %s' % new})
                     return True
                 self._send_json(200, {
                     'ok': True,
@@ -546,6 +546,11 @@ class Handler(BaseHTTPRequestHandler):
         with open(sh, 'w') as f:
             f.write(script)
         os.chmod(sh, 0o755)
+        try:
+            if os.path.exists(logf):
+                os.remove(logf)
+        except OSError:
+            pass
         display = os.environ.get('DISPLAY', '')
         xdg_rt = os.environ.get('XDG_RUNTIME_DIR', '')
         dbus_addr = os.environ.get('DBUS_SESSION_BUS_ADDRESS', '')
@@ -563,30 +568,46 @@ class Handler(BaseHTTPRequestHandler):
             running_as_root = os.getuid() == 0
         except Exception:
             running_as_root = False
-        if running_as_root:
-            subprocess.Popen(['/bin/sh', sh])
-            self._start_linux_watch(sh, logf)
-            return True
-        if shutil.which('pkexec'):
-            subprocess.Popen(['pkexec', '/usr/bin/env'] + env_args + ['/bin/sh', sh])
-            self._start_linux_watch(sh, logf)
-            return True
-        if shutil.which('gksudo'):
-            subprocess.Popen(['gksudo', '/bin/sh', sh])
-            self._start_linux_watch(sh, logf)
-            return True
-        if shutil.which('kdesudo'):
-            subprocess.Popen(['kdesudo', '--', '/bin/sh', sh])
-            self._start_linux_watch(sh, logf)
-            return True
-        if shutil.which('sudo'):
-            try:
-                subprocess.run(['sudo', '-n', 'true'], timeout=5)
-                subprocess.Popen(['sudo', '-n', '/bin/sh', sh])
-                self._start_linux_watch(sh, logf)
+
+        def _try_launch(cmd, timeout):
+            if timeout is None:
+                try:
+                    subprocess.Popen(cmd)
+                except Exception:
+                    return False
                 return True
+            try:
+                subprocess.Popen(cmd)
             except Exception:
                 return False
+            return self._wait_log_started(logf, timeout)
+
+        if running_as_root:
+            if _try_launch(['/bin/sh', sh], 10):
+                self._start_linux_watch(sh, logf)
+                return True
+            return False
+        for name, cmd, tmo in (
+            ('pkexec', ['pkexec', '/usr/bin/env'] + env_args + ['/bin/sh', sh], 20),
+            ('gksudo', ['gksudo', '/bin/sh', sh], 20),
+            ('kdesudo', ['kdesudo', '--', '/bin/sh', sh], 20),
+            ('sudo', ['sudo', '-n', '/bin/sh', sh], 6),
+        ):
+            if shutil.which(name):
+                if _try_launch(cmd, tmo):
+                    self._start_linux_watch(sh, logf)
+                    return True
+        return False
+
+    def _wait_log_started(self, logf, timeout):
+        end = time.time() + timeout
+        while time.time() < end:
+            try:
+                if os.path.exists(logf) and os.path.getsize(logf) > 0:
+                    return True
+            except OSError:
+                pass
+            time.sleep(0.5)
         return False
 
     def _start_linux_watch(self, sh, logf):
