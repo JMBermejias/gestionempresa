@@ -71,6 +71,19 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .stat-card .stat-icon{font-size:2rem;margin-bottom:8px}
 .stat-card .stat-value{font-size:1.8rem;font-weight:700}
 .stat-card .stat-label{font-size:.8rem;opacity:.9;margin-top:4px}
+.dept-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.dept-head{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;user-select:none}
+.dept-head .dept-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.dept-txt{flex:1;min-width:0}
+.dept-name{font-size:1.05rem;font-weight:700;color:var(--primary-dark)}
+.dept-info{font-size:.78rem;color:var(--text-light);margin-top:2px}
+.dept-caret{color:var(--text-light);transition:transform .3s ease;flex-shrink:0}
+.dept-card.open .dept-caret{transform:rotate(180deg)}
+.dept-menu{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.dept-card.open .dept-menu{max-height:900px}
+.dept-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 18px;border:none;background:#fff;cursor:pointer;font-size:.88rem;color:var(--text);text-align:left;border-top:1px solid var(--border)}
+.dept-btn:hover{background:var(--primary-light)}
+.dept-btn span{font-size:1.1rem}
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);font-size:.85rem}
 th{background:var(--primary);color:#fff;font-weight:600;position:sticky;top:0}
@@ -287,7 +300,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
 <div class="page-header"><h1>&#128202; Panel Principal</h1></div>
-<div class="grid grid-5" id="stats-cards"></div>
+<div class="grid grid-3" id="stats-cards"></div>
 <div class="grid grid-2" style="margin-top:20px">
 <div class="card">
 <h3 style="color:var(--primary-dark);margin-bottom:15px">Ultimas Compras</h3>
@@ -3447,24 +3460,23 @@ return`<tr>
 function renderDashboard(){
 const hoy=new Date().toISOString().split('T')[0];
 const mes=hoy.substring(0,7);
-const mMes=mediciones.filter(m=>m.fecha.startsWith(mes));
-document.getElementById('stats-cards').innerHTML=`
-<div class="stat-card elec" style="cursor:pointer" onclick="matFilter='Electricidad';showPage('materiales')"><div class="stat-icon">&#9889;</div><div class="stat-value">${materials.filter(m=>m.categoria==='Electricidad').length}</div><div class="stat-label">Materiales Electricos</div></div>
-<div class="stat-card font" style="cursor:pointer" onclick="matFilter='Fontaneria';showPage('materiales')"><div class="stat-icon">&#128167;</div><div class="stat-value">${materials.filter(m=>m.categoria==='Fontaneria').length}</div><div class="stat-label">Materiales Fontaneria</div></div>
-<div class="stat-card clim" style="cursor:pointer" onclick="matFilter='Calefaccion';showPage('materiales')"><div class="stat-icon">&#127777;&#65039;</div><div class="stat-value">${materials.filter(m=>m.categoria==='Calefaccion').length}</div><div class="stat-label">Materiales Calefaccion</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#29B6F6,#4FC3F7);cursor:pointer" onclick="matFilter='Climatizacion';showPage('materiales')"><div class="stat-icon">&#9729;&#65039;</div><div class="stat-value">${materials.filter(m=>m.categoria==='Climatizacion').length}</div><div class="stat-label">Materiales Climatizacion</div></div>
-<div class="stat-card pci" style="cursor:pointer" onclick="matFilter='PCI';showPage('materiales')"><div class="stat-icon">&#128293;</div><div class="stat-value">${materials.filter(m=>m.categoria==='PCI').length}</div><div class="stat-label">Materiales PCI</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#78909C,#90A4AE);cursor:pointer" onclick="showPage('empresas')"><div class="stat-icon">&#127970;</div><div class="stat-value">${empresas.length}</div><div class="stat-label">Empresas Instaladoras</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#AB47BC,#CE93D8);cursor:pointer" onclick="showPage('obras')"><div class="stat-icon">&#127959;</div><div class="stat-value">${obras.length}</div><div class="stat-label">Obras</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#FF7043,#FFAB91);cursor:pointer" onclick="showPage('zonas')"><div class="stat-icon">&#128205;</div><div class="stat-value">${zonas.length}</div><div class="stat-label">Zonas</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#8E24AA,#AB47BC);cursor:pointer" onclick="showPage('mediciones')"><div class="stat-icon">&#128221;</div><div class="stat-value">${mediciones.length}</div><div class="stat-label">Total Mediciones</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#0288D1,#4FC3F7);cursor:pointer" onclick="showPage('presupuestos')"><div class="stat-icon">&#128203;</div><div class="stat-value">${presupuestos.length}</div><div class="stat-label">Presupuestos</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#F57C00,#FFB74D);cursor:pointer" onclick="showPage('facturas')"><div class="stat-icon">&#128176;</div><div class="stat-value">${facturas.length}</div><div class="stat-label">Facturas</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#26A69A,#80CBC4);cursor:pointer" onclick="showPage('clientes')"><div class="stat-icon">&#128100;</div><div class="stat-value">${clientes.length}</div><div class="stat-label">Clientes</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#5C6BC0,#9FA8DA);cursor:pointer" onclick="showPage('proveedores')"><div class="stat-icon">&#128666;</div><div class="stat-value">${proveedores.length}</div><div class="stat-label">Proveedores</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#7E57C2,#B39DDB);cursor:pointer" onclick="showPage('empleados')"><div class="stat-icon">&#129489;</div><div class="stat-value">${empleados.length}</div><div class="stat-label">Empleados</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#00897B,#4DB6AC);cursor:pointer" onclick="showPage('almacen')"><div class="stat-icon">&#127981;</div><div class="stat-value">${Object.values(computeStock()).filter(v=>v>0).length}</div><div class="stat-label">Almacen (Con Stock)</div></div>
-<div class="stat-card" style="background:linear-gradient(135deg,#00695C,#26A69A);cursor:pointer" onclick="showPage('partes')"><div class="stat-icon">&#128203;</div><div class="stat-value">${partes.length}</div><div class="stat-label">Partes de Trabajo</div></div>`;
+document.getElementById('stats-cards').innerHTML=[
+{icon:'&#128176;',color:'linear-gradient(135deg,#00695C,#26A69A)',nombre:'Contabilidad',info:apuntes.length+' apuntes · '+planCuentas.length+' cuentas',items:[['contabilidad','&#128202;','Panel Contable'],['plan-cuentas','&#128221;','Plan de Cuentas'],['diario','&#128203;','Diario / Apuntes'],['asis','&#9889;','Asientos Automaticos'],['mayor','&#128270;','Mayor'],['sumas','&#128221;','Sumas y Saldos'],['balsit','&#128176;','Balance de Situacion'],['pyg','&#129517;','Cuenta de Resultados'],['prevision','&#128197;','Prevision / Presupuesto'],['impuestos','&#128179;','Impuestos (303 / 130 / 200)']]},
+{icon:'&#127959;',color:'linear-gradient(135deg,#FF7043,#FFAB91)',nombre:'Obras',info:obras.length+' obras · '+mediciones.length+' mediciones · '+partes.length+' partes',items:[['obras','&#127959;','Obras'],['zonas','&#128205;','Zonas'],['mediciones','&#128221;','Mediciones'],['partes','&#128203;','Partes de Trabajo']]},
+{icon:'&#128194;',color:'linear-gradient(135deg,#0288D1,#4FC3F7)',nombre:'Gestion',info:ventas.length+' ventas · '+compras.length+' compras · '+facturas.length+' facturas',items:[['compras','&#128722;','Compras'],['ventas','&#128176;','Ventas'],['presupuestos','&#128203;','Presupuestos'],['facturas','&#128176;','Facturas'],['clientes','&#128100;','Clientes'],['proveedores','&#128666;','Proveedores'],['almacen','&#127981;','Almacen / Stock'],['materiales','&#128230;','Materiales'],['categorias','&#128220;','Categorias'],['miempresa','&#128205;','Mi Empresa'],['empresas','&#127970;','Empresas Instaladoras'],['subcontratas','&#128188;','Subcontratas'],['empleados','&#129489;','Empleados']]}
+].map(d=>'<div class="dept-card">'
++'<div class="dept-head" style="border-top:4px solid '+d.color+'" onclick="toggleDept(this)">'
++'<span class="dept-icon" style="background:'+d.color+'">'+d.icon+'</span>'
++'<div class="dept-txt"><div class="dept-name">'+d.nombre+'</div><div class="dept-info">'+d.info+'</div></div>'
++'<span class="dept-caret">&#9660;</span></div>'
++'<div class="dept-menu">'+d.items.map(i=>'<button class="dept-btn" onclick="showPage(\''+i[0]+'\')"><span>'+i[1]+'</span>'+i[2]+'</button>').join('')+'</div>'
++'</div>').join('');
+function toggleDept(head){
+const card=head.closest('.dept-card');
+const wasOpen=card.classList.contains('open');
+document.querySelectorAll('#stats-cards .dept-card.open').forEach(c=>c.classList.remove('open'));
+if(!wasOpen)card.classList.add('open');
+}
 const compRec=[...compras].filter(c=>c.estado!=='Anulada').sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
 document.getElementById('recent-compras-list').innerHTML=compRec.map(c=>`<tr><td><strong>${getCompSerieStr(c.numero||0)}</strong><br><small>${c.fecha}</small></td><td>${c.proveedor||'-'}</td><td>${c.estado||'Recibida'}</td><td style="text-align:right"><strong>${fmtPrecio(c.total||0)} &euro;</strong></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">Sin datos</td></tr>';
 const ventRec=[...ventas].filter(v=>v.estado!=='Anulada').sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
