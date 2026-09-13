@@ -257,6 +257,35 @@ def _update_error(e):
     return {'offline': False, 'error': str(e)}
 
 
+def _resolve_real_user():
+    """Nombre del usuario real de la sesion grafica.
+
+    Necesario porque la aplicacion puede relanzarse como root tras un update
+    (herencia del script de pkexec) o via pkexec/sudo con SUDO_UID/PKEXEC_UID.
+    """
+    for k in ('REAL_USER', 'PKEXEC_UID', 'SUDO_UID'):
+        v = os.environ.get(k)
+        if not v:
+            continue
+        if k == 'REAL_USER' and v != 'root':
+            return v
+        try:
+            name = pwd.getpwuid(int(v)).pw_name
+            if name and name != 'root':
+                return name
+        except Exception:
+            pass
+    try:
+        out = subprocess.run(['logname'], capture_output=True, text=True, timeout=3)
+        name = out.stdout.strip()
+        if name and name != 'root':
+            return name
+    except Exception:
+        pass
+    name = os.environ.get('USER') or os.environ.get('LOGNAME') or getpass.getuser()
+    return name or 'root'
+
+
 def _norm_version(v):
     m = re.search(r'v?(\d+)\.(\d+)\.(\d+)', v or '')
     if m:
@@ -485,10 +514,7 @@ class Handler(BaseHTTPRequestHandler):
         os.makedirs(UPDATES_DIR, exist_ok=True)
         logf = os.path.join(UPDATES_DIR, 'update_log.txt')
         sh = os.path.join(UPDATES_DIR, 'apply_update.sh')
-        try:
-            real_user = pwd.getpwuid(os.getuid()).pw_name
-        except Exception:
-            real_user = getpass.getuser()
+        real_user = _resolve_real_user()
         script = (
             '#!/bin/sh\n'
             'LOG="%s"\n'
@@ -507,9 +533,9 @@ class Handler(BaseHTTPRequestHandler):
             'echo "Instalando nueva version..." >> "$LOG"\n'
             'dpkg -i "$DEB" >> "$LOG" 2>&1\n'
             'echo "[$(date +%%F_%%T)] Instalacion finalizada" >> "$LOG"\n'
-            'nohup /usr/bin/gestion-empresa-bin >/dev/null 2>&1 &\n'
+            'su - "$REAL_USER" -c \'nohup /usr/bin/gestion-empresa-bin >/dev/null 2>&1 &\'\n'
             'sleep 2\n'
-            'if [ -n "$REAL_USER" ] && command -v su >/dev/null 2>&1 && [ "$(id -u)" != "0" ]; then\n'
+            'if [ -n "$REAL_USER" ] && command -v su >/dev/null 2>&1; then\n'
             '  su "$REAL_USER" -c \'xdg-open "http://127.0.0.1:8081"\' >/dev/null 2>&1 || true\n'
             'else\n'
             '  xdg-open "http://127.0.0.1:8081" >/dev/null 2>&1 || true\n'
@@ -533,6 +559,14 @@ class Handler(BaseHTTPRequestHandler):
             env_args.append('DBUS_SESSION_BUS_ADDRESS=%s' % dbus_addr)
         if xauth:
             env_args.append('XAUTHORITY=%s' % xauth)
+        try:
+            running_as_root = os.getuid() == 0
+        except Exception:
+            running_as_root = False
+        if running_as_root:
+            subprocess.Popen(['/bin/sh', sh])
+            self._start_linux_watch(sh, logf)
+            return True
         if shutil.which('pkexec'):
             subprocess.Popen(['pkexec', '/usr/bin/env'] + env_args + ['/bin/sh', sh])
             self._start_linux_watch(sh, logf)
