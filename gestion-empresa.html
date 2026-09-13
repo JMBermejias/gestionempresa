@@ -839,9 +839,11 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input id="pcu-bus" type="text" placeholder="Buscar cuenta por codigo o nombre..." oninput="renderPlanCuentas()" style="flex:1;min-width:200px;padding:8px 12px;border:2px solid var(--border);border-radius:8px">
 <button class="btn btn-outline" onclick="openCuentaModal()">&#10133; Nueva cuenta</button>
 <button class="btn" style="background:#EEF2FF;color:#3730a3" onclick="openImportPgc()">&#128279; Importar PGC de internet</button>
+<button class="btn btn-outline" onclick="document.getElementById('pgc-file').click()">&#128196; Importar desde CSV</button>
 <button class="btn btn-outline" onclick="exportPlanCuentas()">&#128190; Exportar CSV</button>
 </div>
 <div id="pcu-info" style="font-size:.8rem;color:var(--text-light);margin-bottom:8px"></div>
+<input type="file" id="pgc-file" accept=".csv,text/csv" style="display:none" onchange="importPgcCsv(event)">
 <div class="table-wrap"><table><thead><tr><th>Codigo</th><th>Nombre</th><th>Tipo</th><th>Saldo</th><th></th></tr></thead><tbody id="pcu-out"></tbody></table></div>
 </div>
 </div>
@@ -5359,16 +5361,10 @@ function importPgcUrl(){
 const url=document.getElementById('pgc-url').value.trim();
 const pasted=document.getElementById('pgc-lista').value.trim();
 const st=document.getElementById('pgc-status');
-const apply=function(found){
-const map=new Map();
-found.forEach(x=>{if(x.c&&x.n&&!map.has(x.c))map.set(x.c,{c:x.c,n:x.n})});
-planCuentas=[...map.values()];
-save();closeModal('modal-imp-pgc');renderPlanCuentas();toast('Plan de cuentas actualizado ('+planCuentas.length+' cuentas)');
-};
 if(pasted){
 const items=parsePgcText(pasted);
 if(!items.length){st.textContent='No se reconocieron cuentas en el texto pegado. Usa una cuenta por linea: Codigo,Nombre';return}
-apply(items);return;
+applyPgc(items);return;
 }
 if(!url){alert('Escribe una URL o pega la lista');return}
 st.textContent='Descargando...';
@@ -5381,8 +5377,59 @@ if(Array.isArray(j)){j.forEach(x=>{if(Array.isArray(x))items.push({c:String(x[0]
 }catch(e){}
 if(!items.length)items=parsePgcText(t);
 if(!items.length){st.textContent='No se pudieron extraer cuentas de esa URL. Prueba a pegar la lista en el campo de texto.';return}
-apply(items);
+applyPgc(items);
 }).catch(err=>{st.textContent='Error de descarga ('+err.message+'). Prueba a pegar la lista en el campo de texto.'});
+}
+function applyPgc(found){
+const map=new Map();
+found.forEach(x=>{if(x.c&&x.n&&!map.has(x.c))map.set(x.c,{c:x.c,n:x.n})});
+planCuentas=[...map.values()];
+save();closeModal('modal-imp-pgc');renderPlanCuentas();toast('Plan de cuentas actualizado ('+planCuentas.length+' cuentas)');
+}
+function parsePgcCsv(txt){
+const rows=[];
+txt.replace(/^\ufeff/,'').split(/\r?\n/).forEach(line=>{
+if(!line.trim())return;
+const fields=[];
+let buf='',q=false;
+for(let i=0;i<line.length;i++){
+const ch=line[i];
+if(q){
+if(ch==='"'){if(line[i+1]==='"'){buf+='"';i++}else q=false}
+else buf+=ch;
+}else{
+if(ch==='"')q=true;
+else if(ch===';'||ch===','){fields.push(buf);buf=''}
+else buf+=ch;
+}
+}
+fields.push(buf);
+rows.push(fields);
+});
+return rows;
+}
+function importPgcCsv(event){
+const file=event.target.files[0];
+event.target.value='';
+if(!file)return;
+const st=document.getElementById('pgc-status');
+st.textContent='Leyendo '+file.name+'...';
+const reader=new FileReader();
+reader.onload=function(e){
+const rows=parsePgcCsv(e.target.result);
+let start=0;
+if(rows.length&&!/^\d/.test((rows[0][0]||'').trim()))start=1;
+const items=[];
+for(let i=start;i<rows.length;i++){
+const c=(rows[i][0]||'').replace(/\./g,'').trim();
+const n=(rows[i][1]||'').trim();
+if(c&&n&&/^[0-9]{1,5}$/.test(c))items.push({c:c,n:n});
+}
+if(!items.length){st.textContent='No se encontraron cuentas validas en '+file.name+'. Espera columnas Codigo,Nombre (ej: 600;Compras).';return}
+applyPgc(items);
+st.textContent='';
+};
+reader.readAsText(file,'utf-8');
 }
 function exportPlanCuentas(){
 const sal=ctSaldos('0000-01-01','9999-12-31');
