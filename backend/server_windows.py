@@ -12,6 +12,7 @@ import os
 import pwd
 import re
 import shutil
+import socket
 import sqlite3
 import subprocess
 import sys
@@ -233,6 +234,29 @@ def fetch_github_release():
         return json.loads(resp.read().decode('utf-8'))
 
 
+def _is_network_error(e):
+    msg = str(e).lower()
+    if isinstance(e, urllib.error.URLError):
+        reason = getattr(e, 'reason', None)
+        errno = getattr(reason, 'errno', None)
+        if isinstance(reason, socket.gaierror) or isinstance(reason, socket.timeout) or isinstance(reason, socket.error):
+            return True
+        if errno in (-2, -3, -5, -7, 110, 111, 113):
+            return True
+    if isinstance(e, socket.timeout):
+        return True
+    for token in ('name resolution', 'failed to resolve', 'getaddrinfo', 'temporary failure', 'network is unreachable', 'no route to host', 'timed out', 'connection refused'):
+        if token in msg:
+            return True
+    return False
+
+
+def _update_error(e):
+    if _is_network_error(e):
+        return {'offline': True, 'error': 'Sin conexion a Internet (no se pudo contactar con GitHub). Comprueba tu red o el DNS y vuelve a intentarlo.'}
+    return {'offline': False, 'error': str(e)}
+
+
 def _norm_version(v):
     m = re.search(r'v?(\d+)\.(\d+)\.(\d+)', v or '')
     if m:
@@ -345,7 +369,8 @@ class Handler(BaseHTTPRequestHandler):
                     'name': rel.get('name', ''),
                 })
             except Exception as e:
-                self._send_json(500, {'error': str(e), 'offline': True})
+                info = _update_error(e)
+                self._send_json(500, {'error': info['error'], 'offline': info['offline']})
             return True
         if path == '/api/update/download':
             try:
@@ -371,7 +396,8 @@ class Handler(BaseHTTPRequestHandler):
                         size += len(chunk)
                 self._send_json(200, {'ok': True, 'size': size})
             except Exception as e:
-                self._send_json(500, {'error': str(e)})
+                info = _update_error(e)
+                self._send_json(500, {'error': info['error'], 'offline': info['offline']})
             return True
         if path == '/api/update/apply':
             if not getattr(sys, 'frozen', False):
@@ -380,6 +406,9 @@ class Handler(BaseHTTPRequestHandler):
             new = os.path.join(UPDATES_DIR, EXE_NAME)
             if not os.path.exists(new):
                 self._send_json(400, {'error': 'Primero descarga la actualizacion'})
+                return True
+            if os.path.getsize(new) < 1024:
+                self._send_json(400, {'error': 'La actualizacion descargada esta incompleta o vacia (posible fallo de red). Vuelve a descargarla.'})
                 return True
             if sys.platform.startswith('linux'):
                 try:

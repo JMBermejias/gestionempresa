@@ -2132,7 +2132,11 @@ function updateCheck(){
     if(r.status===401){return}
     return r.json();
   }).then(data=>{
-    if(!data||data.offline){return}
+    if(!data)return;
+    if(data.offline){
+      if(!_updateOfflineShown){_updateOfflineShown=true;toast(data.error||'Sin conexion para comprobar actualizaciones');}
+      return
+    }
     if(data.needs_update){
       const info=document.getElementById('upd-info');
       info.textContent='Version '+data.latest_tag+' disponible (tienes v'+data.current+').';
@@ -2145,6 +2149,7 @@ function updateCheck(){
   }).catch(()=>{});
 }
 let _lastUpdateCheck=null;
+let _updateOfflineShown=false;
 function updateDownload(){
   const info=document.getElementById('upd-info');
   info.textContent='Descargando la actualizacion...';
@@ -2156,7 +2161,7 @@ function updateDownload(){
       document.getElementById('upd-btn-apply').style.display='';
       document.getElementById('upd-title').textContent='Actualizacion descargada';
     }else{
-      info.textContent=b.error||'Error al descargar';
+      info.textContent=(b.offline||/name resolution|sin conexion/i.test(b.error||''))?'Sin conexion a Internet. Comprueba tu red o el DNS y pulsa de nuevo "Descargar".':(b.error||'Error al descargar');
       document.getElementById('upd-btn-download').disabled=false;
     }
   }).catch(()=>{info.textContent='Error de conexion durante la descarga';document.getElementById('upd-btn-download').disabled=false});
