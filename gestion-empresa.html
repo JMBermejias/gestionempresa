@@ -1660,26 +1660,28 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="toast" id="toast"></div>
 
 <script>
-let materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
-let mediciones = JSON.parse(localStorage.getItem('med_data') || '[]');
-let matFilter = 'all';
-let empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
-let misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
 let empresaActivaId = localStorage.getItem('mie_activa') || '';
-let obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
-let zonas = JSON.parse(localStorage.getItem('zonas_data') || '[]');
-let subcontratas = JSON.parse(localStorage.getItem('sub_data') || '[]');
-let presupuestos = JSON.parse(localStorage.getItem('pres_data') || '[]');
-let facturas = JSON.parse(localStorage.getItem('fac_data') || '[]');
-let clientes = JSON.parse(localStorage.getItem('cli_data') || '[]');
-let proveedores = JSON.parse(localStorage.getItem('prov_data') || '[]');
-let empleados = JSON.parse(localStorage.getItem('emp2_data') || '[]');
-let compras = JSON.parse(localStorage.getItem('com_data') || '[]');
-let ventas = JSON.parse(localStorage.getItem('ven_data') || '[]');
-let almacen = JSON.parse(localStorage.getItem('alm_data') || '[]');
-let partes = JSON.parse(localStorage.getItem('par_data') || '[]');
-let categorias = JSON.parse(localStorage.getItem('cat2_data') || '[]');
-let almacenes = JSON.parse(localStorage.getItem('alm2_data') || '[]');
+function aimKey(k){return empresaActivaId?k+'#'+empresaActivaId:k;}
+function aimKeyFor(k,id){return id?k+'#'+id:k;}
+let materials = JSON.parse(localStorage.getItem(aimKey('mat_data')) || '[]');
+let mediciones = JSON.parse(localStorage.getItem(aimKey('med_data')) || '[]');
+let matFilter = 'all';
+let empresas = JSON.parse(localStorage.getItem(aimKey('emp_data')) || '[]');
+let misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
+let obras = JSON.parse(localStorage.getItem(aimKey('obras_data')) || '[]');
+let zonas = JSON.parse(localStorage.getItem(aimKey('zonas_data')) || '[]');
+let subcontratas = JSON.parse(localStorage.getItem(aimKey('sub_data')) || '[]');
+let presupuestos = JSON.parse(localStorage.getItem(aimKey('pres_data')) || '[]');
+let facturas = JSON.parse(localStorage.getItem(aimKey('fac_data')) || '[]');
+let clientes = JSON.parse(localStorage.getItem(aimKey('cli_data')) || '[]');
+let proveedores = JSON.parse(localStorage.getItem(aimKey('prov_data')) || '[]');
+let empleados = JSON.parse(localStorage.getItem(aimKey('emp2_data')) || '[]');
+let compras = JSON.parse(localStorage.getItem(aimKey('com_data')) || '[]');
+let ventas = JSON.parse(localStorage.getItem(aimKey('ven_data')) || '[]');
+let almacen = JSON.parse(localStorage.getItem(aimKey('alm_data')) || '[]');
+let partes = JSON.parse(localStorage.getItem(aimKey('par_data')) || '[]');
+let categorias = JSON.parse(localStorage.getItem(aimKey('cat2_data')) || '[]');
+let almacenes = JSON.parse(localStorage.getItem(aimKey('alm2_data')) || '[]');
 const DEFAULT_ALMACEN_ID='al_principal';
 let tempMedicionLineas = [];
 let tempPresLineas = [];
@@ -1687,30 +1689,30 @@ let tempFacLineas = [];
 let tempCompLineas = [];
 let tempVenLineas = [];
 let tempPartLineas = [];
-let medSerieCounter = parseInt(localStorage.getItem('med_serie_counter') || '0');
-let presSerieCounter = parseInt(localStorage.getItem('pres_serie_counter') || '0');
-let facSerieCounter = parseInt(localStorage.getItem('fac_serie_counter') || '0');
-let compSerieCounter = parseInt(localStorage.getItem('comp_serie_counter') || '0');
-let venSerieCounter = parseInt(localStorage.getItem('ven_serie_counter') || '0');
-let partSerieCounter = parseInt(localStorage.getItem('part_serie_counter') || '0');
+let medSerieCounter = parseInt(localStorage.getItem(aimKey('med_serie_counter')) || '0');
+let presSerieCounter = parseInt(localStorage.getItem(aimKey('pres_serie_counter')) || '0');
+let facSerieCounter = parseInt(localStorage.getItem(aimKey('fac_serie_counter')) || '0');
+let compSerieCounter = parseInt(localStorage.getItem(aimKey('comp_serie_counter')) || '0');
+let venSerieCounter = parseInt(localStorage.getItem(aimKey('ven_serie_counter')) || '0');
+let partSerieCounter = parseInt(localStorage.getItem(aimKey('part_serie_counter')) || '0');
 let _syncing=false;let _ready=false;
 let _fbConnected=false;
-let _db=null;let _dbRef=null;
+let _db=null;let _globalRef=null;let _dataRef=null;
 let _authToken=localStorage.getItem('mo_token')||'';
 let _authUser=localStorage.getItem('mo_user')||'';
 const IS_DESKTOP=location.protocol==='http:'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname==='[::1]'||location.hostname==='::1')&&location.port==='8081';
 let _authRetries=0;let _authConfigured=false;
 let _cloudSync=localStorage.getItem('cloud_sync')!==null?localStorage.getItem('cloud_sync')==='1':!IS_DESKTOP;
-let planCuentas=JSON.parse(localStorage.getItem('pgc_data')||'null');
-let apuntes=JSON.parse(localStorage.getItem('apo_data')||'[]');
-let contabilidad=JSON.parse(localStorage.getItem('cta_data')||'null');
-let asientoCounter=parseInt(localStorage.getItem('aso_counter')||'0');
+let planCuentas=JSON.parse(localStorage.getItem(aimKey('pgc_data'))||'null');
+let apuntes=JSON.parse(localStorage.getItem(aimKey('apo_data'))||'[]');
+let contabilidad=JSON.parse(localStorage.getItem(aimKey('cta_data'))||'null');
+let asientoCounter=parseInt(localStorage.getItem(aimKey('aso_counter'))||'0');
 const PGC_DEFAULT=[{c:'100',n:'Capital social'},{c:'102',n:'Capital'},{c:'103',n:'Socios por desembolsos no exigidos'},{c:'104',n:'Socios por aportaciones no dinerarias pendientes'},{c:'110',n:'Prima de emision o asuncion'},{c:'111',n:'Reservas de capitalizacion'},{c:'112',n:'Reserva legal'},{c:'113',n:'Reservas voluntarias'},{c:'114',n:'Reservas especiales'},{c:'118',n:'Aportaciones de socios o propietarios'},{c:'120',n:'Remanente'},{c:'121',n:'Resultados negativos de ejercicios anteriores'},{c:'129',n:'Resultado del ejercicio'},{c:'130',n:'Subvenciones oficiales de capital'},{c:'131',n:'Donaciones y legados de capital'},{c:'132',n:'Otras subvenciones, donaciones y legados'},{c:'137',n:'Activos por impuesto diferido'},{c:'140',n:'Provision para retribuciones a largo plazo'},{c:'141',n:'Provision para impuestos'},{c:'142',n:'Provision para otras responsabilidades'},{c:'143',n:'Provision por desmantelamiento, retiro o rehabilitacion'},{c:'145',n:'Provision para actuaciones medioambientales'},{c:'146',n:'Provision para reestructuraciones'},{c:'150',n:'Deudas a largo plazo con entidades de credito'},{c:'151',n:'Deudas a largo plazo'},{c:'153',n:'Deudas a largo plazo con empresas del grupo y asociadas'},{c:'160',n:'Proveedores de inmovilizado a largo plazo'},{c:'161',n:'Proveedores, empresas del grupo y asociadas, a largo plazo'},{c:'163',n:'Efectos a pagar a largo plazo'},{c:'170',n:'Deudas a largo plazo con entidades de credito'},{c:'171',n:'Deudas a largo plazo'},{c:'173',n:'Proveedores de inmovilizado a largo plazo'},{c:'174',n:'Proveedores, empresas del grupo y asociadas, a largo plazo'},{c:'175',n:'Efectos a pagar a largo plazo'},{c:'177',n:'Obligaciones y bonos a largo plazo'},{c:'200',n:'Investigacion y desarrollo'},{c:'201',n:'Desarrollo'},{c:'202',n:'Concesiones administrativas'},{c:'203',n:'Propiedad industrial'},{c:'205',n:'Derechos de traspaso'},{c:'206',n:'Aplicaciones informaticas'},{c:'209',n:'Anticipos para inmovilizaciones intangibles'},{c:'210',n:'Terrenos y bienes naturales'},{c:'211',n:'Construcciones'},{c:'212',n:'Instalaciones tecnicas'},{c:'213',n:'Maquinaria'},{c:'214',n:'Utillaje'},{c:'215',n:'Otras instalaciones'},{c:'216',n:'Mobiliario'},{c:'217',n:'Equipos para procesos de informacion'},{c:'218',n:'Elementos de transporte'},{c:'219',n:'Otro inmovilizado material'},{c:'220',n:'Inversiones inmobiliarias en terrenos'},{c:'221',n:'Inversiones inmobiliarias en construcciones'},{c:'250',n:'Inversiones financieras a largo plazo en instrumentos de patrimonio'},{c:'251',n:'Valores representativos de deuda a largo plazo'},{c:'258',n:'Inversiones a largo plazo en empresas del grupo y asociadas'},{c:'260',n:'Fianzas constituidas a largo plazo'},{c:'280',n:'Amortizacion acumulada del inmovilizado intangible'},{c:'281',n:'Amortizacion acumulada del inmovilizado material'},{c:'285',n:'Amortizacion acumulada de inversiones inmobiliarias'},{c:'290',n:'Deterioro de valor del inmovilizado intangible'},{c:'291',n:'Deterioro de valor del inmovilizado material'},{c:'300',n:'Mercaderias'},{c:'310',n:'Materias primas'},{c:'320',n:'Elementos y conjuntos incorporables'},{c:'321',n:'Combustibles'},{c:'330',n:'Productos en curso'},{c:'350',n:'Productos terminados'},{c:'360',n:'Subproductos, residuos y materiales recuperados'},{c:'400',n:'Proveedores'},{c:'401',n:'Proveedores, empresas del grupo y asociadas'},{c:'403',n:'Proveedores, empresas asociadas'},{c:'405',n:'Acreedores por prestaciones de servicios'},{c:'410',n:'Acreedores por prestaciones de servicios'},{c:'411',n:'Acreedores, empresas del grupo y asociadas'},{c:'430',n:'Clientes'},{c:'431',n:'Clientes, empresas del grupo y asociadas'},{c:'433',n:'Clientes, empresas asociadas'},{c:'436',n:'Clientes de dudoso cobro'},{c:'438',n:'Anticipos de clientes'},{c:'440',n:'Deudores'},{c:'441',n:'Deudores, empresas del grupo y asociadas'},{c:'445',n:'Acreedores por enajenacion de activos no corrientes'},{c:'446',n:'Accionistas por desembolsos exigidos'},{c:'460',n:'Anticipos de remuneraciones'},{c:'465',n:'Remuneraciones pendientes de pago'},{c:'470',n:'Hacienda Publica, deudora por diversos conceptos'},{c:'471',n:'Organismos de la Seguridad Social, deudores'},{c:'472',n:'Hacienda Publica, IVA soportado'},{c:'473',n:'Hacienda Publica, retenciones y pagos a cuenta'},{c:'474',n:'Activos por impuesto diferido'},{c:'475',n:'Hacienda Publica, acreedora por conceptos fiscales'},{c:'4750',n:'Hacienda Publica, acreedora por IVA'},{c:'4751',n:'Hacienda Publica, acreedora por retenciones practicadas'},{c:'476',n:'Organismos de la Seguridad Social, acreedores'},{c:'477',n:'Hacienda Publica, IVA repercutido'},{c:'480',n:'Gastos anticipados'},{c:'485',n:'Ingresos anticipados'},{c:'490',n:'Deterioro de valor de creditos por operaciones comerciales'},{c:'500',n:'Emprestitos y otras emisiones, a corto plazo'},{c:'520',n:'Deudas a corto plazo con entidades de credito'},{c:'521',n:'Deudas a corto plazo'},{c:'523',n:'Proveedores de inmovilizado a corto plazo'},{c:'524',n:'Proveedores, empresas del grupo y asociadas, a corto plazo'},{c:'525',n:'Efectos a pagar a corto plazo'},{c:'527',n:'Intereses a corto plazo de deudas con entidades de credito'},{c:'529',n:'Provisiones a corto plazo'},{c:'550',n:'Titular de la explotacion'},{c:'551',n:'Cuenta corriente con socios y administradores'},{c:'552',n:'Cuenta corriente con otras personas y entidades vinculadas'},{c:'555',n:'Partidas pendientes de aplicacion'},{c:'570',n:'Caja, euros'},{c:'572',n:'Bancos e instituciones de credito c/c vista, euros'},{c:'573',n:'Bancos e instituciones de credito c/c vista, moneda extranjera'},{c:'574',n:'Bancos e instituciones de credito, cuentas de ahorro'},{c:'560',n:'Fianzas recibidas a corto plazo'},{c:'561',n:'Depositos recibidos a corto plazo'},{c:'590',n:'Ajustes por valoracion de inversiones financieras a corto plazo'},{c:'598',n:'Deterioro de valor de participaciones a corto plazo en empresas del grupo'},{c:'600',n:'Compras de mercaderias'},{c:'601',n:'Compras de materias primas'},{c:'602',n:'Compras de otros aprovisionamientos'},{c:'606',n:'Descuentos sobre compras por pronto pago'},{c:'607',n:'Trabajos realizados por otras empresas'},{c:'608',n:'Devoluciones de compras y operaciones similares'},{c:'610',n:'Variacion de existencias de mercaderias'},{c:'611',n:'Variacion de existencias de materias primas'},{c:'612',n:'Variacion de existencias de otros aprovisionamientos'},{c:'620',n:'Gastos en investigacion y desarrollo'},{c:'621',n:'Arrendamientos y canones'},{c:'622',n:'Reparaciones y conservacion'},{c:'623',n:'Servicios de profesionales independientes'},{c:'624',n:'Transportes'},{c:'625',n:'Primas de seguros'},{c:'626',n:'Servicios bancarios y similares'},{c:'627',n:'Publicidad, propaganda y relaciones publicas'},{c:'628',n:'Suministros'},{c:'629',n:'Otros servicios exteriores'},{c:'630',n:'Impuesto sobre beneficios'},{c:'631',n:'Otros tributos'},{c:'636',n:'Impuesto sobre beneficios diferido'},{c:'640',n:'Sueldos y salarios'},{c:'641',n:'Indemnizaciones'},{c:'642',n:'Seguridad Social a cargo de la empresa'},{c:'644',n:'Retribuciones a largo plazo mediante sistemas de prestaciones definidas'},{c:'649',n:'Otros gastos sociales'},{c:'651',n:'Resultados de operaciones en comun'},{c:'652',n:'Otros gastos de gestion'},{c:'659',n:'Otras perdidas en gestion corriente'},{c:'660',n:'Gastos financieros por actualizacion de provisiones'},{c:'661',n:'Intereses de obligaciones y bonos'},{c:'662',n:'Intereses de deudas'},{c:'665',n:'Gastos por intereses de descuento de efectos'},{c:'666',n:'Perdidas en valores negociables y otros instrumentos financieros'},{c:'667',n:'Perdidas por diferencias de cambio'},{c:'669',n:'Otros gastos financieros'},{c:'671',n:'Perdidas procedentes del inmovilizado intangible'},{c:'672',n:'Perdidas procedentes del inmovilizado material'},{c:'678',n:'Gastos excepcionales'},{c:'681',n:'Amortizacion del inmovilizado material'},{c:'682',n:'Amortizacion del inmovilizado intangible'},{c:'690',n:'Perdidas por deterioro del inmovilizado intangible'},{c:'691',n:'Perdidas por deterioro del inmovilizado material'},{c:'694',n:'Perdidas por deterioro de creditos por operaciones comerciales'},{c:'700',n:'Ventas de mercaderias'},{c:'701',n:'Ventas de productos terminados'},{c:'702',n:'Ventas de productos semiterminados'},{c:'705',n:'Prestaciones de servicios'},{c:'706',n:'Descuentos sobre ventas por pronto pago'},{c:'708',n:'Devoluciones de ventas y operaciones similares'},{c:'711',n:'Variacion de existencias de productos terminados'},{c:'731',n:'Trabajos realizados para el inmovilizado material'},{c:'740',n:'Subvenciones a la explotacion'},{c:'752',n:'Ingresos por arrendamientos'},{c:'754',n:'Ingresos por comisiones'},{c:'759',n:'Ingresos por servicios diversos'},{c:'760',n:'Ingresos de participaciones en instrumentos de patrimonio'},{c:'761',n:'Ingresos de valores representativos de deuda'},{c:'762',n:'Ingresos de creditos'},{c:'764',n:'Ingresos de valores negociables y otros instrumentos financieros'},{c:'765',n:'Beneficios por diferencias de cambio'},{c:'769',n:'Otros ingresos financieros'},{c:'771',n:'Beneficios procedentes del inmovilizado intangible'},{c:'772',n:'Beneficios procedentes del inmovilizado material'},{c:'778',n:'Ingresos excepcionales'},{c:'791',n:'Exceso de provision y de perdidas por deterioro'},{c:'794',n:'Reversion del deterioro de creditos por operaciones comerciales'},{c:'828',n:'Ingresos imputados al patrimonio neto'},{c:'920',n:'Ingresos imputados al patrimonio neto'}];
 const CT_DEFAULT={ivaCompra:21,ivaVenta:21,cCompra:'600',cVenta:'700',cProveedor:'400',cCliente:'430',cIvaSop:'472',cIvaRep:'477',cGasto:'629',cIngreso:'759',cTesoro:'572',irpfPct:20,isPct:25,prev:{}};
 const FB_CONFIG={apiKey:"AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k",authDomain:"gestionempresa-2026.firebaseapp.com",databaseURL:"https://gestionempresa-2026-default-rtdb.firebaseio.com",projectId:"gestionempresa-2026",storageBucket:"gestionempresa-2026.firebasestorage.app",messagingSenderId:"828319600246",appId:"1:828319600246:web:ce7061e9108ffef2c1d957"};
 const APP_VERSION='v1.5.30';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
-function nextSerie(){medSerieCounter++;localStorage.setItem('med_serie_counter',medSerieCounter);return medSerieCounter}
+function nextSerie(){medSerieCounter++;localStorage.setItem(aimKey('med_serie_counter'),medSerieCounter);return medSerieCounter}
 function getSerieStr(n){return String(n).padStart(5,'0')}
 
 function medLineasSummary(m){
@@ -1787,145 +1789,232 @@ function catTagClass2(c){
 const T={'Electricidad':'elec','PCI':'pci','Fontaneria':'font','Calefaccion':'cal','Climatizacion':'clim'};
 return T[c]||'clim';
 }
+const SCOPE_KEYS=['mat_data','med_data','emp_data','obras_data','zonas_data','sub_data','pres_data','fac_data','cli_data','prov_data','emp2_data','com_data','ven_data','alm_data','par_data','cat2_data','alm2_data','pgc_data','apo_data','cta_data','med_serie_counter','pres_serie_counter','fac_serie_counter','comp_serie_counter','ven_serie_counter','part_serie_counter','aso_counter'];
+function loadCompanyData(){
+materials=JSON.parse(localStorage.getItem(aimKey('mat_data'))||'[]');
+mediciones=JSON.parse(localStorage.getItem(aimKey('med_data'))||'[]');
+empresas=JSON.parse(localStorage.getItem(aimKey('emp_data'))||'[]');
+obras=JSON.parse(localStorage.getItem(aimKey('obras_data'))||'[]');
+zonas=JSON.parse(localStorage.getItem(aimKey('zonas_data'))||'[]');
+subcontratas=JSON.parse(localStorage.getItem(aimKey('sub_data'))||'[]');
+presupuestos=JSON.parse(localStorage.getItem(aimKey('pres_data'))||'[]');
+facturas=JSON.parse(localStorage.getItem(aimKey('fac_data'))||'[]');
+clientes=JSON.parse(localStorage.getItem(aimKey('cli_data'))||'[]');
+proveedores=JSON.parse(localStorage.getItem(aimKey('prov_data'))||'[]');
+empleados=JSON.parse(localStorage.getItem(aimKey('emp2_data'))||'[]');
+compras=JSON.parse(localStorage.getItem(aimKey('com_data'))||'[]');
+ventas=JSON.parse(localStorage.getItem(aimKey('ven_data'))||'[]');
+almacen=JSON.parse(localStorage.getItem(aimKey('alm_data'))||'[]');
+partes=JSON.parse(localStorage.getItem(aimKey('par_data'))||'[]');
+categorias=JSON.parse(localStorage.getItem(aimKey('cat2_data'))||'[]');
+almacenes=JSON.parse(localStorage.getItem(aimKey('alm2_data'))||'[]');
+planCuentas=JSON.parse(localStorage.getItem(aimKey('pgc_data'))||'null');
+apuntes=JSON.parse(localStorage.getItem(aimKey('apo_data'))||'[]');
+contabilidad=JSON.parse(localStorage.getItem(aimKey('cta_data'))||'null');
+medSerieCounter=parseInt(localStorage.getItem(aimKey('med_serie_counter'))||'0');
+presSerieCounter=parseInt(localStorage.getItem(aimKey('pres_serie_counter'))||'0');
+facSerieCounter=parseInt(localStorage.getItem(aimKey('fac_serie_counter'))||'0');
+compSerieCounter=parseInt(localStorage.getItem(aimKey('comp_serie_counter'))||'0');
+venSerieCounter=parseInt(localStorage.getItem(aimKey('ven_serie_counter'))||'0');
+partSerieCounter=parseInt(localStorage.getItem(aimKey('part_serie_counter'))||'0');
+asientoCounter=parseInt(localStorage.getItem(aimKey('aso_counter'))||'0');
+migrateData();
+}
+function resetCompanyData(){
+materials=[];mediciones=[];empresas=[];obras=[];zonas=[];subcontratas=[];presupuestos=[];facturas=[];clientes=[];proveedores=[];empleados=[];compras=[];ventas=[];almacen=[];partes=[];categorias=[];almacenes=[];planCuentas=[];apuntes=[];contabilidad=null;
+medSerieCounter=0;presSerieCounter=0;facSerieCounter=0;compSerieCounter=0;venSerieCounter=0;partSerieCounter=0;asientoCounter=0;
+migrateData();
+}
+function _companyScopeMigrate(){
+if(localStorage.getItem('scope_v2_migrated')==='1')return;
+localStorage.setItem('scope_v2_migrated','1');
+if(!empresaActivaId)return;
+let hasGlobal=false;
+SCOPE_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null&&v!=='[]'&&v!=='0')hasGlobal=true;});
+const hasScoped=localStorage.getItem(aimKey('mat_data'))!==null;
+if(hasGlobal&&!hasScoped){
+SCOPE_KEYS.forEach(k=>{
+const gv=localStorage.getItem(k);
+if(gv===null)return;
+if(localStorage.getItem('legacy_'+k)===null)localStorage.setItem('legacy_'+k,gv);
+localStorage.setItem(aimKey(k),gv);
+});
+loadCompanyData();
+toast('Datos actuales asignados a la empresa activa');
+}
+}
 function migrateData(){
+_companyScopeMigrate();
 if(!Array.isArray(categorias))categorias=[];
-if(localStorage.getItem('cat2_data')===null){
+if(localStorage.getItem(aimKey('cat2_data'))===null){
 ['Electricidad','Fontaneria','Calefaccion','Climatizacion','PCI'].forEach(n=>{if(!categorias.some(c=>(typeof c==='string'?c:c.nombre)===n))categorias.push(n)});
-if(categorias.length>0)localStorage.setItem('cat2_data',JSON.stringify(categorias));
+if(categorias.length>0)localStorage.setItem(aimKey('cat2_data'),JSON.stringify(categorias));
 }
 if(!Array.isArray(almacenes))almacenes=[];
-if(localStorage.getItem('alm2_data')===null&&!almacenes.some(a=>a&&a.id===DEFAULT_ALMACEN_ID)){
+if(localStorage.getItem(aimKey('alm2_data'))===null&&!almacenes.some(a=>a&&a.id===DEFAULT_ALMACEN_ID)){
 almacenes.unshift({id:DEFAULT_ALMACEN_ID,nombre:'Almacen Principal',ubicacion:'',notas:'',fechaCreacion:new Date().toISOString().split('T')[0]});
-localStorage.setItem('alm2_data',JSON.stringify(almacenes));
+localStorage.setItem(aimKey('alm2_data'),JSON.stringify(almacenes));
 }
 [compras,ventas,partes,almacen].forEach(docs=>(docs||[]).forEach(d=>{if(d&&!d.almacenId)d.almacenId=DEFAULT_ALMACEN_ID}));
 if(!Array.isArray(planCuentas))planCuentas=[];
-if(localStorage.getItem('pgc_data')===null&&planCuentas.length===0){
+if(localStorage.getItem(aimKey('pgc_data'))===null&&planCuentas.length===0){
 planCuentas=PGC_DEFAULT.map(x=>({c:x.c,n:x.n}));
-localStorage.setItem('pgc_data',JSON.stringify(planCuentas));
+localStorage.setItem(aimKey('pgc_data'),JSON.stringify(planCuentas));
 }
 if(!contabilidad||typeof contabilidad!=='object'){
 contabilidad=JSON.parse(JSON.stringify(CT_DEFAULT));
-localStorage.setItem('cta_data',JSON.stringify(contabilidad));
+localStorage.setItem(aimKey('cta_data'),JSON.stringify(contabilidad));
 }
 if(!Array.isArray(apuntes))apuntes=[];
 }
 
 function saveLocal(){
-  localStorage.setItem('mat_data',JSON.stringify(materials));
-  localStorage.setItem('med_data',JSON.stringify(mediciones));
-  localStorage.setItem('emp_data',JSON.stringify(empresas));
+  localStorage.setItem(aimKey('mat_data'),JSON.stringify(materials));
+  localStorage.setItem(aimKey('med_data'),JSON.stringify(mediciones));
+  localStorage.setItem(aimKey('emp_data'),JSON.stringify(empresas));
   localStorage.setItem('mie_data',JSON.stringify(misEmpresas));
   localStorage.setItem('mie_activa',empresaActivaId);
-  localStorage.setItem('obras_data',JSON.stringify(obras));
-  localStorage.setItem('zonas_data',JSON.stringify(zonas));
-  localStorage.setItem('sub_data',JSON.stringify(subcontratas));
-  localStorage.setItem('pres_data',JSON.stringify(presupuestos));
-  localStorage.setItem('fac_data',JSON.stringify(facturas));
-  localStorage.setItem('cli_data',JSON.stringify(clientes));
-  localStorage.setItem('prov_data',JSON.stringify(proveedores));
-  localStorage.setItem('emp2_data',JSON.stringify(empleados));
-  localStorage.setItem('com_data',JSON.stringify(compras));
-  localStorage.setItem('ven_data',JSON.stringify(ventas));
-  localStorage.setItem('alm_data',JSON.stringify(almacen));
-  localStorage.setItem('par_data',JSON.stringify(partes));
-  localStorage.setItem('cat2_data',JSON.stringify(categorias));
-  localStorage.setItem('alm2_data',JSON.stringify(almacenes));
-  localStorage.setItem('med_serie_counter',medSerieCounter);
-  localStorage.setItem('pres_serie_counter',presSerieCounter);
-  localStorage.setItem('fac_serie_counter',facSerieCounter);
-  localStorage.setItem('comp_serie_counter',compSerieCounter);
-  localStorage.setItem('ven_serie_counter',venSerieCounter);
-  localStorage.setItem('part_serie_counter',partSerieCounter);
-  localStorage.setItem('pgc_data',JSON.stringify(planCuentas));
-  localStorage.setItem('apo_data',JSON.stringify(apuntes));
-  localStorage.setItem('cta_data',JSON.stringify(contabilidad));
-  localStorage.setItem('aso_counter',asientoCounter);
+  localStorage.setItem(aimKey('obras_data'),JSON.stringify(obras));
+  localStorage.setItem(aimKey('zonas_data'),JSON.stringify(zonas));
+  localStorage.setItem(aimKey('sub_data'),JSON.stringify(subcontratas));
+  localStorage.setItem(aimKey('pres_data'),JSON.stringify(presupuestos));
+  localStorage.setItem(aimKey('fac_data'),JSON.stringify(facturas));
+  localStorage.setItem(aimKey('cli_data'),JSON.stringify(clientes));
+  localStorage.setItem(aimKey('prov_data'),JSON.stringify(proveedores));
+  localStorage.setItem(aimKey('emp2_data'),JSON.stringify(empleados));
+  localStorage.setItem(aimKey('com_data'),JSON.stringify(compras));
+  localStorage.setItem(aimKey('ven_data'),JSON.stringify(ventas));
+  localStorage.setItem(aimKey('alm_data'),JSON.stringify(almacen));
+  localStorage.setItem(aimKey('par_data'),JSON.stringify(partes));
+  localStorage.setItem(aimKey('cat2_data'),JSON.stringify(categorias));
+  localStorage.setItem(aimKey('alm2_data'),JSON.stringify(almacenes));
+  localStorage.setItem(aimKey('med_serie_counter'),medSerieCounter);
+  localStorage.setItem(aimKey('pres_serie_counter'),presSerieCounter);
+  localStorage.setItem(aimKey('fac_serie_counter'),facSerieCounter);
+  localStorage.setItem(aimKey('comp_serie_counter'),compSerieCounter);
+  localStorage.setItem(aimKey('ven_serie_counter'),venSerieCounter);
+  localStorage.setItem(aimKey('part_serie_counter'),partSerieCounter);
+  localStorage.setItem(aimKey('pgc_data'),JSON.stringify(planCuentas));
+  localStorage.setItem(aimKey('apo_data'),JSON.stringify(apuntes));
+  localStorage.setItem(aimKey('cta_data'),JSON.stringify(contabilidad));
+  localStorage.setItem(aimKey('aso_counter'),asientoCounter);
 }
 
+const BIZ_COLLECTIONS=['materials','mediciones','empresas','obras','zonas','subcontratas','presupuestos','facturas','clientes','proveedores','empleados','compras','ventas','almacen','partes','categorias','almacenes','planCuentas','apuntes','contabilidad'];
 function save(){
   saveLocal();
   const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes,categorias,almacenes,planCuentas,apuntes,contabilidad};
-  if(_dbRef){
-    _dbRef.set(payload).catch(e=>console.warn('Firebase save error',e));
+  if(_db){
+    try{
+      const biz={};
+      BIZ_COLLECTIONS.forEach(k=>{biz[k]=payload[k]});
+      const ref=empresaActivaId?_db.ref('companies/'+empresaActivaId):_db.ref('appdata');
+      ref.set(biz).catch(e=>console.warn('Firebase save error',e));
+      _db.ref('meta').set({misEmpresas,empresaActivaId}).catch(e=>console.warn('Firebase save error',e));
+    }catch(e){console.warn('Firebase save error',e);}
   }
-  fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_authToken},body:JSON.stringify(payload)}).then(r=>{
+  const hdrs={'Content-Type':'application/json','Authorization':'Bearer '+_authToken};
+  if(empresaActivaId)hdrs['X-Empresa-Id']=empresaActivaId;
+  fetch('/api/data',{method:'POST',headers:hdrs,body:JSON.stringify(payload)}).then(r=>{
     if(r.status===401){_authToken='';localStorage.removeItem('mo_token');showAuth();}
   }).catch(()=>{});
+}
+
+function _applyRemote(r){
+  if(!r)return;
+  if(r.materials)materials=r.materials;
+  if(r.mediciones)mediciones=r.mediciones;
+  if(r.empresas)empresas=r.empresas;
+  if(r.obras)obras=r.obras;
+  if(r.zonas)zonas=r.zonas;
+  if(r.subcontratas)subcontratas=r.subcontratas;
+  if(r.presupuestos)presupuestos=r.presupuestos;
+  if(r.facturas)facturas=r.facturas;
+  if(r.clientes)clientes=r.clientes;
+  if(r.proveedores)proveedores=r.proveedores;
+  if(r.empleados)empleados=r.empleados;
+  if(r.compras)compras=r.compras;
+  if(r.ventas)ventas=r.ventas;
+  if(r.almacen)almacen=r.almacen;
+  if(r.partes)partes=r.partes;
+  if(r.categorias)categorias=r.categorias;
+  if(r.almacenes)almacenes=r.almacenes;
+  if(r.planCuentas)planCuentas=r.planCuentas;
+  if(r.apuntes)apuntes=r.apuntes;
+  if(r.contabilidad)contabilidad=r.contabilidad;
+}
+function _applyMeta(r){
+  if(!r)return;
+  if(r.misEmpresas){misEmpresas=r.misEmpresas;saveLocal();}
+  if(typeof r.empresaActivaId==='string'&&r.empresaActivaId!==empresaActivaId){
+    empresaActivaId=r.empresaActivaId;
+    localStorage.setItem('mie_activa',empresaActivaId);
+    loadCompanyData();
+    reconfigureSync();
+  }
+}
+function _offSyncListeners(){
+  try{if(_globalRef){_globalRef.off();_globalRef=null;}}catch(e){}
+  try{if(_dataRef){_dataRef.off();_dataRef=null;}}catch(e){}
+}
+function _subscribeSync(){
+  _offSyncListeners();
+  if(!_db)return;
+  _globalRef=_db.ref('meta');
+  _globalRef.on('value',snap=>{
+    if(snap.val())_applyMeta(snap.val());
+    if(!empresaActivaId){
+      _db.ref('appdata').once('value',s=>{
+        _applyRemote(s.val());
+        migrateData();
+        saveLocal();
+        if(!_ready){toast('Datos sincronizados desde la nube');_ready=true;}
+        renderAll();
+      });
+    }else{
+      saveLocal();
+      renderSidebarEmpresa();
+      renderPrintHeader();
+    }
+  });
+  if(empresaActivaId){
+    _dataRef=_db.ref('companies/'+empresaActivaId);
+    _dataRef.on('value',snap=>{
+      _applyRemote(snap.val());
+      migrateData();
+      saveLocal();
+      if(!_ready){toast('Datos sincronizados desde la nube');_ready=true;}
+      renderAll();
+    });
+  }
+}
+function reconfigureSync(){
+  _offSyncListeners();
+  if(_db&&_cloudSync)_subscribeSync();
 }
 
 function initSync(){
   if(!_cloudSync){_fbConnected=false;updateSyncStatus();return;}
   if(!FB_CONFIG.apiKey||!FB_CONFIG.databaseURL){_fbConnected=false;updateSyncStatus();return;}
   try{
-    firebase.initializeApp(FB_CONFIG);
+    if(window.firebase&&firebase.apps&&firebase.apps.length){firebase.app();}else{firebase.initializeApp(FB_CONFIG);}
     _db=firebase.database();
-    _dbRef=_db.ref('appdata');
     _db.ref('.info/connected').on('value',snap=>{
       _fbConnected=snap.val()===true;
       updateSyncStatus();
     });
-    _dbRef.on('value',snap=>{
-      const r=snap.val();
-      if(r){
-        if(r.materials)materials=r.materials;
-        if(r.mediciones)mediciones=r.mediciones;
-        if(r.empresas)empresas=r.empresas;
-        if(r.misEmpresas)misEmpresas=r.misEmpresas;
-        if(typeof r.empresaActivaId==='string')empresaActivaId=r.empresaActivaId;
-        if(r.obras)obras=r.obras;
-        if(r.zonas)zonas=r.zonas;
-        if(r.subcontratas)subcontratas=r.subcontratas;
-        if(r.presupuestos)presupuestos=r.presupuestos;
-        if(r.facturas)facturas=r.facturas;
-        if(r.clientes)clientes=r.clientes;
-        if(r.proveedores)proveedores=r.proveedores;
-        if(r.empleados)empleados=r.empleados;
-        if(r.compras)compras=r.compras;
-        if(r.ventas)ventas=r.ventas;
-        if(r.almacen)almacen=r.almacen;
-        if(r.partes)partes=r.partes;
-        if(r.categorias)categorias=r.categorias;
-        if(r.almacenes)almacenes=r.almacenes;
-        if(r.planCuentas)planCuentas=r.planCuentas;
-        if(r.apuntes)apuntes=r.apuntes;
-        if(r.contabilidad)contabilidad=r.contabilidad;
-        migrateData();
-        saveLocal();
-        if(!_ready){toast('Datos sincronizados desde la nube');_ready=true;}
-        renderAll();
-      }
-    });
+    _subscribeSync();
   }catch(e){
     console.warn('Firebase init error',e);
     _fbConnected=false;
     updateSyncStatus();
-    fetch('/api/data',{headers:{'Authorization':'Bearer '+_authToken}}).then(r=>{
+    const hdrs={headers:{'Authorization':'Bearer '+_authToken}};
+    if(empresaActivaId)hdrs.headers['X-Empresa-Id']=empresaActivaId;
+    fetch('/api/data',hdrs).then(r=>{
       if(r.status===401){_authToken='';localStorage.removeItem('mo_token');showAuth();throw new Error('noauth')}
       return r.json();
     }).then(data=>{
-      if(data.materials)       materials    = data.materials;
-      if(data.mediciones)      mediciones   = data.mediciones;
-      if(data.empresas)        empresas     = data.empresas;
-      if(data.misEmpresas)     misEmpresas  = data.misEmpresas;
-      if(typeof data.empresaActivaId==='string')empresaActivaId=data.empresaActivaId;
-      if(data.obras)           obras        = data.obras;
-      if(data.zonas)           zonas        = data.zonas;
-      if(data.subcontratas)    subcontratas = data.subcontratas;
-      if(data.presupuestos)    presupuestos = data.presupuestos;
-      if(data.facturas)        facturas     = data.facturas;
-      if(data.clientes)        clientes     = data.clientes;
-      if(data.proveedores)     proveedores  = data.proveedores;
-      if(data.compras)         compras      = data.compras;
-      if(data.ventas)          ventas       = data.ventas;
-      if(data.almacen)         almacen      = data.almacen;
-      if(data.empleados)       empleados    = data.empleados;
-      if(data.partes)          partes       = data.partes;
-      if(data.categorias)      categorias   = data.categorias;
-      if(data.almacenes)       almacenes    = data.almacenes;
-      if(data.planCuentas)   planCuentas  = data.planCuentas;
-      if(data.apuntes)       apuntes      = data.apuntes;
-      if(data.contabilidad)  contabilidad = data.contabilidad;
+      _applyRemote(data);
       migrateData();
       saveLocal();renderAll();_ready=true;
     }).catch(()=>{});
@@ -1951,8 +2040,8 @@ function toggleCloudSync(){
 _cloudSync=!_cloudSync;
 localStorage.setItem('cloud_sync',_cloudSync?'1':'0');
 if(_cloudSync){location.reload();return}
-try{if(_dbRef){_dbRef.off()}}catch(e){}
-_dbRef=null;_db=null;_fbConnected=false;
+_offSyncListeners();
+_db=null;_fbConnected=false;
 updateSyncStatus();updateCloudBtn();
 toast('Modo local activado (sin nube)');
 }
@@ -2667,12 +2756,18 @@ return misEmpresas.find(e=>e.id===empresaActivaId)||null;
 
 function setEmpresaActiva(id){
 if(id&&!misEmpresas.find(e=>e.id===id))return;
+if(empresaActivaId===id)return;
+save();
 empresaActivaId=id||'';
-saveLocal();
+loadCompanyData();
+localStorage.setItem('mie_activa',empresaActivaId);
+if(_db){try{_db.ref('meta').set({misEmpresas,empresaActivaId}).catch(e=>{});}catch(e){}}
+reconfigureSync();
 renderSidebarEmpresa();
 renderPrintHeader();
 renderMiEmpresas();
-toast(empresaActivaId?'Empresa activa: '+getEmpresaActiva().nombre:'Sin empresa de trabajo');
+renderAll();
+toast(empresaActivaId?'Empresa activa: '+getEmpresaActiva().nombre+' (cada empresa tiene sus propios datos)':'Sin empresa de trabajo (uso general)');
 }
 
 function renderSidebarEmpresa(){
@@ -2730,15 +2825,33 @@ if(!nombre){alert('Introduce un nombre de empresa');return}
 const data={nombre,nif:document.getElementById('mie-nif').value.trim(),direccion:document.getElementById('mie-direccion').value.trim(),telefono:document.getElementById('mie-telefono').value.trim(),email:document.getElementById('mie-email').value.trim(),notas:document.getElementById('mie-notas').value.trim(),foto:getFotoSrc('mie-img-prev','mie-img-wrap')};
 const editId=document.getElementById('mie-edit-id').value;
 if(editId){const idx=misEmpresas.findIndex(x=>x.id===editId);misEmpresas[idx]={...misEmpresas[idx],...data}}
-else{data.id='mie_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];misEmpresas.push(data);if(!empresaActivaId)empresaActivaId=data.id}
-save();closeModal('modal-miempresa');renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa guardada');
+else{
+data.id='mie_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];misEmpresas.push(data);
+if(!empresaActivaId){
+empresaActivaId=data.id;
+localStorage.setItem('mie_activa',empresaActivaId);
+resetCompanyData();
+reconfigureSync();
+}
+}
+save();
+try{if(_db)_db.ref('meta').set({misEmpresas,empresaActivaId}).catch(e=>{});}catch(e){}
+closeModal('modal-miempresa');renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa guardada');
 }
 
 function deleteMiEmpresa(id){
 if(!confirm('Eliminar esta empresa?'))return;
-if(empresaActivaId===id)empresaActivaId='';
+const wasActive=empresaActivaId===id;
 misEmpresas=misEmpresas.filter(x=>x.id!==id);
-save();renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa eliminada');
+if(wasActive){empresaActivaId='';localStorage.setItem('mie_activa','');}
+SCOPE_KEYS.forEach(k=>{try{localStorage.removeItem(aimKeyFor(k,id));}catch(e){}});
+if(wasActive)loadCompanyData();
+save();
+if(_db){try{_db.ref('companies/'+id).set({}).catch(e=>{});}catch(e){}}
+const ep={};BIZ_COLLECTIONS.forEach(k=>ep[k]=[]);
+fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_authToken,'X-Empresa-Id':id},body:JSON.stringify(ep)}).catch(()=>{});
+reconfigureSync();
+renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa eliminada');
 }
 
 function renderMiEmpresas(){
@@ -3626,8 +3739,8 @@ doc.save('horas-empleados-'+new Date().toISOString().split('T')[0]+'.pdf');toast
 }
 
 
-function nextPresSerie(){presSerieCounter++;localStorage.setItem('pres_serie_counter',presSerieCounter);return presSerieCounter}
-function nextFacSerie(){facSerieCounter++;localStorage.setItem('fac_serie_counter',facSerieCounter);return facSerieCounter}
+function nextPresSerie(){presSerieCounter++;localStorage.setItem(aimKey('pres_serie_counter'),presSerieCounter);return presSerieCounter}
+function nextFacSerie(){facSerieCounter++;localStorage.setItem(aimKey('fac_serie_counter'),facSerieCounter);return facSerieCounter}
 function getPresSerieStr(n){return 'PR-'+String(n).padStart(5,'0')}
 function getFacSerieStr(n){return 'FAC-'+String(n).padStart(5,'0')}
 
@@ -3987,7 +4100,7 @@ return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacS
 }).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
 }
 
-function nextCompSerie(){compSerieCounter++;localStorage.setItem('comp_serie_counter',compSerieCounter);return compSerieCounter}
+function nextCompSerie(){compSerieCounter++;localStorage.setItem(aimKey('comp_serie_counter'),compSerieCounter);return compSerieCounter}
 function getCompSerieStr(n){return 'CMP-'+String(n).padStart(5,'0')}
 
 function calcCompTotals(){
@@ -4190,7 +4303,7 @@ if(c.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+c.notas,1
 doc.save('compra-'+getCompSerieStr(c.numero||0)+'.pdf');toast('PDF de la compra generado');
 }
 
-function nextVenSerie(){venSerieCounter++;localStorage.setItem('ven_serie_counter',venSerieCounter);return venSerieCounter}
+function nextVenSerie(){venSerieCounter++;localStorage.setItem(aimKey('ven_serie_counter'),venSerieCounter);return venSerieCounter}
 function getVenSerieStr(n){return 'VEN-'+String(n).padStart(5,'0')}
 
 function toggleVentaDestino(){
@@ -4443,7 +4556,7 @@ if(v.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+v.notas,1
 doc.save('venta-'+getVenSerieStr(v.numero||0)+'.pdf');toast('PDF de la venta generado');
 }
 
-function nextPartSerie(){partSerieCounter++;localStorage.setItem('part_serie_counter',partSerieCounter);return partSerieCounter}
+function nextPartSerie(){partSerieCounter++;localStorage.setItem(aimKey('part_serie_counter'),partSerieCounter);return partSerieCounter}
 function getPartSerieStr(n){return 'PT-'+String(n).padStart(5,'0')}
 
 function calcParTotals(){
@@ -5049,29 +5162,8 @@ if(savedVersion&&!legacy){
   medSerieCounter=0;presSerieCounter=0;facSerieCounter=0;compSerieCounter=0;venSerieCounter=0;partSerieCounter=0;
 }
 if(savedVersion!==APP_VERSION)localStorage.setItem('app_version',APP_VERSION);
-materials = JSON.parse(localStorage.getItem('mat_data') || '[]');
-mediciones = JSON.parse(localStorage.getItem('med_data') || '[]');
-empresas = JSON.parse(localStorage.getItem('emp_data') || '[]');
-misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
 empresaActivaId = localStorage.getItem('mie_activa') || '';
-obras = JSON.parse(localStorage.getItem('obras_data') || '[]');
-presupuestos = JSON.parse(localStorage.getItem('pres_data') || '[]');
-facturas = JSON.parse(localStorage.getItem('fac_data') || '[]');
-zonas = JSON.parse(localStorage.getItem('zonas_data') || '[]');
-subcontratas = JSON.parse(localStorage.getItem('sub_data') || '[]');
-clientes = JSON.parse(localStorage.getItem('cli_data') || '[]');
-proveedores = JSON.parse(localStorage.getItem('prov_data') || '[]');
-empleados = JSON.parse(localStorage.getItem('emp2_data') || '[]');
-compras = JSON.parse(localStorage.getItem('com_data') || '[]');
-ventas = JSON.parse(localStorage.getItem('ven_data') || '[]');
-almacen = JSON.parse(localStorage.getItem('alm_data') || '[]');
-partes = JSON.parse(localStorage.getItem('par_data') || '[]');
-medSerieCounter = parseInt(localStorage.getItem('med_serie_counter') || '0');
-presSerieCounter = parseInt(localStorage.getItem('pres_serie_counter') || '0');
-facSerieCounter = parseInt(localStorage.getItem('fac_serie_counter') || '0');
-compSerieCounter = parseInt(localStorage.getItem('comp_serie_counter') || '0');
-venSerieCounter = parseInt(localStorage.getItem('ven_serie_counter') || '0');
-partSerieCounter = parseInt(localStorage.getItem('part_serie_counter') || '0');
+loadCompanyData();
 
 const yrSel=document.getElementById('rpt-year');
 if(yrSel){const yr=new Date().getFullYear();for(let y=yr;y>=yr-5;y--){yrSel.innerHTML+=`<option value="${y}">${y}</option>`}}

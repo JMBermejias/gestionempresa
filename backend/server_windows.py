@@ -97,16 +97,30 @@ def get_app_version():
     return '0.0.0'
 
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
+def company_db_path(company):
+    """Ruta de la base SQLite de una empresa concreta.
+
+    Cada empresa (Mi Empresa) tiene su propia base de datos independiente:
+    'medicion.db' para el modo general y 'medicion_<empresa>.db' para cada
+    empresa activa, de modo que ninguna comparte datos con otra.
+    """
+    if company:
+        safe = re.sub(r'[^a-zA-Z0-9_-]', '_', company)
+        return os.path.join(APPDATA, 'medicion_%s.db' % safe)
+    return DB_PATH
+
+
+def get_conn(company=''):
+    path = company_db_path(company)
+    conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.execute(SCHEMA)
     conn.commit()
     return conn
 
 
-def load_data():
-    conn = get_conn()
+def load_data(company=''):
+    conn = get_conn(company)
     rows = conn.execute('SELECT collection, data FROM appdata').fetchall()
     conn.close()
     data = {}
@@ -118,8 +132,8 @@ def load_data():
     return data
 
 
-def save_data(payload):
-    conn = get_conn()
+def save_data(payload, company=''):
+    conn = get_conn(company)
     try:
         for c in COLLECTIONS:
             if c in payload:
@@ -133,6 +147,16 @@ def save_data(payload):
         conn.commit()
     finally:
         conn.close()
+
+
+def request_company(handler, post_data=None):
+    """Empresa activa de la peticion (header X-Empresa-Id o campo empresaId)."""
+    company = (handler.headers.get('X-Empresa-Id') or '').strip()
+    if not company and post_data:
+        emp = post_data.get('empresaId')
+        if isinstance(emp, str):
+            company = emp.strip()
+    return company
 
 
 def auth_is_configured():
@@ -304,7 +328,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Empresa-Id')
         self.end_headers()
         self.wfile.write(data)
 
@@ -340,7 +364,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Empresa-Id')
         self.send_header('Access-Control-Max-Age', '86400')
         self.end_headers()
 
@@ -654,7 +678,7 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json(401, {'error': 'Autenticacion requerida'})
                     return
                 try:
-                    data = load_data()
+                    data = load_data(request_company(self))
                     self._send_json(200, {c: data.get(c, []) for c in COLLECTIONS})
                 except Exception as e:
                     self._send_json(500, {'error': str(e)})
@@ -726,7 +750,7 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json(401, {'error': 'Autenticacion requerida'})
                     return
                 try:
-                    save_data(post_data)
+                    save_data(post_data, request_company(self, post_data))
                     self._send_json(200, {'ok': True})
                 except Exception as e:
                     self._send_json(500, {'error': str(e)})

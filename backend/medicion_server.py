@@ -23,16 +23,24 @@ SCHEMA = (
 )
 
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
+def company_db_path(company):
+    if company:
+        safe = ''.join(c if (c.isalnum() or c in '_-') else '_' for c in company)
+        base = os.path.dirname(DB_PATH) or '.'
+        return os.path.join(base, 'medicion_%s.db' % safe)
+    return DB_PATH
+
+
+def get_conn(company=''):
+    conn = sqlite3.connect(company_db_path(company))
     conn.row_factory = sqlite3.Row
     conn.execute(SCHEMA)
     conn.commit()
     return conn
 
 
-def load_data():
-    conn = get_conn()
+def load_data(company=''):
+    conn = get_conn(company)
     rows = conn.execute('SELECT collection, data FROM appdata').fetchall()
     conn.close()
     data = {}
@@ -44,8 +52,8 @@ def load_data():
     return data
 
 
-def save_data(payload):
-    conn = get_conn()
+def save_data(payload, company=''):
+    conn = get_conn(company)
     try:
         for c in COLLECTIONS:
             if c in payload:
@@ -79,10 +87,18 @@ class Handler(BaseHTTPRequestHandler):
             return {}
         return json.loads(self.rfile.read(length).decode('utf-8'))
 
+    def _company(self, post_data=None):
+        company = (self.headers.get('X-Empresa-Id') or '').strip()
+        if not company and post_data:
+            emp = post_data.get('empresaId')
+            if isinstance(emp, str):
+                company = emp.strip()
+        return company
+
     def do_GET(self):
         if self.path.startswith('/api/data'):
             try:
-                data = load_data()
+                data = load_data(self._company())
                 self._send(200, {c: data.get(c, []) for c in COLLECTIONS})
             except Exception as e:  # noqa: BLE001
                 self._send(500, {'error': str(e)})
@@ -95,7 +111,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith('/api/data'):
             try:
                 payload = self._read_json()
-                save_data(payload)
+                save_data(payload, self._company(payload))
                 self._send(200, {'ok': True})
             except Exception as e:  # noqa: BLE001
                 self._send(500, {'error': str(e)})
