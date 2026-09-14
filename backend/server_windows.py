@@ -9,7 +9,10 @@ import hashlib
 import hmac
 import json
 import os
-import pwd
+try:
+    import pwd
+except ImportError:
+    pwd = None
 import re
 import shutil
 import socket
@@ -294,9 +297,10 @@ def _resolve_real_user():
         if k == 'REAL_USER' and v != 'root':
             return v
         try:
-            name = pwd.getpwuid(int(v)).pw_name
-            if name and name != 'root':
-                return name
+            if pwd:
+                name = pwd.getpwuid(int(v)).pw_name
+                if name and name != 'root':
+                    return name
         except Exception:
             pass
     try:
