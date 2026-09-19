@@ -367,7 +367,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="empresas-list"></tbody></table>
 </div>
 </div>
@@ -394,7 +394,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Activa</th><th>Logo</th><th>Nombre</th><th>NIF/CIF</th><th>Direccion</th><th>Telefono</th><th>Email</th><th>Notas</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Activa</th><th>Logo</th><th>Nombre</th><th>NIF/CIF</th><th>Direccion / Localidad</th><th>Telefono</th><th>Email</th><th>Notas</th><th>Acciones</th></tr></thead>
 <tbody id="miempresas-list"></tbody></table>
 </div>
 </div>
@@ -414,7 +414,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>Empresa</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>Empresa</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="subcontratas-list"></tbody></table>
 </div>
 </div>
@@ -560,7 +560,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="clientes-list"></tbody></table>
 </div>
 </div>
@@ -580,7 +580,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="proveedores-list"></tbody></table>
 </div>
 </div>
@@ -600,7 +600,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/DNI</th><th>Cargo</th><th>Telefono</th><th>Email</th><th>Alta</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/DNI</th><th>Cargo</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Alta</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="empleados-list"></tbody></table>
 </div>
 </div>
@@ -1002,6 +1002,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Contacto</label><input type="text" id="emp-contacto" placeholder="Nombre del contacto"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="emp-nif" placeholder="12345678A"></div>
 <div class="form-group"><label>Direccion</label><input type="text" id="emp-direccion" placeholder="Direccion completa"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="emp-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="emp-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="emp-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="emp-pais" placeholder="Pais"></div>
+</div>
 <div class="form-group"><label>Telefono</label><input type="text" id="emp-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="emp-email" placeholder="email@ejemplo.com"></div>
 <div class="form-group"><label>Notas</label><input type="text" id="emp-notas" placeholder="Observaciones"></div>
@@ -1032,6 +1038,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Nombre de la Empresa *</label><input type="text" id="mie-nombre" placeholder="Nombre de tu empresa"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="mie-nif" placeholder="12345678A"></div>
 <div class="form-group"><label>Direccion</label><input type="text" id="mie-direccion" placeholder="Direccion completa"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="mie-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="mie-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="mie-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="mie-pais" placeholder="Pais"></div>
+</div>
 <div class="form-group"><label>Telefono</label><input type="text" id="mie-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="mie-email" placeholder="email@ejemplo.com"></div>
 <div class="form-group"><label>Notas</label><input type="text" id="mie-notas" placeholder="Observaciones"></div>
@@ -1064,6 +1076,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Contacto</label><input type="text" id="sub-contacto" placeholder="Nombre del contacto"></div>
 <div class="form-group"><label>Telefono</label><input type="text" id="sub-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="sub-email" placeholder="email@ejemplo.com"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="sub-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="sub-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="sub-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="sub-pais" placeholder="Pais"></div>
+</div>
 <div class="form-group"><label>Notas</label><input type="text" id="sub-notas" placeholder="Observaciones"></div>
 <div class="form-group"><label>Logo / Foto</label>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1325,6 +1343,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Contacto</label><input type="text" id="cli-contacto" placeholder="Nombre del contacto"></div>
 <div class="form-group"><label>Direccion</label><input type="text" id="cli-direccion" placeholder="Direccion completa"></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="cli-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="cli-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="cli-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="cli-pais" placeholder="Pais"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Telefono</label><input type="text" id="cli-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="cli-email" placeholder="email@ejemplo.com"></div>
 </div>
@@ -1358,6 +1382,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Contacto</label><input type="text" id="prov-contacto" placeholder="Nombre del contacto"></div>
 <div class="form-group"><label>Direccion</label><input type="text" id="prov-direccion" placeholder="Direccion completa"></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="prov-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="prov-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="prov-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="prov-pais" placeholder="Pais"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Telefono</label><input type="text" id="prov-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="prov-email" placeholder="email@ejemplo.com"></div>
 </div>
@@ -1389,6 +1419,12 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Nombre del Empleado *</label><input type="text" id="empl-nombre" placeholder="Nombre del empleado"></div>
 <div class="form-group"><label>NIF/DNI</label><input type="text" id="empl-nif" placeholder="12345678A"></div>
 <div class="form-group"><label>Cargo</label><input type="text" id="empl-cargo" placeholder="Ej: Oficial 1a, Encargado..."></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="form-group"><label>Codigo Postal</label><input type="text" id="empl-cp" placeholder="00000"></div>
+<div class="form-group"><label>Poblacion</label><input type="text" id="empl-poblacion" placeholder="Poblacion"></div>
+<div class="form-group"><label>Provincia</label><input type="text" id="empl-provincia" placeholder="Provincia"></div>
+<div class="form-group"><label>Pais</label><input type="text" id="empl-pais" placeholder="Pais"></div>
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Telefono</label><input type="text" id="empl-telefono" placeholder="600 000 000"></div>
 <div class="form-group"><label>Email</label><input type="email" id="empl-email" placeholder="email@ejemplo.com"></div>
@@ -1757,6 +1793,7 @@ function clearFoto(previewId,wrapId){const img=document.getElementById(previewId
 function getFotoSrc(previewId,wrapId){const w=document.getElementById(wrapId);if(w&&w.style.display==='block')return document.getElementById(previewId).src;return ''}
 function setFotoPreview(previewId,wrapId,foto){const img=document.getElementById(previewId);const w=document.getElementById(wrapId);if(!foto){if(img)img.src='';if(w)w.style.display='none'}else{img.src=foto;w.style.display='block'}}
 function fotoCell(foto){return foto?'<img src="'+foto+'" style="width:38px;height:38px;object-fit:cover;border-radius:50%;border:2px solid var(--border);vertical-align:middle">':'<span style="color:var(--text-light)">-</span>'}
+function addrCell(r){const parts=[];if(r.direccion)parts.push(r.direccion);const loc=[r.cp,r.poblacion,r.provincia,r.pais].filter(Boolean).join(', ');if(loc)parts.push(loc);return parts.length?parts.join(' | '):'-'}
 
 function getDefaultAlmacen(){return almacenes.find(a=>a.id===DEFAULT_ALMACEN_ID)||almacenes[0]}
 function getAlmacenNombre(id){const a=almacenes.find(x=>x.id===id);return a?a.nombre:''}
@@ -2394,6 +2431,10 @@ document.getElementById('cli-nombre').value='';
 document.getElementById('cli-nif').value='';
 document.getElementById('cli-contacto').value='';
 document.getElementById('cli-direccion').value='';
+document.getElementById('cli-cp').value='';
+document.getElementById('cli-poblacion').value='';
+document.getElementById('cli-provincia').value='';
+document.getElementById('cli-pais').value='';
 document.getElementById('cli-telefono').value='';
 document.getElementById('cli-email').value='';
 document.getElementById('cli-notas').value='';
@@ -2410,6 +2451,10 @@ document.getElementById('cli-nombre').value=c.nombre;
 document.getElementById('cli-nif').value=c.nif||'';
 document.getElementById('cli-contacto').value=c.contacto||'';
 document.getElementById('cli-direccion').value=c.direccion||'';
+document.getElementById('cli-cp').value=c.cp||'';
+document.getElementById('cli-poblacion').value=c.poblacion||'';
+document.getElementById('cli-provincia').value=c.provincia||'';
+document.getElementById('cli-pais').value=c.pais||'';
 document.getElementById('cli-telefono').value=c.telefono||'';
 document.getElementById('cli-email').value=c.email||'';
 document.getElementById('cli-notas').value=c.notas||'';
@@ -2420,7 +2465,7 @@ openModal('modal-cliente');
 function saveCliente(){
 const nombre=document.getElementById('cli-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de cliente');return}
-const data={nombre,nif:document.getElementById('cli-nif').value.trim(),contacto:document.getElementById('cli-contacto').value.trim(),direccion:document.getElementById('cli-direccion').value.trim(),telefono:document.getElementById('cli-telefono').value.trim(),email:document.getElementById('cli-email').value.trim(),notas:document.getElementById('cli-notas').value.trim(),foto:getFotoSrc('cli-img-prev','cli-img-wrap')};
+const data={nombre,nif:document.getElementById('cli-nif').value.trim(),contacto:document.getElementById('cli-contacto').value.trim(),direccion:document.getElementById('cli-direccion').value.trim(),cp:document.getElementById('cli-cp').value.trim(),poblacion:document.getElementById('cli-poblacion').value.trim(),provincia:document.getElementById('cli-provincia').value.trim(),pais:document.getElementById('cli-pais').value.trim(),telefono:document.getElementById('cli-telefono').value.trim(),email:document.getElementById('cli-email').value.trim(),notas:document.getElementById('cli-notas').value.trim(),foto:getFotoSrc('cli-img-prev','cli-img-wrap')};
 const editId=document.getElementById('cli-edit-id').value;
 if(editId){const idx=clientes.findIndex(x=>x.id===editId);clientes[idx]={...clientes[idx],...data}}
 else{data.id='cli_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];clientes.push(data)}
@@ -2435,12 +2480,12 @@ save();renderClientes();toast('Cliente eliminado');
 
 function renderClientes(){
 const q=(document.getElementById('cli-search')?.value||'').toLowerCase();
-const list=clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||(c.nif||'').toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q));
+const list=clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||(c.nif||'').toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q)||(c.poblacion||'').toLowerCase().includes(q)||(c.provincia||'').toLowerCase().includes(q));
 document.getElementById('clientes-list').innerHTML=list.length?list.map(c=>`<tr>
 <td><strong>${c.nombre}</strong></td>
-<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${fotoCell(c.foto)}</td>
+<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${addrCell(c)}</td><td>${fotoCell(c.foto)}</td>
 <td><button class="btn btn-warning" onclick="editCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
 }
 
 function populateClienteSelect(selectId){
@@ -2456,6 +2501,10 @@ document.getElementById('prov-nombre').value='';
 document.getElementById('prov-nif').value='';
 document.getElementById('prov-contacto').value='';
 document.getElementById('prov-direccion').value='';
+document.getElementById('prov-cp').value='';
+document.getElementById('prov-poblacion').value='';
+document.getElementById('prov-provincia').value='';
+document.getElementById('prov-pais').value='';
 document.getElementById('prov-telefono').value='';
 document.getElementById('prov-email').value='';
 document.getElementById('prov-notas').value='';
@@ -2472,6 +2521,10 @@ document.getElementById('prov-nombre').value=p.nombre;
 document.getElementById('prov-nif').value=p.nif||'';
 document.getElementById('prov-contacto').value=p.contacto||'';
 document.getElementById('prov-direccion').value=p.direccion||'';
+document.getElementById('prov-cp').value=p.cp||'';
+document.getElementById('prov-poblacion').value=p.poblacion||'';
+document.getElementById('prov-provincia').value=p.provincia||'';
+document.getElementById('prov-pais').value=p.pais||'';
 document.getElementById('prov-telefono').value=p.telefono||'';
 document.getElementById('prov-email').value=p.email||'';
 document.getElementById('prov-notas').value=p.notas||'';
@@ -2482,7 +2535,7 @@ openModal('modal-proveedor');
 function saveProveedor(){
 const nombre=document.getElementById('prov-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de proveedor');return}
-const data={nombre,nif:document.getElementById('prov-nif').value.trim(),contacto:document.getElementById('prov-contacto').value.trim(),direccion:document.getElementById('prov-direccion').value.trim(),telefono:document.getElementById('prov-telefono').value.trim(),email:document.getElementById('prov-email').value.trim(),notas:document.getElementById('prov-notas').value.trim(),foto:getFotoSrc('prov-img-prev','prov-img-wrap')};
+const data={nombre,nif:document.getElementById('prov-nif').value.trim(),contacto:document.getElementById('prov-contacto').value.trim(),direccion:document.getElementById('prov-direccion').value.trim(),cp:document.getElementById('prov-cp').value.trim(),poblacion:document.getElementById('prov-poblacion').value.trim(),provincia:document.getElementById('prov-provincia').value.trim(),pais:document.getElementById('prov-pais').value.trim(),telefono:document.getElementById('prov-telefono').value.trim(),email:document.getElementById('prov-email').value.trim(),notas:document.getElementById('prov-notas').value.trim(),foto:getFotoSrc('prov-img-prev','prov-img-wrap')};
 const editId=document.getElementById('prov-edit-id').value;
 if(editId){const idx=proveedores.findIndex(x=>x.id===editId);proveedores[idx]={...proveedores[idx],...data}}
 else{data.id='prov_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];proveedores.push(data)}
@@ -2497,12 +2550,12 @@ save();renderProveedores();toast('Proveedor eliminado');
 
 function renderProveedores(){
 const q=(document.getElementById('prov-search')?.value||'').toLowerCase();
-const list=proveedores.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q));
+const list=proveedores.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q)||(p.poblacion||'').toLowerCase().includes(q)||(p.provincia||'').toLowerCase().includes(q));
 document.getElementById('proveedores-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${fotoCell(p.foto)}</td>
+<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
 }
 
 function populateProveedorSelect(selectId){
@@ -2517,6 +2570,10 @@ document.getElementById('empl-modal-title').textContent='Nuevo Empleado';
 document.getElementById('empl-nombre').value='';
 document.getElementById('empl-nif').value='';
 document.getElementById('empl-cargo').value='';
+document.getElementById('empl-cp').value='';
+document.getElementById('empl-poblacion').value='';
+document.getElementById('empl-provincia').value='';
+document.getElementById('empl-pais').value='';
 document.getElementById('empl-telefono').value='';
 document.getElementById('empl-email').value='';
 document.getElementById('empl-alta').value=new Date().toISOString().split('T')[0];
@@ -2532,6 +2589,10 @@ document.getElementById('empl-modal-title').textContent='Editar Empleado';
 document.getElementById('empl-nombre').value=p.nombre;
 document.getElementById('empl-nif').value=p.nif||'';
 document.getElementById('empl-cargo').value=p.cargo||'';
+document.getElementById('empl-cp').value=p.cp||'';
+document.getElementById('empl-poblacion').value=p.poblacion||'';
+document.getElementById('empl-provincia').value=p.provincia||'';
+document.getElementById('empl-pais').value=p.pais||'';
 document.getElementById('empl-telefono').value=p.telefono||'';
 document.getElementById('empl-email').value=p.email||'';
 document.getElementById('empl-alta').value=p.alta||'';
@@ -2542,7 +2603,7 @@ openModal('modal-empleado');
 function saveEmpleado(){
 const nombre=document.getElementById('empl-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de empleado');return}
-const data={nombre,nif:document.getElementById('empl-nif').value.trim(),cargo:document.getElementById('empl-cargo').value.trim(),telefono:document.getElementById('empl-telefono').value.trim(),email:document.getElementById('empl-email').value.trim(),alta:document.getElementById('empl-alta').value,foto:getFotoSrc('empl-img-prev','empl-img-wrap')};
+const data={nombre,nif:document.getElementById('empl-nif').value.trim(),cargo:document.getElementById('empl-cargo').value.trim(),cp:document.getElementById('empl-cp').value.trim(),poblacion:document.getElementById('empl-poblacion').value.trim(),provincia:document.getElementById('empl-provincia').value.trim(),pais:document.getElementById('empl-pais').value.trim(),telefono:document.getElementById('empl-telefono').value.trim(),email:document.getElementById('empl-email').value.trim(),alta:document.getElementById('empl-alta').value,foto:getFotoSrc('empl-img-prev','empl-img-wrap')};
 const editId=document.getElementById('empl-edit-id').value;
 if(editId){const idx=empleados.findIndex(x=>x.id===editId);empleados[idx]={...empleados[idx],...data}}
 else{data.id='emp2_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];empleados.push(data)}
@@ -2557,12 +2618,12 @@ save();renderEmpleados();toast('Empleado eliminado');
 
 function renderEmpleados(){
 const q=(document.getElementById('emp2-search')?.value||'').toLowerCase();
-const list=empleados.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.cargo||'').toLowerCase().includes(q));
+const list=empleados.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.cargo||'').toLowerCase().includes(q)||(p.poblacion||'').toLowerCase().includes(q)||(p.provincia||'').toLowerCase().includes(q));
 document.getElementById('empleados-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.cargo||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${p.alta||'-'}</td><td>${fotoCell(p.foto)}</td>
+<td>${p.nif||'-'}</td><td>${p.cargo||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${p.alta||'-'}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editEmpleado('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpleado('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay empleados registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay empleados registrados</td></tr>';
 }
 
 function populateEmpleadoSelect(selectId){
@@ -2699,6 +2760,10 @@ document.getElementById('emp-especialidad').value='Electricidad';
 document.getElementById('emp-contacto').value='';
 document.getElementById('emp-nif').value='';
 document.getElementById('emp-direccion').value='';
+document.getElementById('emp-cp').value='';
+document.getElementById('emp-poblacion').value='';
+document.getElementById('emp-provincia').value='';
+document.getElementById('emp-pais').value='';
 document.getElementById('emp-telefono').value='';
 document.getElementById('emp-email').value='';
 document.getElementById('emp-notas').value='';
@@ -2715,6 +2780,10 @@ document.getElementById('emp-especialidad').value=e.especialidad;
 document.getElementById('emp-contacto').value=e.contacto||'';
 document.getElementById('emp-nif').value=e.nif||'';
 document.getElementById('emp-direccion').value=e.direccion||'';
+document.getElementById('emp-cp').value=e.cp||'';
+document.getElementById('emp-poblacion').value=e.poblacion||'';
+document.getElementById('emp-provincia').value=e.provincia||'';
+document.getElementById('emp-pais').value=e.pais||'';
 document.getElementById('emp-telefono').value=e.telefono||'';
 document.getElementById('emp-email').value=e.email||'';
 document.getElementById('emp-notas').value=e.notas||'';
@@ -2725,7 +2794,7 @@ openModal('modal-empresa');
 function saveEmpresa(){
 const nombre=document.getElementById('emp-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de empresa');return}
-const data={nombre,especialidad:document.getElementById('emp-especialidad').value,contacto:document.getElementById('emp-contacto').value.trim(),nif:document.getElementById('emp-nif').value.trim(),direccion:document.getElementById('emp-direccion').value.trim(),telefono:document.getElementById('emp-telefono').value.trim(),email:document.getElementById('emp-email').value.trim(),notas:document.getElementById('emp-notas').value.trim(),foto:getFotoSrc('emp-img-prev','emp-img-wrap')};
+const data={nombre,especialidad:document.getElementById('emp-especialidad').value,contacto:document.getElementById('emp-contacto').value.trim(),nif:document.getElementById('emp-nif').value.trim(),direccion:document.getElementById('emp-direccion').value.trim(),cp:document.getElementById('emp-cp').value.trim(),poblacion:document.getElementById('emp-poblacion').value.trim(),provincia:document.getElementById('emp-provincia').value.trim(),pais:document.getElementById('emp-pais').value.trim(),telefono:document.getElementById('emp-telefono').value.trim(),email:document.getElementById('emp-email').value.trim(),notas:document.getElementById('emp-notas').value.trim(),foto:getFotoSrc('emp-img-prev','emp-img-wrap')};
 const editId=document.getElementById('emp-edit-id').value;
 if(editId){const idx=empresas.findIndex(x=>x.id===editId);empresas[idx]={...empresas[idx],...data}}
 else{data.id='emp_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];empresas.push(data)}
@@ -2740,13 +2809,13 @@ save();renderEmpresas();toast('Empresa eliminada');
 
 function renderEmpresas(){
 const q=(document.getElementById('emp-search')?.value||'').toLowerCase();
-const list=empresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.especialidad||'').toLowerCase().includes(q)||(e.contacto||'').toLowerCase().includes(q));
+const list=empresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.especialidad||'').toLowerCase().includes(q)||(e.contacto||'').toLowerCase().includes(q)||(e.poblacion||'').toLowerCase().includes(q)||(e.provincia||'').toLowerCase().includes(q));
 document.getElementById('empresas-list').innerHTML=list.length?list.map(e=>`<tr>
 <td><strong>${e.nombre}</strong></td>
 <td><span class="tag tag-${catTagClass2(e.especialidad)}">${e.especialidad}</span></td>
-<td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${fotoCell(e.foto)}</td>
+<td>${e.contacto||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${addrCell(e)}</td><td>${fotoCell(e.foto)}</td>
 <td><button class="btn btn-outline" onclick="showEmpresaTrabajos('${e.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
+</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas registradas</td></tr>';
 }
 
 function getEmpresaActiva(){
@@ -2787,7 +2856,8 @@ const el=document.getElementById('print-header');
 if(!el)return;
 const emp=getEmpresaActiva();
 if(!emp){el.innerHTML='<h1>Control de Medicion - Obra</h1><hr style="margin:10px 0">';return}
-const fields=[emp.nif,emp.direccion,emp.telefono,emp.email].filter(Boolean);
+const loc=[emp.cp,emp.poblacion,emp.provincia,emp.pais].filter(Boolean).join(', ');
+const fields=[emp.nif,[emp.direccion,loc].filter(Boolean).join(', '),emp.telefono,emp.email].filter(Boolean);
 el.innerHTML='<h1>'+(emp.nombre||'Mi Empresa')+'</h1>'+(fields.length?'<div style="font-size:.8rem;color:#444">'+fields.join(' | ')+'</div>':'')+(emp.foto?'<img src="'+emp.foto+'" style="height:44px;float:right;margin-top:-50px">':'')+'<hr style="margin:10px 0">';
 }
 
@@ -2797,6 +2867,10 @@ document.getElementById('mie-modal-title').textContent='Nueva Empresa';
 document.getElementById('mie-nombre').value='';
 document.getElementById('mie-nif').value='';
 document.getElementById('mie-direccion').value='';
+document.getElementById('mie-cp').value='';
+document.getElementById('mie-poblacion').value='';
+document.getElementById('mie-provincia').value='';
+document.getElementById('mie-pais').value='';
 document.getElementById('mie-telefono').value='';
 document.getElementById('mie-email').value='';
 document.getElementById('mie-notas').value='';
@@ -2812,6 +2886,10 @@ document.getElementById('mie-modal-title').textContent='Editar Empresa';
 document.getElementById('mie-nombre').value=e.nombre;
 document.getElementById('mie-nif').value=e.nif||'';
 document.getElementById('mie-direccion').value=e.direccion||'';
+document.getElementById('mie-cp').value=e.cp||'';
+document.getElementById('mie-poblacion').value=e.poblacion||'';
+document.getElementById('mie-provincia').value=e.provincia||'';
+document.getElementById('mie-pais').value=e.pais||'';
 document.getElementById('mie-telefono').value=e.telefono||'';
 document.getElementById('mie-email').value=e.email||'';
 document.getElementById('mie-notas').value=e.notas||'';
@@ -2822,7 +2900,7 @@ openModal('modal-miempresa');
 function saveMiEmpresa(){
 const nombre=document.getElementById('mie-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de empresa');return}
-const data={nombre,nif:document.getElementById('mie-nif').value.trim(),direccion:document.getElementById('mie-direccion').value.trim(),telefono:document.getElementById('mie-telefono').value.trim(),email:document.getElementById('mie-email').value.trim(),notas:document.getElementById('mie-notas').value.trim(),foto:getFotoSrc('mie-img-prev','mie-img-wrap')};
+const data={nombre,nif:document.getElementById('mie-nif').value.trim(),direccion:document.getElementById('mie-direccion').value.trim(),cp:document.getElementById('mie-cp').value.trim(),poblacion:document.getElementById('mie-poblacion').value.trim(),provincia:document.getElementById('mie-provincia').value.trim(),pais:document.getElementById('mie-pais').value.trim(),telefono:document.getElementById('mie-telefono').value.trim(),email:document.getElementById('mie-email').value.trim(),notas:document.getElementById('mie-notas').value.trim(),foto:getFotoSrc('mie-img-prev','mie-img-wrap')};
 const editId=document.getElementById('mie-edit-id').value;
 if(editId){const idx=misEmpresas.findIndex(x=>x.id===editId);misEmpresas[idx]={...misEmpresas[idx],...data}}
 else{
@@ -2856,13 +2934,13 @@ renderSidebarEmpresa();renderPrintHeader();renderMiEmpresas();toast('Empresa eli
 
 function renderMiEmpresas(){
 const q=(document.getElementById('mie-search')?.value||'').toLowerCase();
-const list=misEmpresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.nif||'').toLowerCase().includes(q)||(e.email||'').toLowerCase().includes(q));
+const list=misEmpresas.filter(e=>!q||e.nombre.toLowerCase().includes(q)||(e.nif||'').toLowerCase().includes(q)||(e.email||'').toLowerCase().includes(q)||(e.poblacion||'').toLowerCase().includes(q)||(e.provincia||'').toLowerCase().includes(q));
 const tb=document.getElementById('miempresas-list');
 if(tb)tb.innerHTML=list.length?list.map(e=>`<tr>
 <td>${e.id===empresaActivaId?'<span style="color:var(--success);font-size:1.1rem">&#10003;</span>':''}</td>
 <td>${fotoCell(e.foto)}</td>
 <td><strong>${e.nombre}</strong></td>
-<td>${e.nif||'-'}</td><td>${e.direccion||'-'}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${e.notas||'-'}</td>
+<td>${e.nif||'-'}</td><td>${addrCell(e)}</td><td>${e.telefono||'-'}</td><td>${e.email||'-'}</td><td>${e.notas||'-'}</td>
 <td><button class="btn ${e.id===empresaActivaId?'btn-success':'btn-primary'}" onclick="setEmpresaActiva('${e.id}')" style="padding:5px 10px;font-size:.75rem">${e.id===empresaActivaId?'Activa':'Usar'}</button> <button class="btn btn-warning" onclick="editMiEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteMiEmpresa('${e.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay empresas creadas</td></tr>';
 renderSidebarEmpresa();
@@ -2875,7 +2953,8 @@ doc.text(emp&&emp.nombre?emp.nombre:'Gestion Empresa',14,15);
 if(emp){
   const block=[];
   if(emp.nif)block.push(emp.nif);
-  if(emp.direccion)block.push(String(emp.direccion).slice(0,30));
+  const loc=[emp.cp,emp.poblacion,emp.provincia,emp.pais].filter(Boolean).join(', ');
+  if(emp.direccion||loc)block.push([emp.direccion,loc].filter(Boolean).join(', ').slice(0,30));
   if(emp.telefono)block.push('Tel: '+emp.telefono);
   if(emp.email)block.push(emp.email);
   const logoWidth=emp.foto?35:0;
@@ -3050,6 +3129,10 @@ document.getElementById('sub-edit-id').value='';
 document.getElementById('sub-modal-title').textContent='Nueva Subcontrata';
 document.getElementById('sub-nombre').value='';
 document.getElementById('sub-contacto').value='';
+document.getElementById('sub-cp').value='';
+document.getElementById('sub-poblacion').value='';
+document.getElementById('sub-provincia').value='';
+document.getElementById('sub-pais').value='';
 document.getElementById('sub-telefono').value='';
 document.getElementById('sub-email').value='';
 document.getElementById('sub-notas').value='';
@@ -3064,6 +3147,10 @@ document.getElementById('sub-edit-id').value=id;
 document.getElementById('sub-modal-title').textContent='Editar Subcontrata';
 document.getElementById('sub-nombre').value=s.nombre;
 document.getElementById('sub-contacto').value=s.contacto||'';
+document.getElementById('sub-cp').value=s.cp||'';
+document.getElementById('sub-poblacion').value=s.poblacion||'';
+document.getElementById('sub-provincia').value=s.provincia||'';
+document.getElementById('sub-pais').value=s.pais||'';
 document.getElementById('sub-telefono').value=s.telefono||'';
 document.getElementById('sub-email').value=s.email||'';
 document.getElementById('sub-notas').value=s.notas||'';
@@ -3078,7 +3165,7 @@ const nombre=document.getElementById('sub-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de subcontrata');return}
 const empresaId=document.getElementById('sub-empresa').value;
 const emp=empresas.find(e=>e.id===empresaId);
-const data={nombre,empresaId,empresa:emp?emp.nombre:'',contacto:document.getElementById('sub-contacto').value.trim(),telefono:document.getElementById('sub-telefono').value.trim(),email:document.getElementById('sub-email').value.trim(),notas:document.getElementById('sub-notas').value.trim(),foto:getFotoSrc('sub-img-prev','sub-img-wrap')};
+const data={nombre,empresaId,empresa:emp?emp.nombre:'',contacto:document.getElementById('sub-contacto').value.trim(),cp:document.getElementById('sub-cp').value.trim(),poblacion:document.getElementById('sub-poblacion').value.trim(),provincia:document.getElementById('sub-provincia').value.trim(),pais:document.getElementById('sub-pais').value.trim(),telefono:document.getElementById('sub-telefono').value.trim(),email:document.getElementById('sub-email').value.trim(),notas:document.getElementById('sub-notas').value.trim(),foto:getFotoSrc('sub-img-prev','sub-img-wrap')};
 const editId=document.getElementById('sub-edit-id').value;
 if(editId){const idx=subcontratas.findIndex(x=>x.id===editId);subcontratas[idx]={...subcontratas[idx],...data}}
 else{data.id='sc_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];subcontratas.push(data)}
@@ -3093,12 +3180,12 @@ save();renderSubcontratas();toast('Subcontrata eliminada');
 
 function renderSubcontratas(){
 const q=(document.getElementById('sub-search')?.value||'').toLowerCase();
-const list=subcontratas.filter(s=>!q||s.nombre.toLowerCase().includes(q)||(s.empresa||'').toLowerCase().includes(q)||(s.contacto||'').toLowerCase().includes(q));
+const list=subcontratas.filter(s=>!q||s.nombre.toLowerCase().includes(q)||(s.empresa||'').toLowerCase().includes(q)||(s.contacto||'').toLowerCase().includes(q)||(s.poblacion||'').toLowerCase().includes(q)||(s.provincia||'').toLowerCase().includes(q));
 document.getElementById('subcontratas-list').innerHTML=list.length?list.map(s=>`<tr>
 <td><strong>${s.nombre}</strong></td>
-<td>${s.empresa||'-'}</td><td>${s.contacto||'-'}</td><td>${s.telefono||'-'}</td><td>${s.email||'-'}</td><td>${fotoCell(s.foto)}</td>
+<td>${s.empresa||'-'}</td><td>${s.contacto||'-'}</td><td>${s.telefono||'-'}</td><td>${s.email||'-'}</td><td>${addrCell(s)}</td><td>${fotoCell(s.foto)}</td>
 <td><button class="btn btn-outline" onclick="showSubcontrataTrabajos('${s.id}')" style="padding:5px 10px;font-size:.75rem">Trabajos</button> <button class="btn btn-warning" onclick="editSubcontrata('${s.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteSubcontrata('${s.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcontratas registradas</td></tr>';
+</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcontratas registradas</td></tr>';
 }
 
 function showSubcontrataTrabajos(subId){
