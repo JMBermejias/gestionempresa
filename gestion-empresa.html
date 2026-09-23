@@ -289,6 +289,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <button class="nav-btn" data-page="estadisticas" onclick="showPage('estadisticas')"><span class="icon">&#128200;</span>Estadisticas</button>
 <button class="nav-btn" data-page="reportes" onclick="showPage('reportes')"><span class="icon">&#128196;</span>Reportes / PDF</button>
+<button class="nav-btn" onclick="openBackupModal()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128190;</span>Copias de seguridad</button>
 <button class="nav-btn" onclick="doCheckUpdate()" style="margin-top:auto;opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128260;</span>Buscar actualizaciones</button>
 <button class="nav-btn" onclick="doLogout()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128682;</span>Salir (cerrar sesion)</button>
 <button class="nav-btn" onclick="doQuit()" style="opacity:.8;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px"><span class="icon">&#128683;</span>Cerrar aplicacion</button>
@@ -1657,6 +1658,20 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 </div>
 
+<div class="modal-overlay" id="modal-backup">
+<div class="modal" style="max-width:520px">
+<h3>&#128190; Copias de seguridad</h3>
+<p style="font-size:.85rem;color:var(--text-light);margin-bottom:12px">Tus datos se guardan automaticamente en el servidor local y, si lo activas, en la nube. Ademas puedes descargar una copia completa y restaurarla cuando quieras, por ejemplo tras instalar la aplicacion en otro equipo.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+<button class="btn btn-primary" onclick="exportarTodo()">&#128190; Descargar copia de seguridad</button>
+<button class="btn btn-outline" onclick="document.getElementById('backup-file').click()">&#128229; Restaurar desde copia</button>
+<input type="file" id="backup-file" accept=".json,application/json" style="display:none" onchange="importarTodo(event)">
+</div>
+<p style="font-size:.78rem;color:var(--text-light);margin-top:12px">La copia incluye todas las secciones (empresas, clientes, presupuestos, facturas, contabilidad, etc.) de la empresa de trabajo actual y la lista de empresas.</p>
+<div class="modal-actions" style="margin-top:15px"><button class="btn btn-outline" onclick="closeModal('modal-backup')">Cerrar</button></div>
+</div>
+</div>
+
 <div class="modal-overlay" id="modal-asiento">
 <div class="modal" style="max-width:720px">
 <h3 id="as-modal-title">Nuevo Asiento</h3>
@@ -1940,7 +1955,7 @@ function saveLocal(){
 const BIZ_COLLECTIONS=['materials','mediciones','empresas','obras','zonas','subcontratas','presupuestos','facturas','clientes','proveedores','empleados','compras','ventas','almacen','partes','categorias','almacenes','planCuentas','apuntes','contabilidad'];
 function save(){
   saveLocal();
-  const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes,categorias,almacenes,planCuentas,apuntes,contabilidad};
+  const payload={materials,mediciones,empresas,misEmpresas,empresaActivaId,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes,categorias,almacenes,planCuentas,apuntes,contabilidad,med_serie_counter:medSerieCounter,pres_serie_counter:presSerieCounter,fac_serie_counter:facSerieCounter,comp_serie_counter:compSerieCounter,ven_serie_counter:venSerieCounter,part_serie_counter:partSerieCounter,aso_counter:asientoCounter};
   if(_db){
     try{
       const biz={};
@@ -2128,7 +2143,7 @@ function checkAuthStatus(){
       _authConfigured=true;
       authFetch('/api/health').then(r=>{
         if(r.status===401){_authToken='';localStorage.removeItem('mo_token');document.getElementById('auth-box-setup').style.display='none';document.getElementById('auth-box-login').style.display='block';showAuth();}
-        else hideAuth();
+        else{hideAuth();restoreFromServer();}
       }).catch(()=>{showAuth();});
     }else{
       _authConfigured=true;
@@ -2271,6 +2286,118 @@ function doSetup(){
 }
 function closeToast(){
   document.getElementById('upd-toast').classList.remove('show');
+}
+
+/* ================= COPIAS DE SEGURIDAD Y RESTAURACION ================= */
+const COLS_TO_LOCAL={materials:'mat_data',mediciones:'med_data',empresas:'emp_data',obras:'obras_data',zonas:'zonas_data',subcontratas:'sub_data',presupuestos:'pres_data',facturas:'fac_data',clientes:'cli_data',proveedores:'prov_data',empleados:'emp2_data',compras:'com_data',ventas:'ven_data',almacen:'alm_data',partes:'par_data',categorias:'cat2_data',almacenes:'alm2_data',planCuentas:'pgc_data',apuntes:'apo_data',contabilidad:'cta_data'};
+const COUNTERS_LOCAL=['med_serie_counter','pres_serie_counter','fac_serie_counter','comp_serie_counter','ven_serie_counter','part_serie_counter','aso_counter'];
+function openBackupModal(){
+  openModal('modal-backup');
+}
+function backupPayload(){
+  const p={generado:new Date().toISOString(),app:APP_VERSION,misEmpresas,empresaActivaId};
+  const ns={materials,mediciones,empresas,obras,zonas,subcontratas,presupuestos,facturas,clientes,proveedores,empleados,compras,ventas,almacen,partes,categorias,almacenes,planCuentas,apuntes,contabilidad};
+  Object.keys(COLS_TO_LOCAL).forEach(k=>p[k]=ns[k]);
+  COUNTERS_LOCAL.forEach(c=>p[c]=parseInt(localStorage.getItem(aimKey(c))||'0',10)||0);
+  return p;
+}
+function setAllData(d){
+  materials=d.materials||[];mediciones=d.mediciones||[];empresas=d.empresas||[];
+  obras=d.obras||[];zonas=d.zonas||[];subcontratas=d.subcontratas||[];
+  presupuestos=d.presupuestos||[];facturas=d.facturas||[];clientes=d.clientes||[];
+  proveedores=d.proveedores||[];empleados=d.empleados||[];compras=d.compras||[];
+  ventas=d.ventas||[];almacen=d.almacen||[];partes=d.partes||[];categorias=d.categorias||[];
+  almacenes=d.almacenes||[];planCuentas=d.planCuentas||[];apuntes=d.apuntes||[];contabilidad=d.contabilidad||null;
+  if(typeof d.med_serie_counter==='number'&&!isNaN(d.med_serie_counter))medSerieCounter=d.med_serie_counter;
+  if(typeof d.pres_serie_counter==='number'&&!isNaN(d.pres_serie_counter))presSerieCounter=d.pres_serie_counter;
+  if(typeof d.fac_serie_counter==='number'&&!isNaN(d.fac_serie_counter))facSerieCounter=d.fac_serie_counter;
+  if(typeof d.comp_serie_counter==='number'&&!isNaN(d.comp_serie_counter))compSerieCounter=d.comp_serie_counter;
+  if(typeof d.ven_serie_counter==='number'&&!isNaN(d.ven_serie_counter))venSerieCounter=d.ven_serie_counter;
+  if(typeof d.part_serie_counter==='number'&&!isNaN(d.part_serie_counter))partSerieCounter=d.part_serie_counter;
+  if(typeof d.aso_counter==='number'&&!isNaN(d.aso_counter))asientoCounter=d.aso_counter;
+}
+function exportarTodo(){
+  try{
+    const data=backupPayload();
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='gestion-empresa-respaldo-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200);
+    toast('Copia de seguridad descargada');
+  }catch(e){alert('No se pudo generar la copia: '+e.message)}
+}
+function importarTodo(ev){
+  const f=ev.target.files&&ev.target.files[0];
+  if(ev.target)ev.target.value='';
+  if(!f)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    let d;
+    try{d=JSON.parse(reader.result)}catch(e){alert('El archivo no es una copia de seguridad valida');return}
+    if(!d||typeof d!=='object'){alert('El archivo no es una copia de seguridad valida');return}
+    const hasData=Object.keys(COLS_TO_LOCAL).some(k=>d[k]!==undefined)||Array.isArray(d.misEmpresas);
+    if(!hasData){alert('La copia no contiene datos restaurables');return}
+    if(!confirm('Se sustituiran TODOS los datos actuales de la empresa de trabajo por los de la copia. Esta accion no se puede deshacer. ¿Continuar?'))return;
+    if(Array.isArray(d.misEmpresas))misEmpresas=d.misEmpresas;
+    if(typeof d.empresaActivaId==='string'){empresaActivaId=d.empresaActivaId;localStorage.setItem('mie_activa',empresaActivaId);}
+    loadCompanyData();
+    setAllData(d);
+    migrateData();
+    saveLocal();
+    save();
+    renderSidebarEmpresa();
+    renderPrintHeader();
+    renderAll();
+    toast('Datos restaurados desde la copia de seguridad');
+  };
+  reader.readAsText(f);
+}
+function storeRemoteCols(d,id){
+  const skipEmpty={'contabilidad':true,'planCuentas':true};
+  Object.keys(COLS_TO_LOCAL).forEach(p=>{
+    if(d[p]===undefined||d[p]===null)return;
+    if(skipEmpty[p]&&Array.isArray(d[p])&&!d[p].length)return;
+    localStorage.setItem(aimKeyFor(COLS_TO_LOCAL[p],id),JSON.stringify(d[p]));
+  });
+  COUNTERS_LOCAL.forEach(c=>{
+    if(typeof d[c]==='number'&&!isNaN(d[c]))localStorage.setItem(aimKeyFor(c,id),String(d[c]));
+  });
+}
+let _serverRestored=false;
+function restoreFromServer(){
+  if(!IS_DESKTOP||!_authToken||_serverRestored)return;
+  // Solo se restaura desde el servidor si este navegador no tiene todavia datos
+  // guardados (por ejemplo tras borrar la cache). Asi nunca se machacan datos
+  // locales que sean mas recientes que la copia del servidor.
+  if(localStorage.getItem(aimKey('mat_data'))!==null){_serverRestored=true;return;}
+  _serverRestored=true;
+  const baseHdrs={'Authorization':'Bearer '+_authToken};
+  function fetchOne(id){
+    const h={headers:Object.assign({},baseHdrs)};
+    if(id){h.headers['X-Empresa-Id']=id;}
+    return fetch('/api/data',h).then(r=>r.ok?r.json():null);
+  }
+  fetchOne('').then(globalData=>{
+    if(!globalData){_serverRestored=false;return;}
+    if(typeof globalData.empresaActivaId==='string'&&globalData.empresaActivaId!==empresaActivaId){
+      empresaActivaId=globalData.empresaActivaId;
+      localStorage.setItem('mie_activa',empresaActivaId);
+    }
+    if(Array.isArray(globalData.misEmpresas))misEmpresas=globalData.misEmpresas;
+    const ids=(misEmpresas||[]).map(e=>e&&e.id).filter(Boolean);
+    const all=[''].concat(ids);
+    return Promise.all(all.map(id=>fetchOne(id).then(d=>{if(d)storeRemoteCols(d,id);})));
+  }).then(()=>{
+    loadCompanyData();
+    migrateData();
+    saveLocal();
+    renderSidebarEmpresa();
+    renderPrintHeader();
+    renderAll();
+    if(!_ready){toast('Datos restaurados desde el servidor');_ready=true;}
+  }).catch(()=>{_serverRestored=false;});
 }
 function updateCheck(){
   authFetch('/api/update/check').then(r=>{
@@ -5399,6 +5526,7 @@ r.classList.remove('show');
 });
 });
 migrateData();
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(()=>{});}
 renderDashboard();
 renderSidebarEmpresa();
 renderPrintHeader();

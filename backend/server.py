@@ -23,7 +23,16 @@ DB_PATH = os.environ.get('DB_PATH', '/var/lib/gestion-empresa/medicion.db')
 AUTH_FILE = os.environ.get('AUTH_FILE', '/var/lib/gestion-empresa/auth.json')
 HOST = os.environ.get('HOST', '0.0.0.0')
 PORT = int(os.environ.get('PORT', '80'))
-COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas', 'clientes', 'proveedores', 'empleados', 'compras', 'ventas', 'almacen', 'partes', 'categorias', 'almacenes', 'planCuentas', 'apuntes', 'contabilidad']
+COLLECTIONS = ['materials', 'mediciones', 'empresas', 'obras', 'zonas', 'subcontratas', 'presupuestos', 'facturas', 'clientes', 'proveedores', 'empleados', 'compras', 'ventas', 'almacen', 'partes', 'categorias', 'almacenes', 'planCuentas', 'apuntes', 'contabilidad', 'misEmpresas', 'empresaActivaId', 'med_serie_counter', 'pres_serie_counter', 'fac_serie_counter', 'comp_serie_counter', 'ven_serie_counter', 'part_serie_counter', 'aso_counter']
+META_FIELDS = ['misEmpresas', 'empresaActivaId']
+
+
+def collection_default(c):
+    if c == 'empresaActivaId':
+        return ''
+    if c.endswith('_counter'):
+        return 0
+    return []
 FB_API_KEY = 'AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k'
 FB_IDP = 'https://identitytoolkit.googleapis.com/v1/accounts:%s?key=' + FB_API_KEY
 
@@ -101,6 +110,24 @@ def save_data(payload, company=''):
         conn.commit()
     finally:
         conn.close()
+    # Los datos globales (lista de empresas y empresa activa) siempre se
+    # guardan tambien en la base global, aunque la peticion vaya a una
+    # empresa concreta.
+    if company and any(c in payload for c in META_FIELDS):
+        gconn = get_conn('')
+        try:
+            for c in META_FIELDS:
+                if c in payload and payload[c] is not None:
+                    value = json.dumps(payload[c], ensure_ascii=False)
+                    gconn.execute(
+                        'INSERT INTO appdata (collection, data) VALUES (?, ?) '
+                        'ON CONFLICT(collection) DO UPDATE SET '
+                        'data=excluded.data, updated_at=datetime(\'now\')',
+                        (c, value),
+                    )
+            gconn.commit()
+        finally:
+            gconn.close()
 
 
 def request_company(handler, post_data=None):
@@ -276,7 +303,10 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 try:
                     data = load_data(request_company(self))
-                    self._send_json(200, {c: data.get(c, []) for c in COLLECTIONS})
+                    self._send_json(200, {
+                        c: data[c] if c in data else collection_default(c)
+                        for c in COLLECTIONS
+                    })
                 except Exception as e:
                     self._send_json(500, {'error': str(e)})
                 return
