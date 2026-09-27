@@ -561,7 +561,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Cuenta</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="clientes-list"></tbody></table>
 </div>
 </div>
@@ -581,7 +581,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Foto</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Contacto</th><th>Telefono</th><th>Email</th><th>Poblacion</th><th>Cuenta</th><th>Foto</th><th>Acciones</th></tr></thead>
 <tbody id="proveedores-list"></tbody></table>
 </div>
 </div>
@@ -2596,8 +2596,8 @@ const nombre=document.getElementById('cli-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de cliente');return}
 const data={nombre,nif:document.getElementById('cli-nif').value.trim(),contacto:document.getElementById('cli-contacto').value.trim(),direccion:document.getElementById('cli-direccion').value.trim(),cp:document.getElementById('cli-cp').value.trim(),poblacion:document.getElementById('cli-poblacion').value.trim(),provincia:document.getElementById('cli-provincia').value.trim(),pais:document.getElementById('cli-pais').value.trim(),telefono:document.getElementById('cli-telefono').value.trim(),email:document.getElementById('cli-email').value.trim(),notas:document.getElementById('cli-notas').value.trim(),foto:getFotoSrc('cli-img-prev','cli-img-wrap')};
 const editId=document.getElementById('cli-edit-id').value;
-if(editId){const idx=clientes.findIndex(x=>x.id===editId);clientes[idx]={...clientes[idx],...data}}
-else{data.id='cli_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];clientes.push(data)}
+if(editId){const idx=clientes.findIndex(x=>x.id===editId);clientes[idx]={...clientes[idx],...data};cuentaTerceroCuenta(clientes[idx],'cliente')}
+else{data.id='cli_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];cuentaTerceroCuenta(data,'cliente');clientes.push(data)}
 save();closeModal('modal-cliente');renderClientes();toast('Cliente guardado');
 }
 
@@ -2612,9 +2612,9 @@ const q=(document.getElementById('cli-search')?.value||'').toLowerCase();
 const list=clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||(c.nif||'').toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q)||(c.poblacion||'').toLowerCase().includes(q)||(c.provincia||'').toLowerCase().includes(q));
 document.getElementById('clientes-list').innerHTML=list.length?list.map(c=>`<tr>
 <td><strong>${c.nombre}</strong></td>
-<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${addrCell(c)}</td><td>${fotoCell(c.foto)}</td>
+<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${addrCell(c)}</td><td>${c.cta?'<span class="tag">'+c.cta+'</span>':'-'}</td><td>${fotoCell(c.foto)}</td>
 <td><button class="btn btn-warning" onclick="editCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
 }
 
 function populateClienteSelect(selectId){
@@ -2666,8 +2666,8 @@ const nombre=document.getElementById('prov-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de proveedor');return}
 const data={nombre,nif:document.getElementById('prov-nif').value.trim(),contacto:document.getElementById('prov-contacto').value.trim(),direccion:document.getElementById('prov-direccion').value.trim(),cp:document.getElementById('prov-cp').value.trim(),poblacion:document.getElementById('prov-poblacion').value.trim(),provincia:document.getElementById('prov-provincia').value.trim(),pais:document.getElementById('prov-pais').value.trim(),telefono:document.getElementById('prov-telefono').value.trim(),email:document.getElementById('prov-email').value.trim(),notas:document.getElementById('prov-notas').value.trim(),foto:getFotoSrc('prov-img-prev','prov-img-wrap')};
 const editId=document.getElementById('prov-edit-id').value;
-if(editId){const idx=proveedores.findIndex(x=>x.id===editId);proveedores[idx]={...proveedores[idx],...data}}
-else{data.id='prov_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];proveedores.push(data)}
+if(editId){const idx=proveedores.findIndex(x=>x.id===editId);proveedores[idx]={...proveedores[idx],...data};cuentaTerceroCuenta(proveedores[idx],'proveedor')}
+else{data.id='prov_'+Date.now();data.fechaCreacion=new Date().toISOString().split('T')[0];cuentaTerceroCuenta(data,'proveedor');proveedores.push(data)}
 save();closeModal('modal-proveedor');renderProveedores();toast('Proveedor guardado');
 }
 
@@ -2682,9 +2682,9 @@ const q=(document.getElementById('prov-search')?.value||'').toLowerCase();
 const list=proveedores.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q)||(p.poblacion||'').toLowerCase().includes(q)||(p.provincia||'').toLowerCase().includes(q));
 document.getElementById('proveedores-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${fotoCell(p.foto)}</td>
+<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${p.cta?'<span class="tag">'+p.cta+'</span>':'-'}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
+</tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
 }
 
 function populateProveedorSelect(selectId){
@@ -5586,6 +5586,29 @@ function ctE(v){return ctFmt(v)+' \u20ac'}
 function nextAsNum(){asientoCounter++;return asientoCounter}
 function ctitulo(c){const e=(planCuentas||[]).find(p=>String(p.c)===String(c));return e&&e.n?e.n:('Cuenta '+c)}
 function asegCuentaAuto(c){if(!(planCuentas||[]).some(p=>String(p.c)===String(c)))planCuentas.push({c:String(c),n:CT_AUTO_NAMES[String(c)]||'Cuenta '+c})}
+function nextSubcuenta(parent){
+const pre=String(parent);
+const ns=(planCuentas||[]).map(p=>String(p.c)).filter(c=>c.startsWith(pre)&&c.length===pre.length+3).map(c=>parseInt(c.slice(pre.length),10)||0);
+return pre+String(ns.length?Math.max(...ns)+1:1).padStart(3,'0');
+}
+function cuentaTerceroCuenta(ent,rol){
+const c=contabilidad||CT_DEFAULT;
+const parent=String(rol==='cliente'?(c.cCliente||'430'):(c.cProveedor||'410'));
+asegCuentaAuto(parent);
+const nombre=(rol==='cliente'?'Clientes':'Proveedores')+' '+ctEsc(ent.nombre||'')+(ent.nif?' ('+ctEsc(ent.nif)+')':'');
+let cod=ent.cta?String(ent.cta):'';
+if(!cod||!(planCuentas||[]).some(p=>String(p.c)===cod))cod=nextSubcuenta(parent);
+const idx=(planCuentas||[]).findIndex(p=>String(p.c)===cod);
+if(idx>=0)planCuentas[idx].n=nombre;
+else planCuentas.push({c:cod,n:nombre});
+ent.cta=cod;
+return cod;
+}
+function terceroDeDoc(doc,tipo){
+if(tipo==='compra')return proveedores.find(p=>p.id===doc.proveedorId)||proveedores.find(p=>p.nombre===doc.proveedor)||null;
+if(tipo==='venta'||tipo==='factura')return clientes.find(x=>x.id===doc.clienteId)||clientes.find(x=>x.nombre===doc.cliente)||null;
+return null;
+}
 function cttipo(c){
 c=String(c||'').replace(/[^0-9]/g,'');
 const ini=c[0]||'';
@@ -5960,16 +5983,20 @@ if(!doc)return;
 if(doc.estado==='Anulada'){alert('No se asienta un documento anulado');return}
 if(asentadoOrigen(tipo,doc.id)){alert('Ya existe un asiento para este documento');return}
 const c=contabilidad||CT_DEFAULT;
+const terr=terceroDeDoc(doc,tipo);
+const terrCta=terr?cuentaTerceroCuenta(terr,tipo==='compra'?'proveedor':'cliente'):'';
+const provCta=terrCta||String(c.cProveedor||'410');
+const cliCta=terrCta||String(c.cCliente||'430');
 const subtotal=Math.round((+(doc.subtotal||0))*100)/100,iva=Math.round((+(doc.iva||0))*100)/100,total=Math.round((+(doc.total||0))*100)/100;
 let lineas;
 if(tipo==='compra'){
-asegCuentaAuto(c.cCompra);asegCuentaAuto(c.cIvaSop);asegCuentaAuto(c.cProveedor);
-if(iva>0)lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:c.cIvaSop,n:ctitulo(c.cIvaSop),d:iva,h:0},{c:c.cProveedor,n:ctitulo(c.cProveedor),d:0,h:total}];
-else lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:c.cProveedor,n:ctitulo(c.cProveedor),d:0,h:total}];
+asegCuentaAuto(c.cCompra);asegCuentaAuto(c.cIvaSop);asegCuentaAuto(provCta);
+if(iva>0)lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:c.cIvaSop,n:ctitulo(c.cIvaSop),d:iva,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
+else lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
 }else{
-asegCuentaAuto(c.cCliente);asegCuentaAuto(c.cVenta);asegCuentaAuto(c.cIvaRep);
-if(iva>0)lineas=[{c:c.cCliente,n:ctitulo(c.cCliente),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:subtotal},{c:c.cIvaRep,n:ctitulo(c.cIvaRep),d:0,h:iva}];
-else lineas=[{c:c.cCliente,n:ctitulo(c.cCliente),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:total}];
+asegCuentaAuto(cliCta);asegCuentaAuto(c.cVenta);asegCuentaAuto(c.cIvaRep);
+if(iva>0)lineas=[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:subtotal},{c:c.cIvaRep,n:ctitulo(c.cIvaRep),d:0,h:iva}];
+else lineas=[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:total}];
 }
 const desc=tipo==='compra'?('Compra '+getCompSerieStr(doc.numero||0)+' - '+(doc.proveedor||'')):(tipo==='venta'?('Venta '+getVenSerieStr(doc.numero||0)+' - '+(doc.cliente||doc.obra||'')):('Factura '+getFacSerieStr(doc.numero||0)+' - '+(doc.cliente||'')));
 const numero=nextAsNum();
