@@ -3132,27 +3132,34 @@ function updateDownload(){
 }
 function _verNum(v){const m=String(v||'').match(/(\d+)\.(\d+)\.(\d+)/);if(!m)return[0,0,0];return[m[1],m[2],m[3]].map(function(x){return parseInt(x,10)})}
 function _verGt(a,b){for(let i=0;i<a.length;i++){if(a[i]>b[i])return true;if(a[i]<b[i])return false}return false}
+function serverHasNewVersion(){
+  return authFetch('/api/health',{cache:'no-store'}).then(function(r){return r.json()}).then(function(h){
+    if(!h||!h.version)return false;
+    return _verGt(_verNum(h.version),_verNum(APP_VERSION));
+  }).catch(function(){return false});
+}
 function scheduleUpdateReload(){
-  const target=_lastUpdateCheck&&_lastUpdateCheck.latest_tag?_lastUpdateCheck.latest_tag:'';
-  const tV=target?_verNum(target):null;
   const info=document.getElementById('upd-info');
   info.textContent+=' La aplicacion se recargara sola cuando este lista la nueva version.';
   let tries=0;
   const iv=setInterval(function(){
     tries++;
-    authFetch('/api/update/check').then(function(r){return r.json()}).then(function(d){
-      if(!d||d.offline)return;
-      const cur=_verNum(d.current);
-      const done=(tV&&!_verGt(tV,cur))||(!tV&&!d.needs_update);
-      if(done||tries>=40){
+    serverHasNewVersion().then(function(nuevo){
+      if(nuevo||tries>=150){
         clearInterval(iv);
         info.textContent+=' Solicitando recarga...';
         location.reload();
       }
-    }).catch(function(){
-      if(tries>=40){clearInterval(iv);location.reload();}
     });
-  },3000);
+  },2000);
+}
+function watchServerVersion(){
+  if(!IS_DESKTOP)return;
+  setInterval(function(){
+    const ao=document.getElementById('auth-overlay');
+    if(ao&&!ao.classList.contains('hidden'))return;
+    serverHasNewVersion().then(function(nuevo){if(nuevo)location.reload()});
+  },60000);
 }
 function updateApply(){
   const info=document.getElementById('upd-info');
@@ -3163,7 +3170,7 @@ function updateApply(){
       document.getElementById('upd-title').textContent='Actualizacion lista';
       document.getElementById('upd-btn-apply').style.display='none';
       document.getElementById('upd-btn-close').style.display='';
-      if(IS_DESKTOP)scheduleUpdateReload();
+      scheduleUpdateReload();
     }else{
       info.textContent='Error: '+(b.error||'');
     }
@@ -6408,6 +6415,7 @@ initSync();
 updateCloudBtn();
 if(IS_DESKTOP){
   checkAuthStatus();
+  watchServerVersion();
 }else{
   initAuthMobile();
 }
