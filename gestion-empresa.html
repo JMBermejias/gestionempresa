@@ -263,6 +263,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="nav-btn" data-page="almacen" onclick="showPage('almacen')"><span class="icon">&#127981;</span>Almacen / Stock</button>
 <button class="nav-btn" data-page="almacenes" onclick="showPage('almacenes')"><span class="icon">&#127968;</span>Almacenes</button>
 <button class="nav-btn" data-page="categorias" onclick="showPage('categorias')"><span class="icon">&#128220;</span>Categorias</button>
+<button class="nav-btn" data-page="subcategorias" onclick="showPage('subcategorias')"><span class="icon">&#128193;</span>Subcategorias</button>
 <button class="nav-btn" data-page="materiales" onclick="showPage('materiales')"><span class="icon">&#128230;</span>Materiales</button>
 </div>
 <button class="nav-btn nav-group" onclick="toggleNavGroup(this)"><span class="icon">&#128194;</span>Gestion<span class="nav-caret">&#9660;</span></button>
@@ -455,6 +456,27 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="table-wrap">
 <table><thead><tr><th>Categoria</th><th>Subcategorias</th><th>Materiales</th><th>Acciones</th></tr></thead>
 <tbody id="categorias-list"></tbody></table>
+</div>
+</div>
+</div>
+
+<!-- SUBCATEGORIAS -->
+<div id="page-subcategorias" class="page">
+<div class="page-header">
+<h1>&#128193; Subcategorias de Materiales</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-outline" onclick="showPage('categorias')">&#8592; Volver a Categorias</button>
+<button class="btn btn-primary" onclick="openNewSubcat()">+ Nueva Subcategoria</button>
+</div>
+</div>
+<div class="filters" style="margin-bottom:15px">
+<label style="font-size:.8rem;color:var(--text-light);font-weight:600">Categoria:</label>
+<select id="filtro-subcat-cat" onchange="renderSubcategorias()"><option value="all">Todas las categorias</option></select>
+</div>
+<div class="card">
+<div class="table-wrap">
+<table><thead><tr><th>Subcategoria</th><th>Categoria</th><th>Codigo</th><th>Materiales</th><th>Acciones</th></tr></thead>
+<tbody id="subcategorias-list"></tbody></table>
 </div>
 </div>
 </div>
@@ -1480,6 +1502,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h3 id="subcat-modal-title">Nueva Subcategoria</h3>
 <input type="hidden" id="subcat-edit-parent">
 <input type="hidden" id="subcat-edit-id">
+<div class="form-group"><label>Categoria *</label><select id="subcat-parent" onchange="document.getElementById('subcat-edit-parent').value=this.value"></select></div>
 <div class="form-group"><label>Nombre *</label><input type="text" id="subcat-nombre" placeholder="Ej: Cableado"></div>
 <div class="form-group"><label>Codigo (2 letras) *</label><input type="text" id="subcat-codigo" maxlength="2" placeholder="Ej: CA" style="text-transform:uppercase"></div>
 <div class="modal-actions">
@@ -3192,6 +3215,7 @@ function renderAll(){
     if(id==='subcontratas')renderSubcontratas();
     if(id==='materiales')renderMaterials();
     if(id==='categorias')renderCategorias();
+    if(id==='subcategorias')renderSubcategorias();
     if(id==='mediciones')renderMediciones();
     if(id==='presupuestos')renderPresupuestos();
     if(id==='facturas')renderFacturas();
@@ -3247,6 +3271,7 @@ if(id==='empresas')renderEmpresas();
 if(id==='subcontratas')renderSubcontratas();
 if(id==='materiales')renderMaterials();
 if(id==='categorias')renderCategorias();
+if(id==='subcategorias')renderSubcategorias();
 if(id==='mediciones')renderMediciones();
 if(id==='presupuestos')renderPresupuestos();
 if(id==='facturas')renderFacturas();
@@ -4291,11 +4316,12 @@ if(categorias.some(c=>catNameOf(c)===nombre)){alert('Esa categoria ya existe');r
 if(categorias.some(c=>normCat(c).codigo===codigo)){alert('Ese codigo ya lo tiene otra categoria');return}
 categorias.push({nombre,codigo,subcategorias:[]});
 }
-save();closeModal('modal-categoria');renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria guardada');
+save();closeModal('modal-categoria');renderCategorias();renderSubcategorias();populateCategoriaSelects();renderMaterials();toast('Categoria guardada');
 }
 
 function openSubcatModal(parentNombre){
 const cat=catOf(parentNombre);if(!cat){alert('La categoria no existe');return}
+fillSubcatParentSelect(parentNombre);
 document.getElementById('subcat-edit-parent').value=parentNombre;
 document.getElementById('subcat-edit-id').value='';
 document.getElementById('subcat-modal-title').textContent='Nueva Subcategoria';
@@ -4306,6 +4332,7 @@ openModal('modal-subcat');
 
 function editSubcat(parentNombre,subname){
 const s=subcatOf(parentNombre,subname);if(!s)return;
+fillSubcatParentSelect(parentNombre);
 document.getElementById('subcat-edit-parent').value=parentNombre;
 document.getElementById('subcat-edit-id').value=subname;
 document.getElementById('subcat-modal-title').textContent='Editar Subcategoria '+subname;
@@ -4314,8 +4341,57 @@ document.getElementById('subcat-codigo').value=s.codigo||'';
 openModal('modal-subcat');
 }
 
+function fillSubcatParentSelect(pref){
+const selp=document.getElementById('subcat-parent');
+if(!selp)return;
+selp.innerHTML=categorias.map(c=>'<option value="'+catNameOf(c)+'">'+catNameOf(c)+'</option>').join('');
+const val=pref||(categorias.length?catNameOf(categorias[0]):'');
+if(val&&categorias.some(c=>catNameOf(c)===val))selp.value=val;
+}
+
+function openNewSubcat(){
+if(!categorias.length){alert('Crea primero una categoria');return}
+const filtro=document.getElementById('filtro-subcat-cat');
+const pref=filtro&&filtro.value!=='all'?filtro.value:'';
+openSubcatModal(pref||catNameOf(categorias[0]));
+}
+
+function renderSubcategorias(){
+const tbody=document.getElementById('subcategorias-list');
+if(!tbody)return;
+const filtroSel=document.getElementById('filtro-subcat-cat');
+if(filtroSel){const v=filtroSel.value;filtroSel.innerHTML='<option value="all">Todas las categorias</option>'+categorias.map(c=>'<option value="'+catNameOf(c)+'">'+catNameOf(c)+'</option>').join('');filtroSel.value=categorias.some(c=>catNameOf(c)===v)?v:'all';}
+const filtro=filtroSel?filtroSel.value:'all';
+const rows=[];
+categorias.forEach(c=>{
+const cat=normCat(c);
+if(filtro!=='all'&&cat.nombre!==filtro)return;
+(cat.subcategorias||[]).forEach(s=>{
+const cod=cat.codigo&&s.codigo?cat.codigo+s.codigo:s.codigo||'--';
+const count=materials.filter(m=>m.categoria===cat.nombre&&m.subcategoria===s.nombre).length;
+rows.push(`<tr>
+<td><span class="tag tag-${catTagClass(cat.nombre)}">${s.nombre}</span></td>
+<td><span class="tag tag-${catTagClass(cat.nombre)}" style="opacity:.85">${cat.nombre}${cat.codigo?' <code style="font-size:.65rem">'+cat.codigo+'</code>':''}</span></td>
+<td><code style="color:var(--text-light);font-size:.75rem">${cod}</code></td>
+<td>${count}</td>
+<td><button class="btn btn-warning" onclick="editSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">Editar</button> <button class="btn btn-outline" onclick="openMaterialWithSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">+ Material</button> <button class="btn btn-danger" onclick="deleteSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">X</button></td>
+</tr>`);
+});
+});
+tbody.innerHTML=rows.length?rows.join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcategorias'+(filtro!=='all'?' para esta categoria':'')+'</td></tr>';
+}
+
+function openMaterialWithSubcat(cat,sub){
+openMaterialModal('');
+popCatSelect('mat-categoria',cat);
+popMatSubcatSelect(sub);
+autoMatCodigo(true);
+}
+
 function saveSubcat(){
-const parent=document.getElementById('subcat-edit-parent').value;
+const selp=document.getElementById('subcat-parent');
+const parent=selp?selp.value:document.getElementById('subcat-edit-parent').value;
+document.getElementById('subcat-edit-parent').value=parent;
 const cat=catOf(parent);if(!cat){alert('La categoria no existe');return}
 const nombre=document.getElementById('subcat-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de subcategoria');return}
@@ -4336,7 +4412,7 @@ else{
 if(!cat.subcategorias)cat.subcategorias=[];
 cat.subcategorias.push({nombre,codigo});
 }
-save();closeModal('modal-subcat');renderCategorias();renderMaterials();toast('Subcategoria guardada');
+save();closeModal('modal-subcat');renderCategorias();renderSubcategorias();renderMaterials();toast('Subcategoria guardada');
 }
 
 function deleteSubcat(parentNombre,subname){
@@ -4347,7 +4423,7 @@ else{if(!confirm(msg+'?'))return}
 const cat=catOf(parentNombre);
 if(cat&&Array.isArray(cat.subcategorias))cat.subcategorias=cat.subcategorias.filter(s=>s.nombre!==subname);
 materials.forEach(m=>{if(m.categoria===parentNombre&&m.subcategoria===subname){m.subcategoria='';m.codigo=''}});
-save();renderCategorias();renderMaterials();toast('Subcategoria eliminada');
+save();renderCategorias();renderSubcategorias();renderMaterials();toast('Subcategoria eliminada');
 }
 
 function deleteCategoria(nombre){
@@ -4358,7 +4434,7 @@ else{if(!confirm(msg+'?'))return}
 categorias=categorias.filter(c=>catNameOf(c)!==nombre);
 materials.forEach(m=>{if(m.categoria===nombre){m.categoria='';m.subcategoria='';m.codigo=''}});
 [mediciones,presupuestos,facturas,compras,ventas,partes].forEach(docs=>docs.forEach(d=>{(d.lineas||[]).forEach(l=>{if(l.categoria===nombre)l.categoria=''})}));
-save();renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria eliminada');
+save();renderCategorias();renderSubcategorias();populateCategoriaSelects();renderMaterials();toast('Categoria eliminada');
 }
 
 function renderAlmacenes(){
