@@ -476,7 +476,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Subcategoria</th><th>Categoria</th><th>Codigo</th><th>Materiales</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Subcategoria</th><th>Categoria</th><th>Materiales</th><th>Acciones</th></tr></thead>
 <tbody id="subcategorias-list"></tbody></table>
 </div>
 </div>
@@ -4263,13 +4263,9 @@ document.getElementById('categorias-list').innerHTML=categorias.length?categoria
 const cat=normCat(c);
 const nombre=cat.nombre;
 const count=materials.filter(m=>m.categoria===nombre).length;
-const subs=cat.subcategorias.map(s=>{
-const cod=cat.codigo?s.codigo?cat.codigo+s.codigo:cat.codigo:s.codigo||'--';
-return`<span class="tag tag-${catTagClass(nombre)}" style="font-size:.7rem;margin:2px 4px 2px 0">${cod} ${s.nombre} <a href="#" onclick="event.preventDefault();editSubcat('${nombre}','${s.nombre}')" title="Editar subcategoria" style="color:inherit;margin-left:2px">&#9998;</a> <a href="#" onclick="event.preventDefault();deleteSubcat('${nombre}','${s.nombre}')" title="Eliminar subcategoria" style="color:#C62828">&#10005;</a></span>`;
-}).join('');
-return`<tr>
-<td><span class="tag tag-${catTagClass(nombre)}">${nombre}</span>${cat.codigo?'<br><code style="color:var(--text-light);font-size:.7rem">'+cat.codigo+'</code>':''}</td>
-<td>${subs?subs+'<br>':''}<button class="btn btn-outline" onclick="openSubcatModal('${nombre}')" style="padding:3px 8px;font-size:.7rem">+ Añadir subcategoria</button></td>
+ return`<tr>
+ <td><span class="tag tag-${catTagClass(nombre)}">${cat.codigo?cat.codigo+' ':''}${nombre}</span></td>
+ <td><button class="btn btn-outline" onclick="openSubcatModal('${nombre}')" style="padding:3px 8px;font-size:.7rem">+ Añadir subcategoria</button></td>
 <td>${count}</td>
 <td><button class="btn btn-warning" onclick="editCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`}).join(''):'<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light)">No hay categorias</td></tr>';
@@ -4371,15 +4367,14 @@ if(filtro!=='all'&&cat.nombre!==filtro)return;
 const cod=cat.codigo&&s.codigo?cat.codigo+s.codigo:s.codigo||'--';
 const count=materials.filter(m=>m.categoria===cat.nombre&&m.subcategoria===s.nombre).length;
 rows.push(`<tr>
-<td><span class="tag tag-${catTagClass(cat.nombre)}">${s.nombre}</span></td>
-<td><span class="tag tag-${catTagClass(cat.nombre)}" style="opacity:.85">${cat.nombre}${cat.codigo?' <code style="font-size:.65rem">'+cat.codigo+'</code>':''}</span></td>
-<td><code style="color:var(--text-light);font-size:.75rem">${cod}</code></td>
-<td>${count}</td>
-<td><button class="btn btn-warning" onclick="editSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">Editar</button> <button class="btn btn-outline" onclick="openMaterialWithSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">+ Material</button> <button class="btn btn-danger" onclick="deleteSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">X</button></td>
+ <td><span class="tag tag-${catTagClass(cat.nombre)}">${cod} ${s.nombre}</span></td>
+ <td><span class="tag tag-${catTagClass(cat.nombre)}" style="opacity:.85">${cat.nombre}${cat.codigo?' <code style="font-size:.65rem">'+cat.codigo+'</code>':''}</span></td>
+ <td>${count}</td>
+ <td><button class="btn btn-warning" onclick="editSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">Editar</button> <button class="btn btn-outline" onclick="openMaterialWithSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">+ Material</button> <button class="btn btn-danger" onclick="deleteSubcat('${cat.nombre}','${s.nombre}')" style="padding:4px 8px;font-size:.7rem">X</button></td>
 </tr>`);
 });
 });
-tbody.innerHTML=rows.length?rows.join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcategorias'+(filtro!=='all'?' para esta categoria':'')+'</td></tr>';
+tbody.innerHTML=rows.length?rows.join(''):'<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light)">No hay subcategorias'+(filtro!=='all'?' para esta categoria':'')+'</td></tr>';
 }
 
 function openMaterialWithSubcat(cat,sub){
@@ -4508,7 +4503,7 @@ document.getElementById('mat-filters').innerHTML=chips+(q?` <span style="color:v
 document.getElementById('materials-list').innerHTML=list.length?list.map(m=>{
 const stock=computeStock()[m.id]||0;
 return`<tr>
-<td><div class="mat-name-cell"><img class="mat-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="mat-name-text"><strong>${m.nombre}</strong>${m.codigo?'<br><code style="color:var(--primary-dark);font-size:.7rem">'+m.codigo+'</code>':''}${m.desc?'<br><small style="color:var(--text-light)">'+m.desc+'</small>':''}</div></div></td>
+<td><div class="mat-name-cell"><img class="mat-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="mat-name-text"><strong>${m.codigo?m.codigo+' ':''}${m.nombre}</strong>${m.desc?'<br><small style="color:var(--text-light)">'+m.desc+'</small>':''}</div></div></td>
 <td><span class="tag tag-${catTagClass(m.categoria)}">${m.categoria}</span>${m.subcategoria?' &rarr; <span class="tag tag-'+catTagClass(m.subcategoria)+'" style="opacity:.8">'+m.subcategoria+'</span>':''}</td>
 <td>${m.unidad}</td>
 <td>${getMaterialCoste(m)>0?'<span style="color:var(--text-light)">'+fmtPrecio(getMaterialCoste(m))+' &euro;</span>':'<span style="color:var(--text-light)">-</span>'}</td>
