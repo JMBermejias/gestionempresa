@@ -3177,7 +3177,6 @@ function scheduleUpdateReload(){
   },2000);
 }
 function watchServerVersion(){
-  if(!IS_DESKTOP)return;
   setInterval(function(){
     const ao=document.getElementById('auth-overlay');
     if(ao&&!ao.classList.contains('hidden'))return;
@@ -6491,10 +6490,10 @@ initSync();
 updateCloudBtn();
 if(IS_DESKTOP){
   checkAuthStatus();
-  watchServerVersion();
 }else{
   initAuthMobile();
 }
+watchServerVersion();
 setTimeout(function(){fetch('/api/health',{cache:'no-store'}).then(r=>{if(r.ok)updateCheck()}).catch(()=>{})},3000);
 
 /* ================= CONTABILIDAD ================= */
