@@ -453,7 +453,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>Categoria</th><th>Materiales</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>Categoria</th><th>Subcategorias</th><th>Materiales</th><th>Acciones</th></tr></thead>
 <tbody id="categorias-list"></tbody></table>
 </div>
 </div>
@@ -1157,7 +1157,9 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <input type="hidden" id="mat-edit-id">
 <input type="hidden" id="mat-img-data">
 <div class="form-group"><label>Nombre</label><input type="text" id="mat-nombre" placeholder="Ej: Cable 2.5mm"></div>
-<div class="form-group"><label>Categoria</label><select id="mat-categoria"></select></div>
+<div class="form-group"><label>Categoria</label><select id="mat-categoria" onchange="popMatSubcatSelect();autoMatCodigo(true)"></select></div>
+<div class="form-group"><label>Subcategoria</label><select id="mat-subcategoria" onchange="autoMatCodigo(true)"></select></div>
+<div class="form-group"><label>Codigo del material</label><input type="text" id="mat-codigo" maxlength="10" placeholder="Se genera solo: letras de categoria+subcategoria y 6 numeros" style="text-transform:uppercase"></div>
 <div class="form-group"><label>Unidad</label><select id="mat-unidad"><option value="ml">Metros (ml)</option><option value="m2">Metros cuadrados (m2)</option><option value="m3">Metros cubicos (m3)</option><option value="ud">Unidad (ud)</option><option value="kg">Kilogramos (kg)</option><option value="l">Litros (l)</option><option value="bulto">Bulto</option><option value="caja">Caja</option><option value="rollo">Rollo</option><option value="juego">Juego</option><option value="par">Par</option><option value="set">Set</option></select></div>
 <div class="form-group"><label>Descripcion (opcional)</label><input type="text" id="mat-desc" placeholder="Descripcion breve"></div>
 <div class="form-group"><label>Precios</label>
@@ -1464,9 +1466,25 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h3 id="cat-modal-title">Nueva Categoria</h3>
 <input type="hidden" id="cat-edit-id">
 <div class="form-group"><label>Nombre *</label><input type="text" id="cat-nombre" placeholder="Ej: Electricidad"></div>
+<div class="form-group"><label>Codigo (2 letras) *</label><input type="text" id="cat-codigo" maxlength="2" placeholder="Ej: EL" style="text-transform:uppercase"></div>
 <div class="modal-actions">
 <button class="btn btn-outline" onclick="closeModal('modal-categoria')">Cancelar</button>
 <button class="btn btn-primary" onclick="saveCategoria()">Guardar</button>
+</div>
+</div>
+</div>
+
+<!-- MODAL SUBCATEGORIA -->
+<div class="modal-overlay" id="modal-subcat">
+<div class="modal">
+<h3 id="subcat-modal-title">Nueva Subcategoria</h3>
+<input type="hidden" id="subcat-edit-parent">
+<input type="hidden" id="subcat-edit-id">
+<div class="form-group"><label>Nombre *</label><input type="text" id="subcat-nombre" placeholder="Ej: Cableado"></div>
+<div class="form-group"><label>Codigo (2 letras) *</label><input type="text" id="subcat-codigo" maxlength="2" placeholder="Ej: CA" style="text-transform:uppercase"></div>
+<div class="modal-actions">
+<button class="btn btn-outline" onclick="closeModal('modal-subcat')">Cancelar</button>
+<button class="btn btn-primary" onclick="saveSubcat()">Guardar</button>
 </div>
 </div>
 </div>
@@ -1735,6 +1753,7 @@ function aimKeyFor(k,id){return id?k+'#'+id:k;}
 let materials = JSON.parse(localStorage.getItem(aimKey('mat_data')) || '[]');
 let mediciones = JSON.parse(localStorage.getItem(aimKey('med_data')) || '[]');
 let matFilter = 'all';
+let matSubFilter = 'all';
 let empresas = JSON.parse(localStorage.getItem(aimKey('emp_data')) || '[]');
 let misEmpresas = JSON.parse(localStorage.getItem('mie_data') || '[]');
 let obras = JSON.parse(localStorage.getItem(aimKey('obras_data')) || '[]');
@@ -2440,6 +2459,53 @@ function getDefaultAlmacen(){return almacenes.find(a=>a.id===DEFAULT_ALMACEN_ID)
 function getAlmacenNombre(id){const a=almacenes.find(x=>x.id===id);return a?a.nombre:''}
 function catNameOf(c){return typeof c==='string'?c:(c&&c.nombre)}
 function catNames(){return categorias.map(catNameOf)}
+function normCat(c){
+if(typeof c==='string')return{nombre:c,codigo:'',subcategorias:[]};
+if(!c||typeof c!=='object')return{nombre:'',codigo:'',subcategorias:[]};
+return{nombre:c.nombre||'',codigo:(typeof c.codigo==='string'?c.codigo:''),subcategorias:Array.isArray(c.subcategorias)?c.subcategorias:[]};
+}
+function catOf(nombre){return categorias.find(function(c){return catNameOf(c)===nombre})}
+function catCode(nombre){const c=catOf(nombre);return c&&c.codigo?c.codigo:''}
+function catSubcats(nombre){const c=catOf(nombre);return c&&Array.isArray(c.subcategorias)?c.subcategorias:[]}
+function catSubNames(nombre){return catSubcats(nombre).map(function(s){return s.nombre})}
+function subcatOf(nombre,sub){return catSubcats(nombre).find(function(s){return s.nombre===sub})}
+function subcatCode(nombre,sub){const s=subcatOf(nombre,sub);return s&&s.codigo?s.codigo:''}
+function norm2Sel(id){const v=String(document.getElementById(id).value||'').trim().toUpperCase();if(!/^[A-Z]{2}$/.test(v))return '';return v}
+function matCodeFor(cat,sub,oldCode){
+const pre=(catCode(cat)||'')+(subcatCode(cat,sub)||'');
+if(pre.length<4)return '';
+let dig=String(oldCode||'').slice(-6);
+if(!/^[0-9]{6}$/.test(dig))dig=null;
+if(dig==null){
+let max=0;
+materials.forEach(function(m){
+if(m.categoria===cat&&m.subcategoria===sub&&/^[0-9]{6}$/.test(String(m.codigo||'').slice(-6))&&String(m.codigo)!==String(oldCode||'')){const n=parseInt(String(m.codigo).slice(-6),10);if(n>max)max=n;}
+});
+dig=String(max+1).padStart(6,'0');
+}
+return pre+dig;
+}
+function rebuildMatCodes(cat){
+materials.forEach(function(m){if(m.categoria===cat)m.codigo=matCodeFor(cat,m.subcategoria||'',m.codigo)});
+}
+function rebuildMatCodesSub(cat,sub){
+materials.forEach(function(m){if(m.categoria===cat&&m.subcategoria===sub)m.codigo=matCodeFor(cat,sub,m.codigo)});
+}
+function autoMatCodigo(force){
+const f=document.getElementById('mat-codigo');if(!f)return;
+const cur=String(f.value||'').toUpperCase();
+if(force||!cur||/^[A-Z]{4}[0-9]{6}$/.test(cur)){
+f.value=matCodeFor(document.getElementById('mat-categoria').value,document.getElementById('mat-subcategoria').value,'');
+}
+}
+function popMatSubcatSelect(keepVal){
+const sel=document.getElementById('mat-subcategoria');if(!sel)return;
+const cur=(keepVal!==undefined?keepVal:sel.value)||'';
+const cat=document.getElementById('mat-categoria').value;
+const subs=catSubNames(cat);
+sel.innerHTML=subs.length?subs.map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join(''):'<option value="">Sin subcategoria</option>';
+if(cur&&subs.indexOf(cur)>=0)sel.value=cur;
+}
 function popCatSelect(selectId,keepVal){
 const sel=document.getElementById(selectId);
 if(!sel)return;
@@ -3963,6 +4029,9 @@ document.getElementById('mat-edit-id').value='';
 document.getElementById('mat-modal-title').textContent='Nuevo Material';
 document.getElementById('mat-nombre').value='';
 popCatSelect('mat-categoria','Electricidad');
+popMatSubcatSelect();
+document.getElementById('mat-codigo').value='';
+autoMatCodigo(true);
 document.getElementById('mat-unidad').value='ud';
 document.getElementById('mat-desc').value='';
 document.getElementById('mat-coste').value='';
@@ -3982,6 +4051,8 @@ document.getElementById('mat-edit-id').value=id;
 document.getElementById('mat-modal-title').textContent='Editar Material';
 document.getElementById('mat-nombre').value=m.nombre;
 popCatSelect('mat-categoria',m.categoria||'Electricidad');
+popMatSubcatSelect(m.subcategoria||'');
+const cf=document.getElementById('mat-codigo');cf.value=m.codigo||'';autoMatCodigo(!m.codigo);
 document.getElementById('mat-unidad').value=m.unidad;
 document.getElementById('mat-desc').value=m.desc||'';
 document.getElementById('mat-coste').value=m.coste||'';
@@ -4118,7 +4189,11 @@ toast('Material importado desde la URL');
 function saveMaterial(){
 const nombre=document.getElementById('mat-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre');return}
-const data={nombre,categoria:document.getElementById('mat-categoria').value,unidad:document.getElementById('mat-unidad').value,desc:document.getElementById('mat-desc').value.trim(),img:document.getElementById('mat-img-data').value,coste:parseFloat(document.getElementById('mat-coste').value)||0,pvp:parseFloat(document.getElementById('mat-pvp').value)||0,incremento:parseFloat(document.getElementById('mat-incremento').value)||0};
+const categoria=document.getElementById('mat-categoria').value;
+const subcategoria=document.getElementById('mat-subcategoria').value;
+let codigo=document.getElementById('mat-codigo').value.trim().toUpperCase();
+if(!codigo)codigo=matCodeFor(categoria,subcategoria,'');
+const data={nombre,categoria,subcategoria,codigo,unidad:document.getElementById('mat-unidad').value,desc:document.getElementById('mat-desc').value.trim(),img:document.getElementById('mat-img-data').value,coste:parseFloat(document.getElementById('mat-coste').value)||0,pvp:parseFloat(document.getElementById('mat-pvp').value)||0,incremento:parseFloat(document.getElementById('mat-incremento').value)||0};
 const editId=document.getElementById('mat-edit-id').value;
 if(editId){const idx=materials.findIndex(x=>x.id===editId);materials[idx]={...materials[idx],...data}}
 else{data.id='m_'+Date.now();materials.push(data)}
@@ -4127,19 +4202,26 @@ save();closeModal('modal-material');renderMaterials();renderAlmacen();toast('Mat
 
 function renderCategorias(){
 document.getElementById('categorias-list').innerHTML=categorias.length?categorias.map(c=>{
-const nombre=catNameOf(c);
+const cat=normCat(c);
+const nombre=cat.nombre;
 const count=materials.filter(m=>m.categoria===nombre).length;
+const subs=cat.subcategorias.map(s=>{
+const cod=cat.codigo?s.codigo?cat.codigo+s.codigo:cat.codigo:s.codigo||'--';
+return`<span class="tag tag-${catTagClass(nombre)}" style="font-size:.7rem;margin:2px 4px 2px 0">${cod} ${s.nombre} <a href="#" onclick="event.preventDefault();editSubcat('${nombre}','${s.nombre}')" title="Editar subcategoria" style="color:inherit;margin-left:2px">&#9998;</a> <a href="#" onclick="event.preventDefault();deleteSubcat('${nombre}','${s.nombre}')" title="Eliminar subcategoria" style="color:#C62828">&#10005;</a></span>`;
+}).join('');
 return`<tr>
-<td><span class="tag tag-${catTagClass(nombre)}">${nombre}</span></td>
+<td><span class="tag tag-${catTagClass(nombre)}">${nombre}</span>${cat.codigo?'<br><code style="color:var(--text-light);font-size:.7rem">'+cat.codigo+'</code>':''}</td>
+<td>${subs?subs+'<br>':''}<button class="btn btn-outline" onclick="openSubcatModal('${nombre}')" style="padding:3px 8px;font-size:.7rem">+ Añadir subcategoria</button></td>
 <td>${count}</td>
 <td><button class="btn btn-warning" onclick="editCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCategoria('${nombre}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
-</tr>`}).join(''):'<tr><td colspan="3" style="text-align:center;padding:30px;color:var(--text-light)">No hay categorias</td></tr>';
+</tr>`}).join(''):'<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light)">No hay categorias</td></tr>';
 }
 
 function openCategoriaModal(){
 document.getElementById('cat-edit-id').value='';
 document.getElementById('cat-modal-title').textContent='Nueva Categoria';
 document.getElementById('cat-nombre').value='';
+document.getElementById('cat-codigo').value='';
 openModal('modal-categoria');
 }
 
@@ -4147,29 +4229,93 @@ function editCategoria(nombre){
 document.getElementById('cat-edit-id').value=nombre;
 document.getElementById('cat-modal-title').textContent='Editar Categoria';
 document.getElementById('cat-nombre').value=nombre;
+document.getElementById('cat-codigo').value=catCode(nombre)||'';
 openModal('modal-categoria');
 }
 
 function saveCategoria(){
 const nombre=document.getElementById('cat-nombre').value.trim();
 if(!nombre){alert('Introduce un nombre de categoria');return}
+const codigo=norm2Sel('cat-codigo');
+if(!codigo){alert('Introduce el codigo de 2 letras de la categoria');return}
 const editNombre=document.getElementById('cat-edit-id').value;
 if(editNombre&&editNombre!==nombre&&materials.some(m=>m.categoria===editNombre)){
 if(!confirm('Al renombrar, los materiales con la categoria "'+editNombre+'" se moveran a "'+nombre+'". Continuar?'))return;
 }
 if(editNombre){
+if(editNombre!==nombre&&categorias.some(c=>catNameOf(c)===nombre)){alert('Esa categoria ya existe');return}
+if(categorias.some(c=>{const cc=normCat(c);return cc.nombre!==editNombre&&cc.codigo===codigo})){alert('Ese codigo ya lo tiene otra categoria');return}
 const idx=categorias.findIndex(c=>catNameOf(c)===editNombre);
-if(idx>=0)categorias[idx]=(typeof categorias[idx]==='string'?nombre:{nombre});
+const old=normCat(categorias[idx]);
+categorias[idx]={nombre,codigo,subcategorias:old.subcategorias};
 if(editNombre!==nombre){
 materials.forEach(m=>{if(m.categoria===editNombre)m.categoria=nombre});
 [mediciones,presupuestos,facturas,compras,ventas,partes].forEach(docs=>docs.forEach(d=>{(d.lineas||[]).forEach(l=>{if(l.categoria===editNombre)l.categoria=nombre})}));
 }
+if(old.codigo!==codigo)rebuildMatCodes(nombre);
 }
 else{
 if(categorias.some(c=>catNameOf(c)===nombre)){alert('Esa categoria ya existe');return}
-categorias.push(nombre);
+if(categorias.some(c=>normCat(c).codigo===codigo)){alert('Ese codigo ya lo tiene otra categoria');return}
+categorias.push({nombre,codigo,subcategorias:[]});
 }
-save();closeModal('modal-categoria');renderCategorias();populateCategoriaSelects();toast('Categoria guardada');
+save();closeModal('modal-categoria');renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria guardada');
+}
+
+function openSubcatModal(parentNombre){
+const cat=catOf(parentNombre);if(!cat){alert('La categoria no existe');return}
+document.getElementById('subcat-edit-parent').value=parentNombre;
+document.getElementById('subcat-edit-id').value='';
+document.getElementById('subcat-modal-title').textContent='Nueva Subcategoria';
+document.getElementById('subcat-nombre').value='';
+document.getElementById('subcat-codigo').value='';
+openModal('modal-subcat');
+}
+
+function editSubcat(parentNombre,subname){
+const s=subcatOf(parentNombre,subname);if(!s)return;
+document.getElementById('subcat-edit-parent').value=parentNombre;
+document.getElementById('subcat-edit-id').value=subname;
+document.getElementById('subcat-modal-title').textContent='Editar Subcategoria '+subname;
+document.getElementById('subcat-nombre').value=s.nombre;
+document.getElementById('subcat-codigo').value=s.codigo||'';
+openModal('modal-subcat');
+}
+
+function saveSubcat(){
+const parent=document.getElementById('subcat-edit-parent').value;
+const cat=catOf(parent);if(!cat){alert('La categoria no existe');return}
+const nombre=document.getElementById('subcat-nombre').value.trim();
+if(!nombre){alert('Introduce un nombre de subcategoria');return}
+const codigo=norm2Sel('subcat-codigo');
+if(!codigo){alert('Introduce el codigo de 2 letras de la subcategoria');return}
+const editNombre=document.getElementById('subcat-edit-id').value;
+const subs=catSubcats(parent);
+if(subs.some(s=>s.nombre!==editNombre&&s.codigo===codigo)){alert('Ese codigo ya lo tiene otra subcategoria de '+parent);return}
+if(subs.some(s=>s.nombre===nombre&&s.nombre!==editNombre)){alert('Esa subcategoria ya existe en '+parent);return}
+if(editNombre){
+const oldCode=subcatCode(parent,editNombre);
+const s=subcatOf(parent,editNombre);
+if(s){s.nombre=nombre;s.codigo=codigo}
+if(editNombre!==nombre)materials.forEach(m=>{if(m.categoria===parent&&m.subcategoria===editNombre)m.subcategoria=nombre});
+if(editNombre!==nombre||oldCode!==codigo)rebuildMatCodesSub(parent,nombre);
+}
+else{
+if(!cat.subcategorias)cat.subcategorias=[];
+cat.subcategorias.push({nombre,codigo});
+}
+save();closeModal('modal-subcat');renderCategorias();renderMaterials();toast('Subcategoria guardada');
+}
+
+function deleteSubcat(parentNombre,subname){
+const count=materials.filter(m=>m.categoria===parentNombre&&m.subcategoria===subname).length;
+let msg='Eliminar la subcategoria "'+subname+'" de "'+parentNombre+'"';
+if(count>0){msg+='? '+count+' material(es) se quedaran sin subcategoria y sin codigo.';if(!confirm(msg))return}
+else{if(!confirm(msg+'?'))return}
+const cat=catOf(parentNombre);
+if(cat&&Array.isArray(cat.subcategorias))cat.subcategorias=cat.subcategorias.filter(s=>s.nombre!==subname);
+materials.forEach(m=>{if(m.categoria===parentNombre&&m.subcategoria===subname){m.subcategoria='';m.codigo=''}});
+save();renderCategorias();renderMaterials();toast('Subcategoria eliminada');
 }
 
 function deleteCategoria(nombre){
@@ -4178,7 +4324,7 @@ let msg='Eliminar la categoria "'+nombre+'"';
 if(count>0){msg+='? '+count+' material(es) usan esta categoria y se quedaran sin categoria.';if(!confirm(msg))return}
 else{if(!confirm(msg+'?'))return}
 categorias=categorias.filter(c=>catNameOf(c)!==nombre);
-materials.forEach(m=>{if(m.categoria===nombre)m.categoria=''});
+materials.forEach(m=>{if(m.categoria===nombre){m.categoria='';m.subcategoria='';m.codigo=''}});
 [mediciones,presupuestos,facturas,compras,ventas,partes].forEach(docs=>docs.forEach(d=>{(d.lineas||[]).forEach(l=>{if(l.categoria===nombre)l.categoria=''})}));
 save();renderCategorias();populateCategoriaSelects();renderMaterials();toast('Categoria eliminada');
 }
@@ -4236,17 +4382,25 @@ materials=materials.filter(x=>x.id!==id);
 save();renderMaterials();toast('Material eliminado');
 }
 
+function setMatFilter(f){matFilter=f;matSubFilter='all';renderMaterials()}
+function setMatSubFilter(s){matSubFilter=s;renderMaterials()}
+
 function renderMaterials(){
 const q=(document.getElementById('mat-search')?.value||'').toLowerCase();
-const list=materials.filter(m=>(matFilter==='all'||m.categoria===matFilter)&&(!q||m.nombre.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q)));
-document.getElementById('mat-filters').innerHTML=
-['all',...catNames()].map(f=>
-`<button class="chip ${matFilter===f?'active':''}" onclick="matFilter='${f}';renderMaterials()">${f==='all'?'Todas':f}</button>`).join('')+(q?` <span style="color:var(--text-light);font-size:.8rem;margin-left:8px">${list.length} resultado${list.length!==1?'s':''}</span>`:'');
+const list=materials.filter(m=>(matFilter==='all'||m.categoria===matFilter)&&(matSubFilter==='all'||m.subcategoria===matSubFilter)&&(!q||m.nombre.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q)||(m.subcategoria||'').toLowerCase().includes(q)||(m.codigo||'').toLowerCase().includes(q)));
+let chips=['all',...catNames()].map(f=>
+`<button class="chip ${matFilter===f?'active':''}" onclick="setMatFilter('${f}')">${f==='all'?'Todas':f}</button>`).join('');
+if(matFilter!=='all'){
+const subs=catSubNames(matFilter);
+if(subs.length)chips+='<span style="color:var(--text-light);margin:0 6px">|</span>'+subs.map(s=>
+`<button class="chip ${matSubFilter===s?'active':''}" onclick="setMatSubFilter('${s}')">${s}</button>`).join('');
+}
+document.getElementById('mat-filters').innerHTML=chips+(q?` <span style="color:var(--text-light);font-size:.8rem;margin-left:8px">${list.length} resultado${list.length!==1?'s':''}</span>`:'');
 document.getElementById('materials-list').innerHTML=list.length?list.map(m=>{
 const stock=computeStock()[m.id]||0;
 return`<tr>
-<td><div class="mat-name-cell"><img class="mat-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="mat-name-text"><strong>${m.nombre}</strong>${m.desc?'<br><small style="color:var(--text-light)">'+m.desc+'</small>':''}</div></div></td>
-<td><span class="tag tag-${catTagClass(m.categoria)}">${m.categoria}</span></td>
+<td><div class="mat-name-cell"><img class="mat-thumb" src="${getMaterialImg(m)}" loading="lazy"><div class="mat-name-text"><strong>${m.nombre}</strong>${m.codigo?'<br><code style="color:var(--primary-dark);font-size:.7rem">'+m.codigo+'</code>':''}${m.desc?'<br><small style="color:var(--text-light)">'+m.desc+'</small>':''}</div></div></td>
+<td><span class="tag tag-${catTagClass(m.categoria)}">${m.categoria}</span>${m.subcategoria?' &rarr; <span class="tag tag-'+catTagClass(m.subcategoria)+'" style="opacity:.8">'+m.subcategoria+'</span>':''}</td>
 <td>${m.unidad}</td>
 <td>${getMaterialCoste(m)>0?'<span style="color:var(--text-light)">'+fmtPrecio(getMaterialCoste(m))+' &euro;</span>':'<span style="color:var(--text-light)">-</span>'}</td>
 <td>${m.pvp>0?fmtPrecio(m.pvp)+' &euro;':'<span style="color:var(--text-light)">-</span>'}</td>
