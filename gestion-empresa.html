@@ -1650,6 +1650,16 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 </div>
 
+<div class="modal-overlay" id="modal-cuenta-ver">
+<div class="modal" style="max-width:600px">
+<h3 id="cv-title">Cuenta</h3>
+<div id="cv-head" style="font-size:.85rem;margin-bottom:10px"></div>
+<div style="max-height:340px;overflow:auto"><table><thead><tr><th>Fecha</th><th>Concepto</th><th>Debe</th><th>Haber</th></tr></thead><tbody id="cv-out"></tbody></table></div>
+<div id="cv-sum" style="margin-top:8px;font-size:.85rem"></div>
+<div class="modal-actions" style="margin-top:15px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="cv-editbtn" style="background:#F0FDF4;color:#166534">Editar</button><button class="btn" id="cv-delbtn" style="background:#FEF2F2;color:#b91c1c">Eliminar</button><button class="btn btn-outline" onclick="closeModal('modal-cuenta-ver')">Cerrar</button></div>
+</div>
+</div>
+
 <div class="modal-overlay" id="modal-imp-pgc">
 <div class="modal">
 <h3>&#128279; Importar Plan General Contable</h3>
@@ -6314,7 +6324,8 @@ document.getElementById('pcu-out').innerHTML=list.map(p=>{
 const s=sal[String(p.c)]?sal[String(p.c)].s:0;
 const tt=ctTipoAut(p.c);
 const tipos={anc:'Activo NC',ac:'Activo C',pnc:'Pasivo NC',pc:'Pasivo C',pn:'Patrimonio neto',g:'Gasto',i:'Ingreso'};
-return '<tr><td><strong>'+ctEsc(p.c)+'</strong></td><td>'+ctEsc(p.n||'')+'</td><td style="font-size:.8rem;color:var(--text-light)">'+tipos[tt]||tt+'</td><td>'+ctE(s)+'</td><td style="white-space:nowrap"><button class="btn btn-outline" style="padding:3px 8px;font-size:.75rem" onclick="editCuenta('+JSON.stringify(p.c).replace(/"/g,'&quot;')+')">Editar</button> <button class="btn btn-outline" style="padding:3px 8px;font-size:.75rem" onclick="deleteCuenta('+JSON.stringify(p.c).replace(/"/g,'&quot;')+')">Borrar</button></td></tr>';
+const jq=JSON.stringify(String(p.c)).replace(/"/g,'&quot;');
+return '<tr ondblclick="verCuenta('+jq+')"><td><strong><a href="javascript:void(0)" onclick="verCuenta('+jq+')" title="Abrir la cuenta">'+ctEsc(p.c)+'</a></strong></td><td>'+ctEsc(p.n||'')+'</td><td style="font-size:.8rem;color:var(--text-light)">'+(tipos[tt]||tt)+'</td><td>'+ctE(s)+'</td><td style="white-space:nowrap"><button class="btn btn-outline" style="padding:3px 8px;font-size:.75rem" onclick="verCuenta('+jq+')" title="Abrir la cuenta">Abrir</button> <button class="btn btn-outline" style="padding:3px 8px;font-size:.75rem" onclick="editCuenta('+jq+')" title="Modificar la cuenta">Editar</button> <button class="btn btn-danger" style="padding:3px 8px;font-size:.75rem" onclick="deleteCuenta('+jq+')" title="Eliminar la cuenta">&times;</button></td></tr>';
 }).join('');
 }
 function openCuentaModal(){
@@ -6356,6 +6367,26 @@ planCuentas=planCuentas.filter(x=>String(x.c)!==String(c));
 clientes.forEach(x=>{if(String(x.cta)===String(c))delete x.cta});
 proveedores.forEach(x=>{if(String(x.cta)===String(c))delete x.cta});
 save();renderPlanCuentas();renderClientes();renderProveedores();toast('Cuenta eliminada');
+}
+function verCuenta(c){
+const p=(planCuentas||[]).find(x=>String(x.c)===String(c));if(!p)return;
+const mov=(apuntes||[]).filter(a=>(a.lineas||[]).some(l=>String(l.c||'')===String(c))).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
+let totD=0,totH=0;
+const filas=mov.map(a=>{
+const l=(a.lineas||[]).find(x=>String(x.c||'')===String(c));
+const d=+l.d||0,h=+l.h||0;totD+=d;totH+=h;
+return '<tr><td>'+ctEsc(a.fecha||'-')+'</td><td>'+ctEsc(a.concepto||'')+'</td><td>'+(d?ctE(d):'-')+'</td><td>'+(h?ctE(h):'-')+'</td></tr>';
+}).join('');
+const sal=ctSaldos('0000-01-01','9999-12-31')[String(c)];
+const tipos={anc:'Activo NC',ac:'Activo C',pnc:'Pasivo NC',pc:'Pasivo C',pn:'Patrimonio neto',g:'Gasto',i:'Ingreso'};
+const tt=ctTipoAut(p.c);
+document.getElementById('cv-title').textContent='Abrir cuenta '+p.c;
+document.getElementById('cv-head').innerHTML='<strong>'+ctEsc(p.c)+'</strong> - '+ctEsc(p.n||'')+'<br>Tipo: '+(tipos[tt]||tt)+' | Saldo: '+ctE(sal?sal.s:0);
+document.getElementById('cv-out').innerHTML=mov.length?filas:'<tr><td colspan="4" style="color:var(--text-light)">Sin movimientos para esta cuenta.</td></tr>';
+document.getElementById('cv-sum').innerHTML='<strong>Totales:</strong> Debe '+ctE(totD)+' | Haber '+ctE(totH)+' | Saldo '+ctE(totD-totH);
+const cb=document.getElementById('cv-editbtn');cb.onclick=function(){closeModal('modal-cuenta-ver');editCuenta(p.c)};
+const db=document.getElementById('cv-delbtn');db.onclick=function(){closeModal('modal-cuenta-ver');deleteCuenta(p.c)};
+openModal('modal-cuenta-ver');
 }
 function openImportPgc(){
 document.getElementById('pgc-url').value='https://raw.githubusercontent.com/odoo/odoo/master/addons/l10n_es/data/template/account.account-es_common.csv';
