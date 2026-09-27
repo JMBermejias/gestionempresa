@@ -839,6 +839,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
 <input id="pcu-bus" type="text" placeholder="Buscar cuenta por codigo o nombre..." oninput="renderPlanCuentas()" style="flex:1;min-width:200px;padding:8px 12px;border:2px solid var(--border);border-radius:8px">
 <button class="btn btn-outline" onclick="openCuentaModal()">&#10133; Nueva cuenta</button>
+<button class="btn" style="background:#F0FDF4;color:#166534" onclick="generarPlanPymes()">&#128202; Regenerar PGC PYMES</button>
+<button class="btn btn-outline" onclick="vaciarPlanCuentas()" style="color:#b91c1c">&#128465; Vaciar plan de cuentas</button>
 <button class="btn" style="background:#EEF2FF;color:#3730a3" onclick="openImportPgc()">&#128279; Importar PGC de internet</button>
 <button class="btn btn-outline" onclick="document.getElementById('pgc-file').click()">&#128196; Importar desde CSV</button>
 <button class="btn btn-outline" onclick="exportPlanCuentas()">&#128190; Exportar CSV</button>
@@ -1762,6 +1764,614 @@ let contabilidad=JSON.parse(localStorage.getItem(aimKey('cta_data'))||'null');
 let asientoCounter=parseInt(localStorage.getItem(aimKey('aso_counter'))||'0');
 const PGC_DEFAULT=[{c:'100',n:'Capital social'},{c:'102',n:'Capital'},{c:'103',n:'Socios por desembolsos no exigidos'},{c:'104',n:'Socios por aportaciones no dinerarias pendientes'},{c:'110',n:'Prima de emision o asuncion'},{c:'111',n:'Reservas de capitalizacion'},{c:'112',n:'Reserva legal'},{c:'113',n:'Reservas voluntarias'},{c:'114',n:'Reservas especiales'},{c:'118',n:'Aportaciones de socios o propietarios'},{c:'120',n:'Remanente'},{c:'121',n:'Resultados negativos de ejercicios anteriores'},{c:'129',n:'Resultado del ejercicio'},{c:'130',n:'Subvenciones oficiales de capital'},{c:'131',n:'Donaciones y legados de capital'},{c:'132',n:'Otras subvenciones, donaciones y legados'},{c:'137',n:'Activos por impuesto diferido'},{c:'140',n:'Provision para retribuciones a largo plazo'},{c:'141',n:'Provision para impuestos'},{c:'142',n:'Provision para otras responsabilidades'},{c:'143',n:'Provision por desmantelamiento, retiro o rehabilitacion'},{c:'145',n:'Provision para actuaciones medioambientales'},{c:'146',n:'Provision para reestructuraciones'},{c:'150',n:'Deudas a largo plazo con entidades de credito'},{c:'151',n:'Deudas a largo plazo'},{c:'153',n:'Deudas a largo plazo con empresas del grupo y asociadas'},{c:'160',n:'Proveedores de inmovilizado a largo plazo'},{c:'161',n:'Proveedores, empresas del grupo y asociadas, a largo plazo'},{c:'163',n:'Efectos a pagar a largo plazo'},{c:'170',n:'Deudas a largo plazo con entidades de credito'},{c:'171',n:'Deudas a largo plazo'},{c:'173',n:'Proveedores de inmovilizado a largo plazo'},{c:'174',n:'Proveedores, empresas del grupo y asociadas, a largo plazo'},{c:'175',n:'Efectos a pagar a largo plazo'},{c:'177',n:'Obligaciones y bonos a largo plazo'},{c:'200',n:'Investigacion y desarrollo'},{c:'201',n:'Desarrollo'},{c:'202',n:'Concesiones administrativas'},{c:'203',n:'Propiedad industrial'},{c:'205',n:'Derechos de traspaso'},{c:'206',n:'Aplicaciones informaticas'},{c:'209',n:'Anticipos para inmovilizaciones intangibles'},{c:'210',n:'Terrenos y bienes naturales'},{c:'211',n:'Construcciones'},{c:'212',n:'Instalaciones tecnicas'},{c:'213',n:'Maquinaria'},{c:'214',n:'Utillaje'},{c:'215',n:'Otras instalaciones'},{c:'216',n:'Mobiliario'},{c:'217',n:'Equipos para procesos de informacion'},{c:'218',n:'Elementos de transporte'},{c:'219',n:'Otro inmovilizado material'},{c:'220',n:'Inversiones inmobiliarias en terrenos'},{c:'221',n:'Inversiones inmobiliarias en construcciones'},{c:'250',n:'Inversiones financieras a largo plazo en instrumentos de patrimonio'},{c:'251',n:'Valores representativos de deuda a largo plazo'},{c:'258',n:'Inversiones a largo plazo en empresas del grupo y asociadas'},{c:'260',n:'Fianzas constituidas a largo plazo'},{c:'280',n:'Amortizacion acumulada del inmovilizado intangible'},{c:'281',n:'Amortizacion acumulada del inmovilizado material'},{c:'285',n:'Amortizacion acumulada de inversiones inmobiliarias'},{c:'290',n:'Deterioro de valor del inmovilizado intangible'},{c:'291',n:'Deterioro de valor del inmovilizado material'},{c:'300',n:'Mercaderias'},{c:'310',n:'Materias primas'},{c:'320',n:'Elementos y conjuntos incorporables'},{c:'321',n:'Combustibles'},{c:'330',n:'Productos en curso'},{c:'350',n:'Productos terminados'},{c:'360',n:'Subproductos, residuos y materiales recuperados'},{c:'400',n:'Proveedores'},{c:'401',n:'Proveedores, empresas del grupo y asociadas'},{c:'403',n:'Proveedores, empresas asociadas'},{c:'405',n:'Acreedores por prestaciones de servicios'},{c:'410',n:'Acreedores por prestaciones de servicios'},{c:'411',n:'Acreedores, empresas del grupo y asociadas'},{c:'430',n:'Clientes'},{c:'431',n:'Clientes, empresas del grupo y asociadas'},{c:'433',n:'Clientes, empresas asociadas'},{c:'436',n:'Clientes de dudoso cobro'},{c:'438',n:'Anticipos de clientes'},{c:'440',n:'Deudores'},{c:'441',n:'Deudores, empresas del grupo y asociadas'},{c:'445',n:'Acreedores por enajenacion de activos no corrientes'},{c:'446',n:'Accionistas por desembolsos exigidos'},{c:'460',n:'Anticipos de remuneraciones'},{c:'465',n:'Remuneraciones pendientes de pago'},{c:'470',n:'Hacienda Publica, deudora por diversos conceptos'},{c:'471',n:'Organismos de la Seguridad Social, deudores'},{c:'472',n:'Hacienda Publica, IVA soportado'},{c:'473',n:'Hacienda Publica, retenciones y pagos a cuenta'},{c:'474',n:'Activos por impuesto diferido'},{c:'475',n:'Hacienda Publica, acreedora por conceptos fiscales'},{c:'4750',n:'Hacienda Publica, acreedora por IVA'},{c:'4751',n:'Hacienda Publica, acreedora por retenciones practicadas'},{c:'476',n:'Organismos de la Seguridad Social, acreedores'},{c:'477',n:'Hacienda Publica, IVA repercutido'},{c:'480',n:'Gastos anticipados'},{c:'485',n:'Ingresos anticipados'},{c:'490',n:'Deterioro de valor de creditos por operaciones comerciales'},{c:'500',n:'Emprestitos y otras emisiones, a corto plazo'},{c:'520',n:'Deudas a corto plazo con entidades de credito'},{c:'521',n:'Deudas a corto plazo'},{c:'523',n:'Proveedores de inmovilizado a corto plazo'},{c:'524',n:'Proveedores, empresas del grupo y asociadas, a corto plazo'},{c:'525',n:'Efectos a pagar a corto plazo'},{c:'527',n:'Intereses a corto plazo de deudas con entidades de credito'},{c:'529',n:'Provisiones a corto plazo'},{c:'550',n:'Titular de la explotacion'},{c:'551',n:'Cuenta corriente con socios y administradores'},{c:'552',n:'Cuenta corriente con otras personas y entidades vinculadas'},{c:'555',n:'Partidas pendientes de aplicacion'},{c:'570',n:'Caja, euros'},{c:'572',n:'Bancos e instituciones de credito c/c vista, euros'},{c:'573',n:'Bancos e instituciones de credito c/c vista, moneda extranjera'},{c:'574',n:'Bancos e instituciones de credito, cuentas de ahorro'},{c:'560',n:'Fianzas recibidas a corto plazo'},{c:'561',n:'Depositos recibidos a corto plazo'},{c:'590',n:'Ajustes por valoracion de inversiones financieras a corto plazo'},{c:'598',n:'Deterioro de valor de participaciones a corto plazo en empresas del grupo'},{c:'600',n:'Compras de mercaderias'},{c:'601',n:'Compras de materias primas'},{c:'602',n:'Compras de otros aprovisionamientos'},{c:'606',n:'Descuentos sobre compras por pronto pago'},{c:'607',n:'Trabajos realizados por otras empresas'},{c:'608',n:'Devoluciones de compras y operaciones similares'},{c:'610',n:'Variacion de existencias de mercaderias'},{c:'611',n:'Variacion de existencias de materias primas'},{c:'612',n:'Variacion de existencias de otros aprovisionamientos'},{c:'620',n:'Gastos en investigacion y desarrollo'},{c:'621',n:'Arrendamientos y canones'},{c:'622',n:'Reparaciones y conservacion'},{c:'623',n:'Servicios de profesionales independientes'},{c:'624',n:'Transportes'},{c:'625',n:'Primas de seguros'},{c:'626',n:'Servicios bancarios y similares'},{c:'627',n:'Publicidad, propaganda y relaciones publicas'},{c:'628',n:'Suministros'},{c:'629',n:'Otros servicios exteriores'},{c:'630',n:'Impuesto sobre beneficios'},{c:'631',n:'Otros tributos'},{c:'636',n:'Impuesto sobre beneficios diferido'},{c:'640',n:'Sueldos y salarios'},{c:'641',n:'Indemnizaciones'},{c:'642',n:'Seguridad Social a cargo de la empresa'},{c:'644',n:'Retribuciones a largo plazo mediante sistemas de prestaciones definidas'},{c:'649',n:'Otros gastos sociales'},{c:'651',n:'Resultados de operaciones en comun'},{c:'652',n:'Otros gastos de gestion'},{c:'659',n:'Otras perdidas en gestion corriente'},{c:'660',n:'Gastos financieros por actualizacion de provisiones'},{c:'661',n:'Intereses de obligaciones y bonos'},{c:'662',n:'Intereses de deudas'},{c:'665',n:'Gastos por intereses de descuento de efectos'},{c:'666',n:'Perdidas en valores negociables y otros instrumentos financieros'},{c:'667',n:'Perdidas por diferencias de cambio'},{c:'669',n:'Otros gastos financieros'},{c:'671',n:'Perdidas procedentes del inmovilizado intangible'},{c:'672',n:'Perdidas procedentes del inmovilizado material'},{c:'678',n:'Gastos excepcionales'},{c:'681',n:'Amortizacion del inmovilizado material'},{c:'682',n:'Amortizacion del inmovilizado intangible'},{c:'690',n:'Perdidas por deterioro del inmovilizado intangible'},{c:'691',n:'Perdidas por deterioro del inmovilizado material'},{c:'694',n:'Perdidas por deterioro de creditos por operaciones comerciales'},{c:'700',n:'Ventas de mercaderias'},{c:'701',n:'Ventas de productos terminados'},{c:'702',n:'Ventas de productos semiterminados'},{c:'705',n:'Prestaciones de servicios'},{c:'706',n:'Descuentos sobre ventas por pronto pago'},{c:'708',n:'Devoluciones de ventas y operaciones similares'},{c:'711',n:'Variacion de existencias de productos terminados'},{c:'731',n:'Trabajos realizados para el inmovilizado material'},{c:'740',n:'Subvenciones a la explotacion'},{c:'752',n:'Ingresos por arrendamientos'},{c:'754',n:'Ingresos por comisiones'},{c:'759',n:'Ingresos por servicios diversos'},{c:'760',n:'Ingresos de participaciones en instrumentos de patrimonio'},{c:'761',n:'Ingresos de valores representativos de deuda'},{c:'762',n:'Ingresos de creditos'},{c:'764',n:'Ingresos de valores negociables y otros instrumentos financieros'},{c:'765',n:'Beneficios por diferencias de cambio'},{c:'769',n:'Otros ingresos financieros'},{c:'771',n:'Beneficios procedentes del inmovilizado intangible'},{c:'772',n:'Beneficios procedentes del inmovilizado material'},{c:'778',n:'Ingresos excepcionales'},{c:'791',n:'Exceso de provision y de perdidas por deterioro'},{c:'794',n:'Reversion del deterioro de creditos por operaciones comerciales'},{c:'828',n:'Ingresos imputados al patrimonio neto'},{c:'920',n:'Ingresos imputados al patrimonio neto'}];
 const CT_DEFAULT={ivaCompra:21,ivaVenta:21,cCompra:'600',cVenta:'700',cProveedor:'400',cCliente:'430',cIvaSop:'472',cIvaRep:'477',cGasto:'629',cIngreso:'759',cTesoro:'572',irpfPct:20,isPct:25,prev:{}};
+const PGC_PYMES=[{"c": "101", "n": "Fondo social"},
+{"c": "102", "n": "Capital"},
+{"c": "108", "n": "Acciones o participaciones propias en situaciones especiales"},
+{"c": "109", "n": "Acciones o participaciones propias para reducción de capital"},
+{"c": "110", "n": "Prima de emisión o asunción"},
+{"c": "115", "n": "Reservas por pérdidas y ganancias actuariales y otros ajustes"},
+{"c": "118", "n": "Aportaciones de socios o propietarios"},
+{"c": "119", "n": "Diferencias por ajuste del capital a euros"},
+{"c": "131", "n": "Donaciones y legados de capital"},
+{"c": "141", "n": "Provisión para impuestos"},
+{"c": "142", "n": "Provisión para otras responsabilidades"},
+{"c": "143", "n": "Provisión por desmantelamiento, retiro o rehabilitación del inmovilizado"},
+{"c": "145", "n": "Provisión para actuaciones medioambientales"},
+{"c": "170", "n": "Deudas con entidades de crédito"},
+{"c": "172", "n": "Deudas transformables en subvenciones, donaciones y legados"},
+{"c": "173", "n": "Proveedores de inmovilizado"},
+{"c": "174", "n": "Acreedores por arrendamiento financiero"},
+{"c": "175", "n": "Efectos a pagar"},
+{"c": "176", "n": "Pasivos por derivados financieros"},
+{"c": "177", "n": "Obligaciones y bonos"},
+{"c": "178", "n": "Obligaciones y bonos convertibles"},
+{"c": "179", "n": "Deudas representadas en otros valores negociables"},
+{"c": "180", "n": "Fianzas recibidas"},
+{"c": "181", "n": "Anticipos recibidos por ventas o prestaciones de servicios"},
+{"c": "185", "n": "Depósitos recibidos"},
+{"c": "189", "n": "Garantías financieras"},
+{"c": "190", "n": "Acciones o participaciones emitidas"},
+{"c": "192", "n": "Suscriptores de acciones"},
+{"c": "194", "n": "Capital emitido pendiente de inscripción"},
+{"c": "195", "n": "Acciones o participaciones emitidas consideradas como pasivos financieros"},
+{"c": "197", "n": "Suscriptores de acciones consideradas como pasivos financieros"},
+{"c": "199", "n": "Acciones o participaciones emitidas consideradas como pasivos financieros pendientes de inscripción"},
+{"c": "200", "n": "Investigación"},
+{"c": "201", "n": "Desarrollo"},
+{"c": "202", "n": "Concesiones administrativas"},
+{"c": "203", "n": "Propiedad industrial"},
+{"c": "205", "n": "Derechos de traspaso"},
+{"c": "206", "n": "Aplicaciones informáticas"},
+{"c": "209", "n": "Anticipos para inmovilizaciones intangibles"},
+{"c": "210", "n": "Terrenos y bienes naturales"},
+{"c": "211", "n": "Construcciones"},
+{"c": "212", "n": "Instalaciones técnicas"},
+{"c": "213", "n": "Maquinaria"},
+{"c": "214", "n": "Utillaje"},
+{"c": "215", "n": "Otras instalaciones"},
+{"c": "216", "n": "Mobiliario"},
+{"c": "217", "n": "Equipos para proceso de información"},
+{"c": "218", "n": "Elementos de transporte"},
+{"c": "219", "n": "Otro inmovilizado material"},
+{"c": "220", "n": "Inversiones en terrenos y bienes naturales"},
+{"c": "221", "n": "Inversiones en construcciones"},
+{"c": "230", "n": "Adaptación de terrenos y bienes naturales"},
+{"c": "231", "n": "Construcciones en curso"},
+{"c": "232", "n": "Instalaciones técnicas en montaje"},
+{"c": "233", "n": "Maquinaria en montaje"},
+{"c": "237", "n": "Equipos para procesos de información en montaje"},
+{"c": "239", "n": "Anticipos para inmovilizaciones materiales"},
+{"c": "250", "n": "Acciones de otras empresas"},
+{"c": "251", "n": "Bonos a largo plazo"},
+{"c": "252", "n": "Préstamos a largo plazo"},
+{"c": "253", "n": "Préstamos a largo plazo provenientes de ventas de activos fijos"},
+{"c": "254", "n": "Préstamos a largo plazo a empleados"},
+{"c": "258", "n": "Depósitos fijos a largo plazoo"},
+{"c": "259", "n": "Capital exigido no pagado"},
+{"c": "260", "n": "Se otorgan garantías a largo plazo"},
+{"c": "265", "n": "Depósitos a largo plazo realizados"},
+{"c": "282", "n": "Depreciación de propiedades de inversión"},
+{"c": "296", "n": "Deterioro de  valor de participaciones en el patrimonio neto a largo plazo"},
+{"c": "297", "n": "Deterioro de valor de valores representativos de deuda"},
+{"c": "298", "n": "Deterioro de valor de créditos"},
+{"c": "300", "n": "Mercaderías A"},
+{"c": "301", "n": "Mercaderías B"},
+{"c": "310", "n": "Materias primas A"},
+{"c": "311", "n": "Materias primas B"},
+{"c": "320", "n": "Elementos y conjuntos incorporables"},
+{"c": "321", "n": "Combustibles"},
+{"c": "322", "n": "Repuestos"},
+{"c": "325", "n": "Materiales diversos"},
+{"c": "326", "n": "Embalajes"},
+{"c": "327", "n": "Envases"},
+{"c": "328", "n": "Material de oficina"},
+{"c": "330", "n": "Productos en curso A"},
+{"c": "331", "n": "Productos en curso B"},
+{"c": "340", "n": "Productos semiterminados A"},
+{"c": "341", "n": "Productos semiterminados B"},
+{"c": "350", "n": "Productos terminados A"},
+{"c": "351", "n": "Productos terminados B"},
+{"c": "360", "n": "Subproductos A"},
+{"c": "361", "n": "Subproductos B"},
+{"c": "365", "n": "Residuos A"},
+{"c": "366", "n": "Residuos B"},
+{"c": "368", "n": "Materiales recuperados A"},
+{"c": "369", "n": "Materiales recuperados B"},
+{"c": "390", "n": "Deterioro de valor de las mercaderías"},
+{"c": "391", "n": "Deterioro de valor de las materias primas"},
+{"c": "392", "n": "Deterioro de valor de otros aprovisionamientos"},
+{"c": "393", "n": "Deterioro de valor de los productos en curso"},
+{"c": "394", "n": "Deterioro de valor de los productos semiterminados"},
+{"c": "395", "n": "Deterioro de valor de los productos terminados"},
+{"c": "396", "n": "Deterioro de valor de los subproductos, residuos y materiales recuperados"},
+{"c": "401", "n": "Proveedores, efectos comerciales a pagar"},
+{"c": "404", "n": "Proveedores, empresas asociadas"},
+{"c": "405", "n": "Proveedores, otras partes vinculadas"},
+{"c": "406", "n": "Envases y embalajes a devolver a proveedores"},
+{"c": "407", "n": "Anticipos a proveedores"},
+{"c": "411", "n": "Acreedores, efectos comerciales a pagar"},
+{"c": "419", "n": "Acreedores por operaciones en común"},
+{"c": "432", "n": "Clientes, operaciones de factoring"},
+{"c": "434", "n": "Clientes, empresas asociadas"},
+{"c": "435", "n": "Clientes, otras partes vinculadas"},
+{"c": "436", "n": "Clientes de dudoso cobro"},
+{"c": "437", "n": "Envases y embalajes a devolver por clientes"},
+{"c": "438", "n": "Anticipos de clientes"},
+{"c": "446", "n": "Deudores de dudoso cobro"},
+{"c": "449", "n": "Deudores por operaciones en común"},
+{"c": "460", "n": "Anticipos de remuneraciones"},
+{"c": "465", "n": "Remuneraciones pendientes de pago"},
+{"c": "471", "n": "Organismos de la Seguridad Social, deudores"},
+{"c": "472", "n": "Hacienda Pública. IVA soportado"},
+{"c": "473", "n": "Hacienda Pública, retenciones y pagos a cuenta"},
+{"c": "476", "n": "Organismos de la Seguridad Social, acreedores"},
+{"c": "477", "n": "Hacienda Pública. IVA repercutido"},
+{"c": "479", "n": "Pasivos por diferencias temporarias imponibles"},
+{"c": "480", "n": "Gastos anticipados"},
+{"c": "485", "n": "Ingresos anticipados"},
+{"c": "500", "n": "Obligaciones y bonos a corto plazo"},
+{"c": "505", "n": "Deudas representadas en otros valores negociables a corto plazo"},
+{"c": "506", "n": "Intereses a corto plazo de empréstitos y otras emisiones análogas"},
+{"c": "507", "n": "Dividendos de acciones o participaciones consideradas como pasivos financieros"},
+{"c": "522", "n": "Deudas a corto plazo transformables en subvenciones, donaciones y legados"},
+{"c": "523", "n": "Proveedores de inmovilizado a corto plazo"},
+{"c": "524", "n": "Acreedores por arrendamiento financiero a corto plazo"},
+{"c": "525", "n": "Efectos a pagar a corto plazo"},
+{"c": "527", "n": "Intereses a corto plazo de deudas con entidades de crédito"},
+{"c": "528", "n": "Intereses a corto plazo de deudas"},
+{"c": "540", "n": "Inversiones financieras a corto plazo en instrumentos de patrimonio"},
+{"c": "541", "n": "Valores representativos de deuda a corto plazo"},
+{"c": "542", "n": "Créditos a corto plazo"},
+{"c": "543", "n": "Créditos a corto plazo por enajenación de inmovilizado"},
+{"c": "544", "n": "Créditos a corto plazo al personal"},
+{"c": "545", "n": "Dividendo a cobrar"},
+{"c": "546", "n": "Intereses a corto plazo de valores representativos de deudas"},
+{"c": "547", "n": "Intereses a corto plazo de créditos"},
+{"c": "548", "n": "Imposiciones a corto plazo"},
+{"c": "549", "n": "Desembolsos pendientes sobre participaciones en el patrimonio neto a corto plazo"},
+{"c": "550", "n": "Titular de la explotación"},
+{"c": "554", "n": "Cuenta corriente con uniones temporales de empresas y comunidades de bienes"},
+{"c": "555", "n": "Partidas pendientes de aplicación"},
+{"c": "557", "n": "Dividendo activo a cuenta"},
+{"c": "560", "n": "Fianzas recibidas a corto plazo"},
+{"c": "561", "n": "Depósitos recibidos a corto plazo"},
+{"c": "565", "n": "Fianzas constituidas a corto plazo"},
+{"c": "566", "n": "Depósitos constituidos a corto plazo"},
+{"c": "567", "n": "Intereses pagados por anticipado"},
+{"c": "568", "n": "Intereses cobrados por anticipado"},
+{"c": "570", "n": "Caja, euros"},
+{"c": "571", "n": "Caja, moneda extranjera"},
+{"c": "572", "n": "Bancos e instituciones de crédito c/c vista, euros"},
+{"c": "573", "n": "Bancos e instituciones de crédito c/c vista, moneda extranjera"},
+{"c": "574", "n": "Bancos e instituciones de crédito, cuentas de ahorro, euros"},
+{"c": "575", "n": "Bancos e instituciones de crédito, cuentas de ahorro, moneda extranjera"},
+{"c": "576", "n": "Inversiones a corto plazo de gran liquidez"},
+{"c": "596", "n": "Deterioro de valor de participaciones a corto plazo"},
+{"c": "597", "n": "Deterioro de valor de valores representativos de deuda a corto plazo"},
+{"c": "598", "n": "Deterioro de valor de créditos a corto plazo"},
+{"c": "600", "n": "Compras de mercaderías"},
+{"c": "601", "n": "Compras de materias primas"},
+{"c": "602", "n": "Compras de otros aprovisionamientos"},
+{"c": "607", "n": "Trabajos realizados por otras empresas"},
+{"c": "610", "n": "Variación de existencias de mercaderías"},
+{"c": "611", "n": "Variación de existencias de materias primas"},
+{"c": "612", "n": "Variación de existencias de otros aprovisionamientos"},
+{"c": "620", "n": "Gastos en investigación y desarrollo del ejercicio"},
+{"c": "621", "n": "Arrendamientos y cánones"},
+{"c": "622", "n": "Reparaciones y conservación"},
+{"c": "623", "n": "Servicios de profesionales independientes"},
+{"c": "624", "n": "Transportes"},
+{"c": "625", "n": "Primas de seguros"},
+{"c": "626", "n": "Servicios bancarios y similares"},
+{"c": "627", "n": "Publicidad, propaganda y relaciones públicas"},
+{"c": "628", "n": "Suministros"},
+{"c": "629", "n": "Otros servicios"},
+{"c": "631", "n": "Otros tributos"},
+{"c": "633", "n": "Ajustes negativos en la imposición sobre beneficios"},
+{"c": "636", "n": "Devolución de impuestos"},
+{"c": "638", "n": "Ajustes positivos en la imposición sobre beneficios"},
+{"c": "640", "n": "Sueldos y salarios"},
+{"c": "641", "n": "Indemnizaciones"},
+{"c": "642", "n": "Seguridad Social a cargo de la empresa"},
+{"c": "649", "n": "Otros gastos sociales"},
+{"c": "650", "n": "Pérdidas de créditos comerciales incobrables"},
+{"c": "659", "n": "Otras pérdidas en gestión corriente"},
+{"c": "660", "n": "Gastos financieros por actualización de provisiones"},
+{"c": "668", "n": "Diferencias negativas de cambio"},
+{"c": "669", "n": "Otros gastos financieros"},
+{"c": "670", "n": "Pérdidas procedentes del inmovilizado intangible"},
+{"c": "672", "n": "Pérdidas procedentes de las inversiones inmobiliarias"},
+{"c": "675", "n": "Pérdidas por operaciones con obligaciones propias"},
+{"c": "678", "n": "Gastos excepcionales"},
+{"c": "680", "n": "Amortización del inmovilizado intangible"},
+{"c": "681", "n": "Amortización del inmovilizado material"},
+{"c": "682", "n": "Amortización de las inversiones inmobiliarias"},
+{"c": "690", "n": "Pérdidas por deterioro del inmovilizado intangible"},
+{"c": "692", "n": "Pérdidas por deterioro de las inversiones inmobiliarias"},
+{"c": "710", "n": "Variación de existencias de productos en curso"},
+{"c": "711", "n": "Variación de existencias de productos semiterminados"},
+{"c": "712", "n": "Variación de existencias de productos terminados"},
+{"c": "713", "n": "Variación de existencias de subproductos, residuos y materiales recuperados"},
+{"c": "730", "n": "Trabajos realizados para el inmovilizado intangible"},
+{"c": "731", "n": "Trabajos realizados para el inmovilizado material"},
+{"c": "732", "n": "Trabajos realizados en inversiones inmobiliarias"},
+{"c": "733", "n": "Trabajos realizados para el inmovilizado material en curso"},
+{"c": "740", "n": "Subvenciones, donaciones y legados a la explotación"},
+{"c": "746", "n": "Subvenciones, donaciones y legados de capital transferidos al resultado del ejercicio de carácter no financiero"},
+{"c": "747", "n": "Otras subvenciones, donaciones y legados transferidos al resultado del ejercicio"},
+{"c": "752", "n": "Ingresos por arrendamientos"},
+{"c": "753", "n": "Ingresos de propiedad industrial cedida en explotación"},
+{"c": "754", "n": "Ingresos por comisiones"},
+{"c": "755", "n": "Ingresos por servicios al personal"},
+{"c": "759", "n": "Ingresos por servicios diversos"},
+{"c": "768", "n": "Diferencias positivas de cambio"},
+{"c": "769", "n": "Otros ingresos financieros"},
+{"c": "770", "n": "Beneficios procedentes del inmovilizado intangible"},
+{"c": "771", "n": "Beneficios procedentes del inmovilizado material"},
+{"c": "772", "n": "Beneficios procedentes de las inversiones inmobiliarias"},
+{"c": "775", "n": "Beneficos por operaciones con obligaciones propias"},
+{"c": "778", "n": "Ingresos excepcionales"},
+{"c": "790", "n": "Reversión del deterioro del inmovilizado intangible"},
+{"c": "792", "n": "Reversión del deterioro de las inversiones inmobiliarias"},
+{"c": "1140", "n": "Reservas para acciones o participaciones de la sociedad dominante"},
+{"c": "1141", "n": "Reservas estatutarias"},
+{"c": "1142", "n": "Reserva por capital amortizado"},
+{"c": "1144", "n": "Reservas por acciones propias aceptadas en garantía"},
+{"c": "1370", "n": "Ingresos fiscales por diferencias permanentes a distribuir en varios ejercicios"},
+{"c": "1371", "n": "Ingresos fiscales por deducciones y bonificaciones a distribuir en varios ejercicios"},
+{"c": "1533", "n": "Desembolsos no exigidos, empresas del grupo"},
+{"c": "1534", "n": "Desembolsos no exigidos, empresas asociadas"},
+{"c": "1535", "n": "Desembolsos no exigidos, otras partes vinculadas"},
+{"c": "1536", "n": "Otros desembolsos no exigidos"},
+{"c": "1543", "n": "Aportaciones no dinerarias pendientes, empresas del grupo"},
+{"c": "1544", "n": "Aportaciones no dinerarias pendientes, empresas asociadas"},
+{"c": "1545", "n": "Aportaciones no dinerarias pendientes, otras partes vinculadas"},
+{"c": "1546", "n": "Otras aportaciones no dinerarias pendientes"},
+{"c": "1603", "n": "Deudas con entidades de crédito vinculadas, empresas del grupo"},
+{"c": "1604", "n": "Deudas con entidades de crédito vinculadas, empresas asociadas"},
+{"c": "1605", "n": "Deudas con otras entidades de crédito vinculadas"},
+{"c": "1613", "n": "Proveedores de inmovilizado, empresas del grupo"},
+{"c": "1614", "n": "Proveedores de inmovilizado, empresas asociadas"},
+{"c": "1615", "n": "Proveedores de inmovilizado, otras partes vinculadas"},
+{"c": "1623", "n": "Acreedores por arrendamiento financiero, empresas de grupo"},
+{"c": "1624", "n": "Acreedores por arrendamiento financiero, empresas asociadas"},
+{"c": "1625", "n": "Acreedores por arrendamiento financiero, otras partes vinculadas"},
+{"c": "1633", "n": "Otras deudas, empresas del grupo"},
+{"c": "1634", "n": "Otras deudas, empresas asociadas"},
+{"c": "1635", "n": "Otras deudas, con otras partes vinculadas"},
+{"c": "2405", "n": "Participaciones en otras partes vinculadas"},
+{"c": "2413", "n": "Valores representativos de deuda de empresas del grupo"},
+{"c": "2414", "n": "Valores representativos de deuda de empresas asociadas"},
+{"c": "2415", "n": "Valores representativos de deuda de otras partes vinculadas"},
+{"c": "2423", "n": "Créditos a empresas del grupo"},
+{"c": "2424", "n": "Créditos a empresas asociadas"},
+{"c": "2425", "n": "Créditos a otras partes vinculadas"},
+{"c": "2495", "n": "Desembolsos pendientes sobre participaciones en otras partes vinculadas"},
+{"c": "2800", "n": "Amortización de la investigación"},
+{"c": "2801", "n": "Amortización del desarrollo"},
+{"c": "2802", "n": "Amortización de concesiones administrativas"},
+{"c": "2803", "n": "Amortización de la propiedad industrial"},
+{"c": "2805", "n": "Amortización de arrendamientos"},
+{"c": "2806", "n": "Amortización de programas informáticos"},
+{"c": "2811", "n": "Depreciación de edificios"},
+{"c": "2812", "n": "Depreciación de instalaciones técnicas"},
+{"c": "2813", "n": "Depreciación de maquinaria"},
+{"c": "2814", "n": "Depreciación de equipos"},
+{"c": "2815", "n": "Depreciación de otras instalaciones"},
+{"c": "2816", "n": "Depreciación de los muebles"},
+{"c": "2817", "n": "Depreciación de equipos de tecnología de la información"},
+{"c": "2818", "n": "Depreciación de vehículos de motor"},
+{"c": "2819", "n": "Depreciación de otras propiedades, planta y equipo"},
+{"c": "2900", "n": "Deterioro del valor de investigación"},
+{"c": "2901", "n": "Deterioro del valor de desarrollo"},
+{"c": "2902", "n": "Deterioro del valor de concesiones administrativas"},
+{"c": "2903", "n": "Deterioro del valor de propiedad industrial"},
+{"c": "2905", "n": "Deterioro del valor de derechos de traspaso"},
+{"c": "2906", "n": "Deterioro del valor de aplicaciones informáticas"},
+{"c": "2910", "n": "Deterioro de valor de terrenos y bienes naturales"},
+{"c": "2911", "n": "Deterioro de valor de construcciones"},
+{"c": "2912", "n": "Deterioro de valor de instalaciones técnicas"},
+{"c": "2913", "n": "Deterioro de valor de maquinaria"},
+{"c": "2914", "n": "Deterioro de valor de utillaje"},
+{"c": "2915", "n": "Deterioro de valor de otras instalaciones"},
+{"c": "2916", "n": "Deterioro de valor de mobiliario"},
+{"c": "2917", "n": "Deterioro de valor de equipos para proceso de información"},
+{"c": "2918", "n": "Deterioro de valor de elementos de transporte"},
+{"c": "2919", "n": "Deterioro de valor de otro inmovilizado material"},
+{"c": "2920", "n": "Deterioro de valor de los terrenos y bienes naturales"},
+{"c": "2921", "n": "Deterioro de valor de construcciones"},
+{"c": "2933", "n": "Deterioro de valor de participaciones en empresas del grupo"},
+{"c": "2934", "n": "Deterioro de valor de participaciones en empresas asociadas"},
+{"c": "2943", "n": "Deterioro de valor de valores representativos de deuda de empresas del grupo"},
+{"c": "2944", "n": "Deterioro de valor de valores representativos de deuda de empresas asociadas"},
+{"c": "2945", "n": "Deterioro de valor de valores representativos de deuda de otras partes vinculadas"},
+{"c": "2953", "n": "Deterioro de valor de créditos a empresas del grupo"},
+{"c": "2954", "n": "Deterioro de valor de créditos a empresas asociadas"},
+{"c": "2955", "n": "Deterioro de valor de créditos a otras partes vinculadas"},
+{"c": "4000", "n": "Proveedores (euros)"},
+{"c": "4004", "n": "Proveedores (moneda extranjera)"},
+{"c": "4009", "n": "Proveedores, facturas pendientes de recibir o de formalizar"},
+{"c": "4030", "n": "Proveedores, empresas del grupo (euros)"},
+{"c": "4031", "n": "Efectos comerciales a pagar, empresas del grupo"},
+{"c": "4034", "n": "Proveedores, empresas del grupo (moneda extranjera)"},
+{"c": "4036", "n": "Envases y embalajes a devolver a proveedores, empresas del grupo"},
+{"c": "4039", "n": "Proveedores, empresas del grupo, facturas pendientes de recibir o de formalizar"},
+{"c": "4100", "n": "Acreedores por prestaciones de servicios (euros)"},
+{"c": "4104", "n": "Acreedores por prestaciones de servicios (moneda extranjera)"},
+{"c": "4109", "n": "Acreedores por prestaciones de servicios, facturas pendientes de recibir o de formalizar"},
+{"c": "4300", "n": "Clientes (euros)"},
+{"c": "4301", "n": "Clientes (euros) (PoS)"},
+{"c": "4304", "n": "Clientes (moneda extranjera)"},
+{"c": "4309", "n": "Clientes, facturas pendientes de recibir o de formalizar"},
+{"c": "4310", "n": "Efectos comerciales en cartera"},
+{"c": "4311", "n": "Efectos comerciales descontados"},
+{"c": "4312", "n": "Efectos comerciales en gestión de cobro"},
+{"c": "4315", "n": "Efectos comerciales impagados"},
+{"c": "4330", "n": "Clientes empresas del grupo (euros)"},
+{"c": "4331", "n": "Efectos comerciales a cobrar, empresas del grupo"},
+{"c": "4332", "n": "Clientes empresas del grupo, operaciones de factoring"},
+{"c": "4334", "n": "Clientes empresas del grupo (moneda extranjera)"},
+{"c": "4336", "n": "Clientes empresas del grupo de dudoso cobro"},
+{"c": "4337", "n": "Envases y embalajes a devolver a clientes, empresas del grupo"},
+{"c": "4339", "n": "Clientes empresas del grupo, facturas pendientes de formalizar"},
+{"c": "4400", "n": "Deudores (euros)"},
+{"c": "4404", "n": "Deudores (moneda extranjera)"},
+{"c": "4409", "n": "Deudores, facturas pendientes de formalizar"},
+{"c": "4410", "n": "Deudores, efectos comerciales en cartera"},
+{"c": "4411", "n": "Deudores, efectos comerciales descontados"},
+{"c": "4412", "n": "Deudores, efectos comerciales en gestión de cobro"},
+{"c": "4415", "n": "Deudores, efectos comerciales impagados"},
+{"c": "4700", "n": "Hacienda Pública, deudora por IVA"},
+{"c": "4708", "n": "Hacienda Pública, deudora por subvenciones concedidas"},
+{"c": "4709", "n": "Hacienda Pública, deudora por devolución de impuestos"},
+{"c": "4740", "n": "Activos por diferencias temporarias deducibles"},
+{"c": "4742", "n": "Derechos por deducciones y bonificaciones pendientes de aplicar"},
+{"c": "4745", "n": "Crédito por pérdidas a compensar del ejercicio"},
+{"c": "4750", "n": "Hacienda Pública, acreedora por IVA"},
+{"c": "4751", "n": "Hacienda Pública, acreedora por retenciones practicadas"},
+{"c": "4752", "n": "Hacienda Pública, acreedora por impuesto sobre sociedades"},
+{"c": "4758", "n": "Hacienda Pública, acreedora por subvenciones a reintegrar"},
+{"c": "4759", "n": "Hacienda Pública, acreedora por otros conceptos"},
+{"c": "4933", "n": "Deterioro de valor de créditos por operaciones comerciales con empresas del grupo"},
+{"c": "4934", "n": "Deterioro de valor de créditos por operaciones comerciales con empresas asociadas"},
+{"c": "4935", "n": "Deterioro de valor de créditos por operaciones comerciales con otras partes vinculadas"},
+{"c": "4994", "n": "Provisión por contratos onerosos"},
+{"c": "4999", "n": "Provisión para otras operaciones comerciales"},
+{"c": "5090", "n": "Obligaciones y bonos amortizados"},
+{"c": "5095", "n": "Otros valores negociables amortizados"},
+{"c": "5103", "n": "Deudas a corto plazo con entidades de crédito, empresas del grupo"},
+{"c": "5104", "n": "Deudas a corto plazo con entidades de crédito, empresas asociadas"},
+{"c": "5105", "n": "Deudas a corto plazo con otras entidades de crédito vinculadas"},
+{"c": "5113", "n": "Proveedores de inmovilizado a corto plazo, empresas del grupo"},
+{"c": "5114", "n": "Proveedores de inmovilizado a corto plazo, empresas asociadas"},
+{"c": "5115", "n": "Proveedores de inmovilizado a corto plazo, otras partes vinculadas"},
+{"c": "5123", "n": "Acreedores por arrendamiento financiero a corto plazo, empresas del grupo"},
+{"c": "5124", "n": "Acreedores por arrendamiento financiero a corto plazo, empresas asociadas"},
+{"c": "5125", "n": "Acreedores por arrendamiento financiero a corto plazo, otras partes vinculadas"},
+{"c": "5133", "n": "Otras deudas a corto plazo con empresas del grupo"},
+{"c": "5134", "n": "Otras deudas a corto plazo con empresas asociadas"},
+{"c": "5135", "n": "Otras deudas a corto plazo con otras partes vinculadas"},
+{"c": "5143", "n": "Intereses a corto plazo de deudas con empresas del grupo"},
+{"c": "5144", "n": "Intereses a corto plazo de deudas con empresas asociadas"},
+{"c": "5145", "n": "Intereses a corto plazo de deudas con otras partes vinculadas"},
+{"c": "5200", "n": "Préstamos a corto plazo de entidades de crédito"},
+{"c": "5201", "n": "Deudas a corto plazo por crédito dispuesto"},
+{"c": "5208", "n": "Deudas por efectos descontados"},
+{"c": "5209", "n": "Deudas por operaciones de “factoring”"},
+{"c": "5290", "n": "Provisión a corto plazo por retribuciones al personal"},
+{"c": "5291", "n": "Provisión a corto plazo para impuestos"},
+{"c": "5292", "n": "Provisión a corto plazo para otras responsabilidades"},
+{"c": "5293", "n": "Provisión a corto plazo por desmantelamiento, retiro o rehabilitación del inmovilizado"},
+{"c": "5295", "n": "Provisión a corto plazo para actuaciones medioambientales"},
+{"c": "5303", "n": "Participaciones a corto plazo en empresas del grupo"},
+{"c": "5304", "n": "Participaciones a corto plazo en empresas asociadas"},
+{"c": "5305", "n": "Participaciones a corto plazo en otras partes vinculadas"},
+{"c": "5313", "n": "Valores representativos de deuda a corto plazo de empresas del grupo"},
+{"c": "5314", "n": "Valores representativos de deuda a corto plazo de empresas asociadas"},
+{"c": "5315", "n": "Valores representativos de deuda a corto plazo de otras partes vinculadas"},
+{"c": "5323", "n": "Créditos a corto plazo a empresas del grupo"},
+{"c": "5324", "n": "Créditos a corto plazo a empresas asociadas"},
+{"c": "5325", "n": "Créditos a corto plazo a otras partes vinculadas"},
+{"c": "5333", "n": "Intereses a corto plazo de valores representativos de deuda de empresas del grupo"},
+{"c": "5334", "n": "Intereses a corto plazo de valores representativos de deuda de empresas asociadas"},
+{"c": "5335", "n": "Intereses a corto plazo de valores representativos de deuda de otras partes vinculadas"},
+{"c": "5343", "n": "Intereses a corto plazo de créditos a empresas del grupo"},
+{"c": "5344", "n": "Intereses a corto plazo de créditos a empresas asociadas"},
+{"c": "5345", "n": "Intereses a corto plazo de créditos a otras partes vinculadas"},
+{"c": "5353", "n": "Dividendo a cobrar de inversiones financieras en empresas del grupo"},
+{"c": "5354", "n": "Dividendo a cobrar de inversiones financieras en empresas asociadas"},
+{"c": "5355", "n": "Dividendo a cobrar de inversiones financieras en otras partes vinculadas"},
+{"c": "5393", "n": "Desembolsos pendientes sobre participaciones a corto plazo en empresas del grupo"},
+{"c": "5394", "n": "Desembolsos pendientes sobre participaciones a corto plazo en empresas asociadas"},
+{"c": "5395", "n": "Desembolsos pendientes sobre participaciones a corto plazo en otras partes vinculadas"},
+{"c": "5523", "n": "Cuenta corriente con empresas del grupo"},
+{"c": "5524", "n": "Cuenta corriente con empresas asociadas"},
+{"c": "5525", "n": "Cuenta corriente con otras partes vinculadas"},
+{"c": "5563", "n": "Desembolsos exigidos sobre participaciones, empresas del grupo"},
+{"c": "5564", "n": "Desembolsos exigidos sobre participaciones, empresas asociadas"},
+{"c": "5565", "n": "Desembolsos exigidos sobre participaciones, otras partes vinculadas"},
+{"c": "5566", "n": "Desembolsos exigidos sobre participaciones de otras empresas"},
+{"c": "5580", "n": "Socios por desembolsos exigidos sobre acciones o participaciones ordinarias"},
+{"c": "5590", "n": "Activos por derivados financieros a corto plazo, cartera de negociación"},
+{"c": "5595", "n": "Pasivos por derivados financieros a corto plazo, cartera de negociación"},
+{"c": "5933", "n": "Deterioro de valor de participaciones a corto plazo en empresas del grupo"},
+{"c": "5934", "n": "Deterioro de valor de participaciones a corto plazo en empresas asociadas"},
+{"c": "5935", "n": "Deterioro de valor de participaciones a corto plazo en otras partes vinculadas"},
+{"c": "5943", "n": "Deterioro de valor de valores representativos de deuda a corto plazo de empresas del grupo"},
+{"c": "5944", "n": "Deterioro de valor de valores representativos de deuda a corto plazo de empresas asociadas"},
+{"c": "5945", "n": "Deterioro de valor de valores representativos de deuda a corto plazo de otras partes vinculadas"},
+{"c": "5953", "n": "Deterioro de valor de créditos a corto plazo a empresas del grupo"},
+{"c": "5954", "n": "Deterioro de valor de créditos a corto plazo a empresas asociadas"},
+{"c": "5955", "n": "Deterioro de valor de créditos a corto plazo a otras partes vinculadas"},
+{"c": "6060", "n": "Descuentos sobre compras por pronto pago de mercaderías"},
+{"c": "6061", "n": "Descuentos sobre compras por pronto pago de materias primas"},
+{"c": "6062", "n": "Descuentos sobre compras por pronto pago de otros aprovisionamientos"},
+{"c": "6080", "n": "Devoluciones de compras de mercaderías"},
+{"c": "6081", "n": "Devoluciones de compras de materias primas"},
+{"c": "6082", "n": "Devoluciones de compras de otros aprovisionamientos"},
+{"c": "6090", "n": "\"Rappels\" por compras de mercaderías"},
+{"c": "6091", "n": "\"Rappels\" por compras de materias primas"},
+{"c": "6092", "n": "\"Rappels\" por compras de otros aprovisionamientos"},
+{"c": "6231", "n": "Contabilidad"},
+{"c": "6232", "n": "Gastos legales"},
+{"c": "6233", "n": "Tarifas de importación"},
+{"c": "6241", "n": "Vuelos"},
+{"c": "6242", "n": "Transporte público"},
+{"c": "6251", "n": "Seguro contra incendios"},
+{"c": "6252", "n": "Seguros profesionales"},
+{"c": "6253", "n": "Seguro de Protección Legal"},
+{"c": "6254", "n": "Seguro de responsabilidad civil profesional"},
+{"c": "6271", "n": "Regalos de empresa"},
+{"c": "6281", "n": "Agua, electricidad, gas"},
+{"c": "6282", "n": "Combustible"},
+{"c": "6283", "n": "Teléfono e internet"},
+{"c": "6291", "n": "Gastos de software"},
+{"c": "6292", "n": "Gastos de administración"},
+{"c": "6293", "n": "Costos de mantenimiento de oficina"},
+{"c": "6294", "n": "Cuotas de membresía"},
+{"c": "6295", "n": "Comida y restaurante"},
+{"c": "6296", "n": "Formación y documentación"},
+{"c": "6300", "n": "Impuesto corriente"},
+{"c": "6301", "n": "Impuesto diferido"},
+{"c": "6341", "n": "Ajustes negativos en IVA de activo corriente"},
+{"c": "6342", "n": "Ajustes negativos en IVA de inversiones"},
+{"c": "6391", "n": "Ajustes positivos en IVA de activo corriente"},
+{"c": "6392", "n": "Ajustes positivos en IVA de inversiones"},
+{"c": "6610", "n": "Intereses de obligaciones y bonos, empresas del grupo"},
+{"c": "6611", "n": "Intereses de obligaciones y bonos, empresas asociadas"},
+{"c": "6612", "n": "Intereses de obligaciones y bonos, otras partes vinculadas"},
+{"c": "6613", "n": "Intereses de obligaciones y bonos, otras empresas"},
+{"c": "6615", "n": "Intereses de obligaciones y bonos a corto plazo, empresas del grupo"},
+{"c": "6616", "n": "Intereses de obligaciones y bonos a corto plazo, empresas asociadas"},
+{"c": "6617", "n": "Intereses de obligaciones y bonos a corto plazo, otras partes vinculadas"},
+{"c": "6618", "n": "Intereses de obligaciones y bonos a corto plazo, otras empresas"},
+{"c": "6620", "n": "Intereses de deudas, empresas del grupo"},
+{"c": "6621", "n": "Intereses de deudas, empresas asociadas"},
+{"c": "6622", "n": "Intereses de deudas, otras partes vinculadas"},
+{"c": "6623", "n": "Intereses de deudas con entidades de crédito"},
+{"c": "6624", "n": "Intereses de deudas, otras empresas"},
+{"c": "6640", "n": "Dividendos de pasivos, empresas del grupo"},
+{"c": "6641", "n": "Dividendos de pasivos, empresas asociadas"},
+{"c": "6642", "n": "Dividendos de pasivos, otras partes vinculadas"},
+{"c": "6643", "n": "Dividendos de pasivos, otras empresas"},
+{"c": "6650", "n": "Intereses por descuento de efectos en entidades de crédito del grupo"},
+{"c": "6651", "n": "Intereses por descuento de efectos en entidades de crédito asociadas"},
+{"c": "6652", "n": "Intereses por descuento de efectos en entidades de crédito vinculadas"},
+{"c": "6653", "n": "Intereses por descuento de efectos en otras entidades de crédito"},
+{"c": "6654", "n": "Intereses por operaciones de \"factoring\" con entidades de crédito del grupo"},
+{"c": "6655", "n": "Intereses por operaciones de \"factoring\" con entidades de crédito asociadas"},
+{"c": "6656", "n": "Intereses por operaciones de \"factoring\" con entidades de crédito vinculadas"},
+{"c": "6657", "n": "Intereses por operaciones de \"factoring\" con otras entidades de crédito"},
+{"c": "6660", "n": "Pérdidas en valores representativos de deuda, empresas del grupo"},
+{"c": "6661", "n": "Pérdidas en valores representativos de deuda, empresas asociadas"},
+{"c": "6662", "n": "Pérdidas en valores representativos de deuda, otras partes vinculadas"},
+{"c": "6663", "n": "Pérdidas en valores representativos de deuda, otras empresas"},
+{"c": "6665", "n": "Pérdidas en valores representativos de deuda a corto plazo, empresas del grupo"},
+{"c": "6666", "n": "Pérdidas en valores representativos de deuda a corto plazo, empresas asociadas"},
+{"c": "6667", "n": "Pérdidas en valores representativos de deuda a corto plazo, otras partes vinculadas"},
+{"c": "6668", "n": "Pérdidas en valores representativos de deuda a corto plazo, otras empresas"},
+{"c": "6670", "n": "Pérdidas de créditos, empresas del grupo"},
+{"c": "6671", "n": "Pérdidas de créditos, empresas asociadas"},
+{"c": "6672", "n": "Pérdidas de créditos, otras partes vinculadas"},
+{"c": "6673", "n": "Pérdidas de créditos, otras empresas"},
+{"c": "6675", "n": "Pérdidas de créditos a corto plazo, empresas del grupo"},
+{"c": "6676", "n": "Pérdidas de créditos a corto plazo, empresas asociadas"},
+{"c": "6677", "n": "Pérdidas de créditos a corto plazo, otras partes vinculadas"},
+{"c": "6678", "n": "Pérdidas de créditos a corto plazo, otras empresas"},
+{"c": "6733", "n": "Pérdidas procedentes de participaciones en, empresas del grupo"},
+{"c": "6734", "n": "Pérdidas procedentes de participaciones, empresas asociadas"},
+{"c": "6735", "n": "Pérdidas procedentes de participaciones, otras partes vinculadas"},
+{"c": "6930", "n": "Pérdidas por deterioro de productos terminados y en curso de fabricación"},
+{"c": "6931", "n": "Pérdidas por deterioro de mercaderías"},
+{"c": "6932", "n": "Pérdidas por deterioro de materias primas"},
+{"c": "6933", "n": "Pérdidas por deterioro de otros aprovisionamientos"},
+{"c": "6954", "n": "Dotación a la provisión por contratos onerosos"},
+{"c": "6959", "n": "Dotación a la provisión para otras operaciones comerciales"},
+{"c": "6960", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto, empresas del grupo"},
+{"c": "6961", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto, empresas asociadas"},
+{"c": "6962", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto, otras partes vinculadas"},
+{"c": "6963", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto, otras empresas"},
+{"c": "6965", "n": "Pérdidas por deterioro en valores representativos de deuda, empresas del grupo"},
+{"c": "6966", "n": "Pérdidas por deterioro en valores representativos de deuda, empresas asociadas"},
+{"c": "6967", "n": "Pérdidas por deterioro en valores representativos de deuda, otras partes vinculadas"},
+{"c": "6968", "n": "Pérdidas por deterioro en valores representativos de deuda, otras empresas"},
+{"c": "6970", "n": "Pérdidas por deterioro de créditos, empresas del grupo"},
+{"c": "6971", "n": "Pérdidas por deterioro de créditos, empresas asociadas"},
+{"c": "6972", "n": "Pérdidas por deterioro de créditos, otras partes vinculadas"},
+{"c": "6973", "n": "Pérdidas por deterioro de créditos, otras empresas"},
+{"c": "6980", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto a corto plazo, empresas del grupo"},
+{"c": "6981", "n": "Pérdidas por deterioro de participaciones en instrumentos de patrimonio neto a corto plazo, empresas asociadas"},
+{"c": "6985", "n": "Pérdidas por deterioro en valores representativos de deuda a corto plazo, empresas del grupo"},
+{"c": "6986", "n": "Pérdidas por deterioro en valores representativos de deuda a corto plazo, empresas asociadas"},
+{"c": "6987", "n": "Pérdidas por deterioro en valores representativos de deuda a corto plazo, otras partes vinculadas"},
+{"c": "6988", "n": "Pérdidas por deterioro en valores representativos de deuda a corto plazo, otras empresas"},
+{"c": "6990", "n": "Pérdidas por deterioro de créditos a corto plazo, empresas del grupo"},
+{"c": "6991", "n": "Pérdidas por deterioro de créditos a corto plazo, empresas asociadas"},
+{"c": "6992", "n": "Pérdidas por deterioro de créditos a corto plazo, otras partes vinculadas"},
+{"c": "6993", "n": "Pérdidas por deterioro de créditos a corto plazo, otras empresas"},
+{"c": "7000", "n": "Ventas de mercaderías"},
+{"c": "7010", "n": "Ventas de productos terminados"},
+{"c": "7020", "n": "Ventas de productos semiterminados"},
+{"c": "7030", "n": "Ventas de subproductos y residues"},
+{"c": "7040", "n": "Ventas de envases y embalajes"},
+{"c": "7050", "n": "Prestaciones de servicios"},
+{"c": "7060", "n": "Descuentos sobre ventas por pronto pago de mercaderías"},
+{"c": "7061", "n": "Descuentos sobre ventas por pronto pago de productos terminados"},
+{"c": "7062", "n": "Descuentos sobre ventas por pronto pago de productos semiterminados"},
+{"c": "7063", "n": "Descuentos sobre ventas por pronto pago de subproductos y residuos"},
+{"c": "7080", "n": "Devoluciones de ventas de mercaderías"},
+{"c": "7081", "n": "Devoluciones de ventas de productos terminados"},
+{"c": "7082", "n": "Devoluciones de ventas de productos semiterminados"},
+{"c": "7083", "n": "Devoluciones de ventas de subproductos y residuos"},
+{"c": "7084", "n": "Devoluciones de ventas de envases y embalajes"},
+{"c": "7090", "n": "\"Rappels\" sobre ventas de mercaderías"},
+{"c": "7091", "n": "\"Rappels\" sobre ventas de productos terminados"},
+{"c": "7092", "n": "\"Rappels\" sobre ventas de productos semiterminados"},
+{"c": "7093", "n": "\"Rappels\" sobre ventas de subproductos y residuos"},
+{"c": "7094", "n": "\"Rappels\" sobre ventas de envases y embalajes"},
+{"c": "7461", "n": "Subvenciones, donaciones y legados de capital transferidos al resultado del ejercicio de carácter financiero"},
+{"c": "7510", "n": "Pérdida transferido (gestor)"},
+{"c": "7511", "n": "Beneficio atribuido (partícipe o asociado no gestor)"},
+{"c": "7600", "n": "Ingresos de participaciones en instrumentos de patrimonio, empresas del grupo"},
+{"c": "7601", "n": "Ingresos de participaciones en instrumentos de patrimonio, empresas asociadas"},
+{"c": "7602", "n": "Ingresos de participaciones en instrumentos de patrimonio, otras partes vinculadas"},
+{"c": "7603", "n": "Ingresos de participaciones en instrumentos de patrimonio, otras empresas"},
+{"c": "7610", "n": "Ingresos de valores representativos de deuda, empresas del grupo"},
+{"c": "7611", "n": "Ingresos de valores representativos de deuda, empresas asociadas"},
+{"c": "7612", "n": "Ingresos de valores representativos de deuda, otras partes vinculadas"},
+{"c": "7613", "n": "Ingresos de valores representativos de deuda, otras empresas"},
+{"c": "7660", "n": "Beneficios en valores representativos de deuda a largo plazo, empresas del grupo"},
+{"c": "7661", "n": "Beneficios en valores representativos de deuda a largo plazo, empresas asociadas"},
+{"c": "7662", "n": "Beneficios en valores representativos de deuda a largo plazo, otras partes vinculadas"},
+{"c": "7663", "n": "Beneficios en valores representativos de deuda a largo plazo, otras empresas"},
+{"c": "7665", "n": "Beneficios en valores representativos de deuda a corto plazo, empresas del grupo"},
+{"c": "7666", "n": "Beneficios en valores representativos de deuda a corto plazo, empresas asociadas"},
+{"c": "7667", "n": "Beneficios en valores representativos de deuda a corto plazo, otras partes vinculadas"},
+{"c": "7668", "n": "Beneficios en valores representativos de deuda a corto plazo, otras empresas"},
+{"c": "7733", "n": "Beneficios procedentes de participaciones a largo plazo, empresas del grupo"},
+{"c": "7734", "n": "Beneficios procedentes de participaciones a largo plazo, empresas asociadas"},
+{"c": "7735", "n": "Beneficios procedentes de participaciones a largo plazo, otras partes vinculadas"},
+{"c": "7930", "n": "Reversión del deterioro de productos terminados y en curso de fabricación"},
+{"c": "7931", "n": "Reversión del deterioro de mercaderías"},
+{"c": "7932", "n": "Reversión del deterioro de materias primas"},
+{"c": "7933", "n": "Reversión del deterioro de otros aprovisionamientos"},
+{"c": "7951", "n": "Exceso de provisión para impuestos"},
+{"c": "7952", "n": "Exceso de provisión para otras responsabilidades"},
+{"c": "7955", "n": "Exceso de provisión para actuaciones medioambientales"},
+{"c": "7960", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a largo plazo, empresas del grupo"},
+{"c": "7961", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a largo plazo, empresas asociadas"},
+{"c": "7962", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a largo plazo, otras partes vinculadas"},
+{"c": "7963", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a largo plazo, otras empresas"},
+{"c": "7965", "n": "Reversión del deterioro de valores representativos de deuda a largo plazo, empresas del grupo"},
+{"c": "7966", "n": "Reversión del deterioro de valores representativos de deuda a largo plazo, empresas asociadas"},
+{"c": "7967", "n": "Reversión del deterioro de valores representativos de deuda a largo plazo, otras partes vinculadas"},
+{"c": "7968", "n": "Reversión del deterioro de valores representativos de deuda a largo plazo, otras empresas"},
+{"c": "7970", "n": "Reversión del deterioro de créditos a largo plazo, empresas del grupo"},
+{"c": "7971", "n": "Reversión del deterioro de créditos a largo plazo, empresas asociadas"},
+{"c": "7972", "n": "Reversión del deterioro de créditos a largo plazo, otras partes vinculadas"},
+{"c": "7973", "n": "Reversión del deterioro de créditos a largo plazo, otras empresas"},
+{"c": "7980", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a corto plazo, empresas del grupo"},
+{"c": "7981", "n": "Reversión del deterioro de participaciones en instrumentos de patrimonio neto a corto plazo, empresas asociadas"},
+{"c": "7985", "n": "Reversión del deterioro de valores representativos de deuda a corto plazo, empresas del grupo"},
+{"c": "7986", "n": "Reversión del deterioro de valores representativos de deuda a corto plazo, empresas asociadas"},
+{"c": "7987", "n": "Reversión del deterioro de valores representativos de deuda a corto plazo, otras partes vinculadas"},
+{"c": "7988", "n": "Reversión del deterioro de valores representativos de deuda a corto plazo, otras empresas"},
+{"c": "7990", "n": "Reversión del deterioro de créditos a corto plazo, empresas del grupo"},
+{"c": "7991", "n": "Reversión del deterioro de créditos a corto plazo, empresas asociadas"},
+{"c": "7992", "n": "Reversión del deterioro de créditos a corto plazo, otras partes vinculadas"},
+{"c": "7993", "n": "Reversión del deterioro de créditos a corto plazo, otras empresas"},
+{"c": "76200", "n": "Ingresos de créditos a largo plazo, empresas del grupo"},
+{"c": "76201", "n": "Ingresos de créditos a largo plazo, empresas asociadas"},
+{"c": "76202", "n": "Ingresos de créditos a largo plazo, otras partes vinculadas"},
+{"c": "76203", "n": "Ingresos de créditos a largo plazo, otras empresas"},
+{"c": "76210", "n": "Ingresos de créditos a corto plazo, empresas del grupo"},
+{"c": "76211", "n": "Ingresos de créditos a corto plazo, empresas asociadas"},
+{"c": "76212", "n": "Ingresos de créditos a corto plazo, otras partes vinculadas"},
+{"c": "76213", "n": "Ingresos de créditos a corto plazo, otras empresas"},
+{"c": "79544", "n": "Exceso de provisión por contratos onerosos"},
+{"c": "79549", "n": "Exceso de provisión para otras operaciones comerciales"},
+{"c": "572998", "n": "Cuenta transitoria"}
+];
 const FB_CONFIG={apiKey:"AIzaSyDl3R6815pBX8fc4bbcvCum4T5usHa737k",authDomain:"gestionempresa-2026.firebaseapp.com",databaseURL:"https://gestionempresa-2026-default-rtdb.firebaseio.com",projectId:"gestionempresa-2026",storageBucket:"gestionempresa-2026.firebasestorage.app",messagingSenderId:"828319600246",appId:"1:828319600246:web:ce7061e9108ffef2c1d957"};
 const APP_VERSION='v1.5.36';if(localStorage.getItem('app_version')!==APP_VERSION){localStorage.setItem('app_version',APP_VERSION);if('caches' in window){caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c))))}}
 
@@ -2612,7 +3222,7 @@ const q=(document.getElementById('cli-search')?.value||'').toLowerCase();
 const list=clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||(c.nif||'').toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q)||(c.poblacion||'').toLowerCase().includes(q)||(c.provincia||'').toLowerCase().includes(q));
 document.getElementById('clientes-list').innerHTML=list.length?list.map(c=>`<tr>
 <td><strong>${c.nombre}</strong></td>
-<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${addrCell(c)}</td><td>${c.cta?'<span class="tag">'+c.cta+'</span>':'-'}</td><td>${fotoCell(c.foto)}</td>
+<td>${c.nif||'-'}</td><td>${c.contacto||'-'}</td><td>${c.telefono||'-'}</td><td>${c.email||'-'}</td><td>${addrCell(c)}</td><td>${c.cta?'<span class="tag">'+c.cta+'</span><div style="margin-top:3px"><button class="btn btn-outline" style="padding:2px 6px;font-size:.7rem" onclick="editCuenta(JSON.stringify(\''+c.cta+'\'))">Editar</button> <button class="btn btn-danger" style="padding:2px 6px;font-size:.7rem" onclick="deleteCuenta(JSON.stringify(\''+c.cta+'\'))">X</button></div>':'-'}</td><td>${fotoCell(c.foto)}</td>
 <td><button class="btn btn-warning" onclick="editCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteCliente('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay clientes registrados</td></tr>';
 }
@@ -2682,7 +3292,7 @@ const q=(document.getElementById('prov-search')?.value||'').toLowerCase();
 const list=proveedores.filter(p=>!q||p.nombre.toLowerCase().includes(q)||(p.nif||'').toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q)||(p.poblacion||'').toLowerCase().includes(q)||(p.provincia||'').toLowerCase().includes(q));
 document.getElementById('proveedores-list').innerHTML=list.length?list.map(p=>`<tr>
 <td><strong>${p.nombre}</strong></td>
-<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${p.cta?'<span class="tag">'+p.cta+'</span>':'-'}</td><td>${fotoCell(p.foto)}</td>
+<td>${p.nif||'-'}</td><td>${p.contacto||'-'}</td><td>${p.telefono||'-'}</td><td>${p.email||'-'}</td><td>${addrCell(p)}</td><td>${p.cta?'<span class="tag">'+p.cta+'</span><div style="margin-top:3px"><button class="btn btn-outline" style="padding:2px 6px;font-size:.7rem" onclick="editCuenta(JSON.stringify(\''+p.cta+'\'))">Editar</button> <button class="btn btn-danger" style="padding:2px 6px;font-size:.7rem" onclick="deleteCuenta(JSON.stringify(\''+p.cta+'\'))">X</button></div>':'-'}</td><td>${fotoCell(p.foto)}</td>
 <td><button class="btn btn-warning" onclick="editProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">Editar</button> <button class="btn btn-danger" onclick="deleteProveedor('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td>
 </tr>`).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay proveedores registrados</td></tr>';
 }
@@ -5588,8 +6198,8 @@ function ctitulo(c){const e=(planCuentas||[]).find(p=>String(p.c)===String(c));r
 function asegCuentaAuto(c){if(!(planCuentas||[]).some(p=>String(p.c)===String(c)))planCuentas.push({c:String(c),n:CT_AUTO_NAMES[String(c)]||'Cuenta '+c})}
 function nextSubcuenta(parent){
 const pre=String(parent);
-const ns=(planCuentas||[]).map(p=>String(p.c)).filter(c=>c.startsWith(pre)&&c.length===pre.length+3).map(c=>parseInt(c.slice(pre.length),10)||0);
-return pre+String(ns.length?Math.max(...ns)+1:1).padStart(3,'0');
+const ns=(planCuentas||[]).map(p=>String(p.c)).filter(c=>c.startsWith(pre)&&c.length===8&&/^\d+$/.test(c.slice(pre.length))).map(c=>parseInt(c.slice(pre.length),10)||0);
+return pre+String(ns.length?Math.max(...ns)+1:1).padStart(5,'0');
 }
 function cuentaTerceroCuenta(ent,rol){
 const c=contabilidad||CT_DEFAULT;
@@ -5730,22 +6340,27 @@ if(!n){alert('Indica el nombre de la cuenta');return}
 const ed=document.getElementById('ccu-edit-id').value;
 if(ed){
 const p=planCuentas.find(x=>String(x.c)===String(ed));
-if(p){p.c=c;p.n=n;p.t=t||undefined;}
+if(p){p.c=c;p.n=n;p.t=t||undefined;
+clientes.forEach(x=>{if(String(x.cta)===String(ed))x.cta=c});
+proveedores.forEach(x=>{if(String(x.cta)===String(ed))x.cta=c});
+}
 }else{
 if(planCuentas.some(x=>String(x.c)===String(c))){alert('Ya existe una cuenta con ese codigo');return}
 planCuentas.push({c,n,t:t||undefined});
 }
-save();closeModal('modal-cuenta');renderPlanCuentas();toast('Cuenta guardada');
+save();closeModal('modal-cuenta');renderPlanCuentas();renderClientes();renderProveedores();toast('Cuenta guardada');
 }
 function deleteCuenta(c){
 if(!confirm('Eliminar la cuenta '+c+' del plan de cuentas?'))return;
 planCuentas=planCuentas.filter(x=>String(x.c)!==String(c));
-save();renderPlanCuentas();toast('Cuenta eliminada');
+clientes.forEach(x=>{if(String(x.cta)===String(c))delete x.cta});
+proveedores.forEach(x=>{if(String(x.cta)===String(c))delete x.cta});
+save();renderPlanCuentas();renderClientes();renderProveedores();toast('Cuenta eliminada');
 }
 function openImportPgc(){
-document.getElementById('pgc-url').value='https://www.plangeneralcontable.com/plan-general-contable';
+document.getElementById('pgc-url').value='https://raw.githubusercontent.com/odoo/odoo/master/addons/l10n_es/data/template/account.account-es_common.csv';
 document.getElementById('pgc-lista').value='';
-document.getElementById('pgc-status').textContent='Descarga el PGC (Real Decreto 1514/2007) desde internet, o pega una lista en texto: cada linea "Codigo,Nombre" o "Codigo - Nombre".';
+document.getElementById('pgc-status').textContent='Descarga la lista de cuentas del PGC 2007 (fuente abierta, Odoo l10n_es) o pega una lista en texto: cada linea "Codigo,Nombre". Las cuentas activas (clientes/proveedores, apuntes, configuracion) se conservan.';
 openModal('modal-imp-pgc');
 }
 function parsePgcText(txt){
@@ -5754,10 +6369,29 @@ const lines=txt.split(/[\n;]+/).map(l=>l.trim()).filter(Boolean);
 lines.forEach(l=>{
 let s=l;
 if(s.indexOf('<')>=0)s=s.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
-const m=s.match(/^(\d{1,5}(?:\.\d{1,2})?)\s*[,\-:;]\s*(.+)$/)||s.match(/^(\d{1,5}(?:\.\d{1,2})?)\s+(\S.*)$/);
+const m=s.match(/^(\d{1,8}(?:\.\d{1,2})?)\s*[,\-:;]\s*(.+)$/)||s.match(/^(\d{1,8}(?:\.\d{1,2})?)\s+(\S.*)$/);
 if(m&&m[1]&&m[2])items.push({c:m[1],n:m[2].trim()});
 });
 return items;
+}
+function pgcFromText(t){
+const rows=parsePgcCsv(t);
+if(rows.length>1){
+const h=rows[0].map(c=>String(c).toLowerCase());
+let ci=h.indexOf('code'),ni=h.indexOf('name@es');
+if(ni<0)ni=h.indexOf('name');
+if(ci<0||ni<0||ci===ni){ci=h.findIndex(x=>/^(codigo|código|code)$/.test(x));ni=h.findIndex(x=>/^(nombre|name)$/.test(x))}
+if(ci>=0&&ni>=0&&ci!==ni){
+const items=[];
+for(let i=1;i<rows.length;i++){
+const c=(rows[i][ci]||'').replace(/\./g,'').trim();
+const n=(rows[i][ni]||'').trim();
+if(c&&n&&/^\d+$/.test(c))items.push({c,n});
+}
+if(items.length)return items;
+}
+}
+return parsePgcText(t);
 }
 function importPgcUrl(){
 const url=document.getElementById('pgc-url').value.trim();
@@ -5777,16 +6411,44 @@ try{
 const j=JSON.parse(t);
 if(Array.isArray(j)){j.forEach(x=>{if(Array.isArray(x))items.push({c:String(x[0]),n:String(x[1]||'')});else if(x&&x.c!=null)items.push({c:String(x.c),n:String(x.n||'')})})}
 }catch(e){}
-if(!items.length)items=parsePgcText(t);
+if(!items.length)items=pgcFromText(t);
 if(!items.length){st.textContent='No se pudieron extraer cuentas de esa URL. Prueba a pegar la lista en el campo de texto.';return}
 applyPgc(items);
 }).catch(err=>{st.textContent='Error de descarga ('+err.message+'). Prueba a pegar la lista en el campo de texto.'});
 }
 function applyPgc(found){
 const map=new Map();
-found.forEach(x=>{if(x.c&&x.n&&!map.has(x.c))map.set(x.c,{c:x.c,n:x.n})});
+found.forEach(x=>{if(x.c&&x.n&&!map.has(String(x.c)))map.set(String(x.c),{c:String(x.c),n:x.n})});
+protegerCuentasActivas(map);
 planCuentas=[...map.values()];
 save();closeModal('modal-imp-pgc');renderPlanCuentas();toast('Plan de cuentas actualizado ('+planCuentas.length+' cuentas)');
+}
+function planBasePgcPymes(){
+const map=new Map();
+(PGC_PYMES||[]).forEach(x=>{if(x&&x.c)map.set(String(x.c),{c:String(x.c),n:x.n})});
+(PGC_DEFAULT||[]).forEach(x=>{if(x&&x.c&&!map.has(String(x.c)))map.set(String(x.c),{c:String(x.c),n:x.n})});
+return map;
+}
+function protegerCuentasActivas(map){
+const old=new Map((planCuentas||[]).map(p=>[String(p.c),p]));
+const proteger=(c)=>{if(c==null||c==='')return;c=String(c);const o=old.get(c);map.set(c,o?{c:String(o.c),n:o.n}:{c,n:'Cuenta '+c})};
+(clientes||[]).forEach(x=>{if(x.cta)proteger(x.cta)});
+(proveedores||[]).forEach(x=>{if(x.cta)proteger(x.cta)});
+(apuntes||[]).forEach(a=>(a.lineas||[]).forEach(l=>{if(l.c)proteger(l.c)}));
+const cf=contabilidad||CT_DEFAULT;
+['cCompra','cVenta','cCliente','cProveedor','cIvaSop','cIvaRep','cGasto','cIngreso','cTesoro'].forEach(k=>{if(cf[k])proteger(cf[k])});
+}
+function vaciarPlanCuentas(){
+if(!confirm('VACIAR TODO el plan de cuentas?\nSe eliminaran todas las cuentas. Las de clientes/proveedores y las usadas en apuntes se vuelven a crear al generar asientos o regenerar el PGC.'))return;
+planCuentas=[];
+save();renderPlanCuentas();toast('Plan de cuentas vaciado');
+}
+function generarPlanPymes(){
+if(!confirm('Se regenerara el plan de cuentas con el PGC de PYMES (Real Decreto 1515/2007).\nSe conservan las cuentas de clientes/proveedores, las usadas en apuntes y las de configuracion.\nContinuar?'))return;
+const map=planBasePgcPymes();
+protegerCuentasActivas(map);
+planCuentas=[...map.values()];
+save();renderPlanCuentas();toast('Plan de cuentas regenerado (PGC PYMES, '+planCuentas.length+' cuentas)');
 }
 function parsePgcCsv(txt){
 const rows=[];
@@ -5825,7 +6487,7 @@ const items=[];
 for(let i=start;i<rows.length;i++){
 const c=(rows[i][0]||'').replace(/\./g,'').trim();
 const n=(rows[i][1]||'').trim();
-if(c&&n&&/^[0-9]{1,5}$/.test(c))items.push({c:c,n:n});
+if(c&&n&&/^[0-9]{1,8}$/.test(c))items.push({c:c,n:n});
 }
 if(!items.length){st.textContent='No se encontraron cuentas validas en '+file.name+'. Espera columnas Codigo,Nombre (ej: 600;Compras).';return}
 applyPgc(items);
