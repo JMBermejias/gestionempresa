@@ -3130,6 +3130,30 @@ function updateDownload(){
     }
   }).catch(()=>{info.textContent='Error de conexion durante la descarga';document.getElementById('upd-btn-download').disabled=false});
 }
+function _verNum(v){const m=String(v||'').match(/(\d+)\.(\d+)\.(\d+)/);if(!m)return[0,0,0];return[m[1],m[2],m[3]].map(function(x){return parseInt(x,10)})}
+function _verGt(a,b){for(let i=0;i<a.length;i++){if(a[i]>b[i])return true;if(a[i]<b[i])return false}return false}
+function scheduleUpdateReload(){
+  const target=_lastUpdateCheck&&_lastUpdateCheck.latest_tag?_lastUpdateCheck.latest_tag:'';
+  const tV=target?_verNum(target):null;
+  const info=document.getElementById('upd-info');
+  info.textContent+=' La aplicacion se recargara sola cuando este lista la nueva version.';
+  let tries=0;
+  const iv=setInterval(function(){
+    tries++;
+    authFetch('/api/update/check').then(function(r){return r.json()}).then(function(d){
+      if(!d||d.offline)return;
+      const cur=_verNum(d.current);
+      const done=(tV&&!_verGt(tV,cur))||(!tV&&!d.needs_update);
+      if(done||tries>=40){
+        clearInterval(iv);
+        info.textContent+=' Solicitando recarga...';
+        location.reload();
+      }
+    }).catch(function(){
+      if(tries>=40){clearInterval(iv);location.reload();}
+    });
+  },3000);
+}
 function updateApply(){
   const info=document.getElementById('upd-info');
   info.textContent='Preparando la actualizacion...';
@@ -3139,6 +3163,7 @@ function updateApply(){
       document.getElementById('upd-title').textContent='Actualizacion lista';
       document.getElementById('upd-btn-apply').style.display='none';
       document.getElementById('upd-btn-close').style.display='';
+      if(IS_DESKTOP)scheduleUpdateReload();
     }else{
       info.textContent='Error: '+(b.error||'');
     }
