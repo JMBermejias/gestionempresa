@@ -527,6 +527,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <button class="btn btn-warning" onclick="exportFacturasPDF()">&#128424; Exportar PDF</button>
 <button class="btn btn-success" onclick="exportFacturasExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openFacturaModal()">+ Nueva Factura</button>
+<button class="btn btn-outline" onclick="openFacturaModal('abono')">&#128280; Abono cliente</button>
+<button class="btn btn-outline" onclick="openFacturaModal('abono-proveedor')">&#128280; Abono proveedor</button>
 </div>
 </div>
 <div class="filters" style="margin-bottom:15px">
@@ -541,7 +543,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 </div>
 <div class="card">
 <div class="table-wrap">
-<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente</th><th>Empresa</th><th>Obra</th><th>Subcontrata</th><th>Vencimiento</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
+<table><thead><tr><th>N&ordm;/Fecha</th><th>Cliente / Proveedor</th><th>Empresa</th><th>Obra</th><th>Subcontrata</th><th>Vencimiento</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
 <tbody id="facturas-list"></tbody></table>
 </div>
 </div>
@@ -1288,6 +1290,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="modal" style="max-width:700px">
 <h3 id="fac-modal-title">Nueva Factura</h3>
 <input type="hidden" id="fac-edit-id">
+<div class="form-group"><label>Tipo de documento</label><select id="fac-tipo" onchange="facTipoChanged()"><option value="factura">Factura (venta a cliente)</option><option value="abono">Abono de cliente</option><option value="abono-proveedor">Abono de proveedor</option></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Fecha *</label><input type="date" id="fac-fecha"></div>
 <div class="form-group"><label>Vencimiento</label><input type="date" id="fac-vencimiento"></div>
@@ -1295,9 +1298,10 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Empresa Instaladora *</label><select id="fac-empresa"></select></div>
 <div class="form-group"><label>Obra</label><select id="fac-obra"></select></div>
 <div class="form-group"><label>Subcontrata</label><select id="fac-subcontrata"></select></div>
-<div class="form-group"><label>Cliente existente</label><select id="fac-cliente-select" onchange="facClienteSelected()"></select></div>
+<div id="fac-clientesel-wrap"><div class="form-group"><label id="fac-lbl-cliente-ex">Cliente existente</label><select id="fac-cliente-select" onchange="facClienteSelected()"></select></div></div>
+<div id="fac-provsel-wrap" class="form-group" style="display:none"><label>Proveedor existente</label><select id="fac-prov-select" onchange="facProvSelected()"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<div class="form-group"><label>Cliente</label><input type="text" id="fac-cliente" placeholder="Nombre del cliente"></div>
+<div class="form-group"><label id="fac-lbl-nombre">Cliente</label><input type="text" id="fac-cliente" placeholder="Nombre del cliente"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="fac-nif" placeholder="NIF o CIF"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -4851,9 +4855,10 @@ return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPres
 }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay presupuestos registrados</td></tr>');
 }
 
-function openFacturaModal(){
+function openFacturaModal(tipo){
+document.getElementById('fac-tipo').value=tipo||'factura';
 document.getElementById('fac-edit-id').value='';
-document.getElementById('fac-modal-title').textContent='Nueva Factura';
+document.getElementById('fac-modal-title').textContent=(tipo==='abono'?'Nuevo Abono de Cliente':(tipo==='abono-proveedor'?'Nuevo Abono de Proveedor':'Nueva Factura'));
 document.getElementById('fac-fecha').value=new Date().toISOString().split('T')[0];
 const ven=new Date();ven.setDate(ven.getDate()+30);
 document.getElementById('fac-vencimiento').value=ven.toISOString().split('T')[0];
@@ -4870,19 +4875,37 @@ document.getElementById('fac-estado').value='Borrador';
 document.getElementById('fac-mat-search').value='';
 tempFacLineas=[];
 populateClienteSelect('fac-cliente-select');
+populateProveedorSelect('fac-prov-select');
 populateEmpresaSelect('fac-empresa');
 populateObraSelect('fac-obra');
 populateSubcontrataSelect('fac-subcontrata');
 filterMaterialsForFac();
+facTipoChanged();
 renderTempFacLineas();
 calcFacTotals();
 openModal('modal-factura');
+}
+function facTipoChanged(){
+const t=(document.getElementById('fac-tipo').value)||'factura';
+const prov=t==='abono-proveedor';
+const cw=document.getElementById('fac-clientesel-wrap');if(cw)cw.style.display=prov?'none':'';
+const pw=document.getElementById('fac-provsel-wrap');if(pw)pw.style.display=prov?'':'none';
+const lb=document.getElementById('fac-lbl-cliente-ex');if(lb)lb.textContent=prov?'Proveedor existente':'Cliente existente';
+const ln=document.getElementById('fac-lbl-nombre');if(ln)ln.textContent=prov?'Proveedor':'Cliente';
+const ci=document.getElementById('fac-cliente');if(ci)ci.placeholder=prov?'Nombre del proveedor':'Nombre del cliente';
+}
+function facProvSelected(){
+const id=document.getElementById('fac-prov-select').value;
+const p=proveedores.find(x=>x.id===id);
+const set=(s,v)=>{const el=document.getElementById('fac-'+s);if(el)el.value=v||''};
+if(p){set('cliente',p.nombre);set('nif',p.nif);set('direccion',docClienteAddr(p));set('telefono',p.telefono);set('email',p.email);}
 }
 
 function editFactura(id){
 const f=facturas.find(x=>x.id===id);
 document.getElementById('fac-edit-id').value=id;
-document.getElementById('fac-modal-title').textContent='Editar Factura '+getFacSerieStr(f.numero||0);
+document.getElementById('fac-tipo').value=f.tipo||'factura';
+document.getElementById('fac-modal-title').textContent=(f.tipo==='abono'?'Editar Abono de Cliente ':(f.tipo==='abono-proveedor'?'Editar Abono de Proveedor ':'Editar Factura ')+getFacSerieStr(f.numero||0));
 document.getElementById('fac-fecha').value=f.fecha;
 document.getElementById('fac-vencimiento').value=f.fechaVencimiento||'';
 populateEmpresaSelect('fac-empresa');
@@ -4891,8 +4914,16 @@ populateObraSelect('fac-obra');
 document.getElementById('fac-obra').value=f.obraId||'';
 populateSubcontrataSelect('fac-subcontrata');
 document.getElementById('fac-subcontrata').value=f.subcontrataId||'';
+facTipoChanged();
+populateProveedorSelect('fac-prov-select');
+if(f.tipo==='abono-proveedor'){
+const sel=document.getElementById('fac-prov-select');if(sel&&f.proveedorId)sel.value=f.proveedorId;
+syncDocClienteSelect('fac',null,'');
+document.getElementById('fac-cliente').value=f.proveedor||'';
+}else{
 syncDocClienteSelect('fac',f.clienteId,f.cliente);
 document.getElementById('fac-cliente').value=f.cliente||'';
+}
 document.getElementById('fac-nif').value=f.nif||'';
 document.getElementById('fac-direccion').value=f.direccion||'';
 document.getElementById('fac-telefono').value=f.telefono||'';
@@ -4923,11 +4954,15 @@ const total=subtotal+iva;
 const editId=document.getElementById('fac-edit-id').value;
 const subId=document.getElementById('fac-subcontrata').value;
 const sub=subcontratas.find(s=>s.id===subId);
-const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',clienteId:document.getElementById('fac-cliente-select').value||'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
+const tipodoc=document.getElementById('fac-tipo').value||'factura';
+const esProvAbono=tipodoc==='abono-proveedor';
+const terrId=esProvAbono?document.getElementById('fac-prov-select').value:document.getElementById('fac-cliente-select').value;
+const terrName=document.getElementById('fac-cliente').value.trim();
+const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',tipo:tipodoc,clienteId:esProvAbono?'':terrId,cliente:esProvAbono?'':terrName,proveedorId:esProvAbono?terrId:'',proveedor:esProvAbono?terrName:'',nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
 if(editId){const idx=facturas.findIndex(x=>x.id===editId);facturas[idx]={...facturas[idx],...data}}
 else{const numero=nextFacSerie();facturas.push({id:'fc_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempFacLineas=[];
-save();closeModal('modal-factura');renderFacturas();toast('Factura guardada');
+save();closeModal('modal-factura');renderFacturas();renderAsientosAuto();toast(tipodoc==='factura'?'Factura guardada':'Abono guardado');
 }
 
 function deleteFactura(id){
@@ -4953,7 +4988,9 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Enviada:'background:
 document.getElementById('facturas-list').innerHTML=
 (list.length?list.map(f=>{
 const total=(f.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small></td><td>${f.cliente||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarFacturaEmail('${f.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+const abonoTipo=f.tipo==='abono'?'ABONO cliente':(f.tipo==='abono-proveedor'?'ABONO proveedor':'');
+const abonoColor=f.tipo==='abono'?'background:#FEF3C7;color:#92400E':'background:#EDE9FE;color:#5B21B6';
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small>${abonoTipo?'<br><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;'+abonoColor+'">'+abonoTipo+'</span>':''}</td><td>${f.cliente||f.proveedor||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td style="white-space:nowrap">${f.estado!=='Pagada'?'<button class="btn btn-success" onclick="marcarFacturaCobrada(\''+f.id+'\')" style="padding:5px 10px;font-size:.75rem" title="Dar por cobrada/pagada y generar su asiento">&#10003; Cobrada</button> ':''}<button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarFacturaEmail('${f.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
 }
 
@@ -6671,27 +6708,52 @@ save();closeModal('modal-gasto');renderDiario();toast('Apunte guardado');
 }
 
 function asentadoOrigen(tipo,id){return (apuntes||[]).some(a=>a.origen&&a.origen.tipo===tipo&&a.origen.id===id)}
+function factAsientoTipo(f){return f.tipo==='abono'?'abono-cliente':(f.tipo==='abono-proveedor'?'abono-proveedor':'factura')}
+function marcarFacturaCobrada(id){
+const f=facturas.find(x=>x.id===id);if(!f)return;
+const t=factAsientoTipo(f);
+if(f.estado==='Pagada'){toast('La factura ya esta marcada como cobrada');return}
+f.estado='Pagada';
+if(!asentadoOrigen(t,f.id))asentarAutomatico(f,t);
+save();renderFacturas();renderAsientosAuto();toast('Factura '+getFacSerieStr(f.numero||0)+' cobrada');
+}
 function asentarAutomatico(doc,tipo){
 if(!doc)return;
 if(doc.estado==='Anulada'){alert('No se asienta un documento anulado');return}
 if(asentadoOrigen(tipo,doc.id)){alert('Ya existe un asiento para este documento');return}
 const c=contabilidad||CT_DEFAULT;
-const terr=terceroDeDoc(doc,tipo);
-const terrCta=terr?cuentaTerceroCuenta(terr,tipo==='compra'?'proveedor':'cliente'):'';
-const provCta=terrCta||String(c.cProveedor||'410');
-const cliCta=terrCta||String(c.cCliente||'430');
+const esCompra=(tipo==='compra'||tipo==='abono-proveedor');
+const terr=esCompra?terceroDeDoc(doc,'compra'):terceroDeDoc(doc,'factura');
+const terrCta=terr?cuentaTerceroCuenta(terr,esCompra?'proveedor':'cliente'):'';
+const provCta=esCompra?(terrCta||String(c.cProveedor||'410')):'';
+const cliCta=(!esCompra)?(terrCta||String(c.cCliente||'430')):'';
 const subtotal=Math.round((+(doc.subtotal||0))*100)/100,iva=Math.round((+(doc.iva||0))*100)/100,total=Math.round((+(doc.total||0))*100)/100;
 let lineas;
-if(tipo==='compra'){
+if(esCompra){
 asegCuentaAuto(c.cCompra);asegCuentaAuto(c.cIvaSop);asegCuentaAuto(provCta);
-if(iva>0)lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:c.cIvaSop,n:ctitulo(c.cIvaSop),d:iva,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
-else lineas=[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
+const abono=(tipo==='abono-proveedor');
+if(iva>0)lineas=abono
+?[{c:provCta,n:ctitulo(provCta),d:total,h:0},{c:c.cCompra,n:ctitulo(c.cCompra),d:0,h:subtotal},{c:c.cIvaSop,n:ctitulo(c.cIvaSop),d:0,h:iva}]
+:[{c:c.cCompra,n:ctitulo(c.cCompra),d:subtotal,h:0},{c:c.cIvaSop,n:ctitulo(c.cIvaSop),d:iva,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
+else lineas=abono
+?[{c:provCta,n:ctitulo(provCta),d:total,h:0},{c:c.cCompra,n:ctitulo(c.cCompra),d:0,h:total}]
+:[{c:c.cCompra,n:ctitulo(c.cCompra),d:total,h:0},{c:provCta,n:ctitulo(provCta),d:0,h:total}];
 }else{
 asegCuentaAuto(cliCta);asegCuentaAuto(c.cVenta);asegCuentaAuto(c.cIvaRep);
-if(iva>0)lineas=[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:subtotal},{c:c.cIvaRep,n:ctitulo(c.cIvaRep),d:0,h:iva}];
-else lineas=[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:total}];
+const abono=(tipo==='abono-cliente');
+if(iva>0)lineas=abono
+?[{c:c.cVenta,n:ctitulo(c.cVenta),d:subtotal,h:0},{c:c.cIvaRep,n:ctitulo(c.cIvaRep),d:iva,h:0},{c:cliCta,n:ctitulo(cliCta),d:0,h:total}]
+:[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:subtotal},{c:c.cIvaRep,n:ctitulo(c.cIvaRep),d:0,h:iva}];
+else lineas=abono
+?[{c:c.cVenta,n:ctitulo(c.cVenta),d:total,h:0},{c:cliCta,n:ctitulo(cliCta),d:0,h:total}]
+:[{c:cliCta,n:ctitulo(cliCta),d:total,h:0},{c:c.cVenta,n:ctitulo(c.cVenta),d:0,h:total}];
 }
-const desc=tipo==='compra'?('Compra '+getCompSerieStr(doc.numero||0)+' - '+(doc.proveedor||'')):(tipo==='venta'?('Venta '+getVenSerieStr(doc.numero||0)+' - '+(doc.cliente||doc.obra||'')):('Factura '+getFacSerieStr(doc.numero||0)+' - '+(doc.cliente||'')));
+let desc;
+if(tipo==='compra')desc='Compra '+getCompSerieStr(doc.numero||0)+' - '+(doc.proveedor||'');
+else if(tipo==='venta')desc='Venta '+getVenSerieStr(doc.numero||0)+' - '+(doc.cliente||doc.obra||'');
+else if(tipo==='factura')desc='Factura '+getFacSerieStr(doc.numero||0)+' - '+(doc.cliente||'');
+else if(tipo==='abono-proveedor')desc='Abono de proveedor '+getFacSerieStr(doc.numero||0)+' - '+(doc.proveedor||'');
+else desc='Abono de cliente '+getFacSerieStr(doc.numero||0)+' - '+(doc.cliente||'');
 const numero=nextAsNum();
 apuntes.push({id:'apo_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,fecha:doc.fecha,concepto:desc,origen:{tipo:tipo,id:doc.id},lineas});
 save();renderAsientosAuto();toast('Asiento generado para '+desc);
@@ -6700,20 +6762,20 @@ function asentarPendientesAutomatico(){
 let n=0;
 compras.forEach(c=>{if(c.estado!=='Anulada'&&!asentadoOrigen('compra',c.id)){asentarAutomatico(c,'compra');n++}});
 ventas.forEach(v=>{if(v.estado!=='Anulada'&&v.estado!=='Borrador'&&!asentadoOrigen('venta',v.id)){asentarAutomatico(v,'venta');n++}});
-facturas.forEach(f=>{if((f.estado==='Enviada'||f.estado==='Pagada')&&!asentadoOrigen('factura',f.id)){asentarAutomatico(f,'factura');n++}});
+facturas.forEach(f=>{if((f.estado==='Enviada'||f.estado==='Pagada')&&!asentadoOrigen(factAsientoTipo(f),f.id)){asentarAutomatico(f,factAsientoTipo(f));n++}});
 toast(n?('Se generaron '+n+' asientos'):'Sin documentos pendientes de asentar');
 }
-function asisSection(titulo,docs,tipo,fnRef){
-const pend=docs.filter(d=>d.estado!=='Anulada'&&(tipo==='venta'?d.estado!=='Borrador':true)&&(tipo==='factura'?(d.estado==='Enviada'||d.estado==='Pagada'):true)&&!asentadoOrigen(tipo,d.id));
+function asisSection(titulo,docs,tipoFn,fnRef){
+const pend=docs.filter(d=>{const t=tipoFn(d);return d.estado!=='Anulada'&&(t==='venta'?d.estado!=='Borrador':true)&&(t==='factura'?(d.estado==='Enviada'||d.estado==='Pagada'):true)&&!asentadoOrigen(t,d.id)});
 return '<div class="card" style="margin-bottom:14px"><h3 style="color:var(--primary-dark);margin:0 0 8px">'+titulo+' <span style="font-size:.8rem;color:var(--text-light)">('+pend.length+' pendientes)</span></h3>'
 +(pend.length?'<table class="auto-asis"><thead><tr><th>Documento</th><th>Fecha</th><th>Tercero</th><th>Base</th><th>IVA</th><th>Total</th><th></th></tr></thead><tbody>'
-+pend.map(d=>'<tr><td>'+fnRef(d)+'</td><td>'+d.fecha+'</td><td>'+ctEsc((d.proveedor||d.cliente||d.obra||''))+'</td><td>'+ctE(d.subtotal)+'</td><td>'+ctE(d.iva)+'</td><td><strong>'+ctE(d.total)+'</strong></td><td><button class="btn btn-primary" style="padding:4px 10px;font-size:.75rem" onclick="asentarAutomatico('+JSON.stringify(d).replace(/"/g,'&quot;')+','+'&quot;'+tipo+'&quot;'+')">Asentar</button></td></tr>').join('')
++pend.map(d=>{const t=tipoFn(d);return '<tr><td>'+fnRef(d)+(t==='abono-cliente'?' <span class="tag">abono cliente</span>':(t==='abono-proveedor'?' <span class="tag">abono proveedor</span>':''))+'</td><td>'+d.fecha+'</td><td>'+ctEsc((d.proveedor||d.cliente||d.obra||''))+'</td><td>'+ctE(d.subtotal)+'</td><td>'+ctE(d.iva)+'</td><td><strong>'+ctE(d.total)+'</strong></td><td><button class="btn btn-primary" style="padding:4px 10px;font-size:.75rem" onclick="asentarAutomatico('+JSON.stringify(d).replace(/"/g,'&quot;')+','+'&quot;'+t+'&quot;'+')">Asentar</button></td></tr>'}).join('')
 +'</tbody></table>':'<p style="font-size:.85rem;color:var(--text-light)">No quedan documentos pendientes.</p>')+'</div>';
 }
 function renderAsientosAuto(){
-document.getElementById('asis-out').innerHTML=asisSection('Compras',compras,'compra',d=>getCompSerieStr(d.numero||0))
-+asisSection('Ventas',ventas,'venta',d=>getVenSerieStr(d.numero||0))
-+asisSection('Facturas emitidas',facturas,'factura',d=>getFacSerieStr(d.numero||0));
+document.getElementById('asis-out').innerHTML=asisSection('Compras',compras,()=> 'compra',d=>getCompSerieStr(d.numero||0))
++asisSection('Ventas',ventas,()=> 'venta',d=>getVenSerieStr(d.numero||0))
++asisSection('Facturas y abonos',facturas,factAsientoTipo,d=>getFacSerieStr(d.numero||0));
 }
 
 function ctAnioSel(id,cur){const sel=document.getElementById(id);const y=cur||sel.value||String(new Date().getFullYear());ctFillAnio(id,y)}
