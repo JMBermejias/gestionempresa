@@ -1238,6 +1238,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Empresa Instaladora *</label><select id="pres-empresa"></select></div>
 <div class="form-group"><label>Obra</label><select id="pres-obra"></select></div>
 <div class="form-group"><label>Subcontrata</label><select id="pres-subcontrata"></select></div>
+<div class="form-group"><label>Cliente existente</label><select id="pres-cliente-select" onchange="presClienteSelected()"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Cliente</label><input type="text" id="pres-cliente" placeholder="Nombre del cliente"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="pres-nif" placeholder="NIF o CIF"></div>
@@ -1292,6 +1293,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div class="form-group"><label>Empresa Instaladora *</label><select id="fac-empresa"></select></div>
 <div class="form-group"><label>Obra</label><select id="fac-obra"></select></div>
 <div class="form-group"><label>Subcontrata</label><select id="fac-subcontrata"></select></div>
+<div class="form-group"><label>Cliente existente</label><select id="fac-cliente-select" onchange="facClienteSelected()"></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <div class="form-group"><label>Cliente</label><input type="text" id="fac-cliente" placeholder="Nombre del cliente"></div>
 <div class="form-group"><label>NIF/CIF</label><input type="text" id="fac-nif" placeholder="NIF o CIF"></div>
@@ -4106,6 +4108,23 @@ const container=document.getElementById('fac-lineas');
 container.innerHTML=tempFacLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempFacLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempFacLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
 }
 
+function docClienteAddr(c){return [c.direccion,c.cp,c.poblacion,c.provincia,c.pais].filter(Boolean).join(', ')}
+function docClienteSelected(prefix){
+const id=document.getElementById(prefix+'-cliente-select').value;
+const c=clientes.find(x=>x.id===id);
+const set=(s,v)=>{const el=document.getElementById(prefix+'-'+s);if(el)el.value=v||''};
+if(c){set('cliente',c.nombre);set('nif',c.nif);set('direccion',docClienteAddr(c));set('telefono',c.telefono);set('email',c.email);}
+}
+function presClienteSelected(){docClienteSelected('pres')}
+function facClienteSelected(){docClienteSelected('fac')}
+function syncDocClienteSelect(prefix,clienteIdVal,nombreVal){
+populateClienteSelect(prefix+'-cliente-select');
+let match='';
+if(clienteIdVal&&clientes.some(c=>c.id===clienteIdVal))match=clienteIdVal;
+else{const c=clientes.find(c=>c.nombre===nombreVal);if(c)match=c.id}
+const sel=document.getElementById(prefix+'-cliente-select');
+if(sel)sel.value=match||'';
+}
 function openPresupuestoModal(){
 document.getElementById('pres-edit-id').value='';
 document.getElementById('pres-modal-title').textContent='Nuevo Presupuesto';
@@ -4124,6 +4143,7 @@ document.getElementById('pres-notas').value='';
 document.getElementById('pres-estado').value='Borrador';
 document.getElementById('pres-mat-search').value='';
 tempPresLineas=[];
+populateClienteSelect('pres-cliente-select');
 populateEmpresaSelect('pres-empresa');
 populateObraSelect('pres-obra');
 populateSubcontrataSelect('pres-subcontrata');
@@ -4145,6 +4165,7 @@ populateObraSelect('pres-obra');
 document.getElementById('pres-obra').value=p.obraId||'';
 populateSubcontrataSelect('pres-subcontrata');
 document.getElementById('pres-subcontrata').value=p.subcontrataId||'';
+syncDocClienteSelect('pres',p.clienteId,p.cliente);
 document.getElementById('pres-cliente').value=p.cliente||'';
 document.getElementById('pres-nif').value=p.nif||'';
 document.getElementById('pres-direccion').value=p.direccion||'';
@@ -4176,7 +4197,7 @@ const total=subtotal+iva;
 const editId=document.getElementById('pres-edit-id').value;
 const subId=document.getElementById('pres-subcontrata').value;
 const sub=subcontratas.find(s=>s.id===subId);
-const data={fecha,fechaValidez:document.getElementById('pres-validez').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('pres-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',cliente:document.getElementById('pres-cliente').value.trim(),nif:document.getElementById('pres-nif').value.trim(),direccion:document.getElementById('pres-direccion').value.trim(),telefono:document.getElementById('pres-telefono').value.trim(),email:document.getElementById('pres-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('pres-estado').value,notas:document.getElementById('pres-notas').value.trim()};
+const data={fecha,fechaValidez:document.getElementById('pres-validez').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('pres-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',clienteId:document.getElementById('pres-cliente-select').value||'',cliente:document.getElementById('pres-cliente').value.trim(),nif:document.getElementById('pres-nif').value.trim(),direccion:document.getElementById('pres-direccion').value.trim(),telefono:document.getElementById('pres-telefono').value.trim(),email:document.getElementById('pres-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('pres-estado').value,notas:document.getElementById('pres-notas').value.trim()};
 if(editId){const idx=presupuestos.findIndex(x=>x.id===editId);presupuestos[idx]={...presupuestos[idx],...data}}
 else{const numero=nextPresSerie();presupuestos.push({id:'pr_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempPresLineas=[];
@@ -4228,6 +4249,7 @@ document.getElementById('fac-notas').value='';
 document.getElementById('fac-estado').value='Borrador';
 document.getElementById('fac-mat-search').value='';
 tempFacLineas=[];
+populateClienteSelect('fac-cliente-select');
 populateEmpresaSelect('fac-empresa');
 populateObraSelect('fac-obra');
 populateSubcontrataSelect('fac-subcontrata');
@@ -4249,6 +4271,7 @@ populateObraSelect('fac-obra');
 document.getElementById('fac-obra').value=f.obraId||'';
 populateSubcontrataSelect('fac-subcontrata');
 document.getElementById('fac-subcontrata').value=f.subcontrataId||'';
+syncDocClienteSelect('fac',f.clienteId,f.cliente);
 document.getElementById('fac-cliente').value=f.cliente||'';
 document.getElementById('fac-nif').value=f.nif||'';
 document.getElementById('fac-direccion').value=f.direccion||'';
@@ -4280,7 +4303,7 @@ const total=subtotal+iva;
 const editId=document.getElementById('fac-edit-id').value;
 const subId=document.getElementById('fac-subcontrata').value;
 const sub=subcontratas.find(s=>s.id===subId);
-const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
+const data={fecha,fechaVencimiento:document.getElementById('fac-vencimiento').value,empresaId,empresa:emp?emp.nombre:'',obraId:document.getElementById('fac-obra').value,obra:ob?ob.nombre:'',subcontrataId:subId,subcontrata:sub?sub.nombre:'',clienteId:document.getElementById('fac-cliente-select').value||'',cliente:document.getElementById('fac-cliente').value.trim(),nif:document.getElementById('fac-nif').value.trim(),direccion:document.getElementById('fac-direccion').value.trim(),telefono:document.getElementById('fac-telefono').value.trim(),email:document.getElementById('fac-email').value.trim(),lineas,subtotal,ivaPorcentaje:ivaPct,iva,total,estado:document.getElementById('fac-estado').value,notas:document.getElementById('fac-notas').value.trim()};
 if(editId){const idx=facturas.findIndex(x=>x.id===editId);facturas[idx]={...facturas[idx],...data}}
 else{const numero=nextFacSerie();facturas.push({id:'fc_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),numero,...data})}
 tempFacLineas=[];
