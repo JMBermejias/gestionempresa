@@ -519,7 +519,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128203; Presupuestos</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportPresupuestosPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportPresupuestosPDF()" title="Cada presupuesto con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportPresupuestosPDFResumen()" title="Listado resumen de presupuestos">PDF resumen</button>
 <button class="btn btn-success" onclick="exportPresupuestosExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openPresupuestoModal()">+ Nuevo Presupuesto</button>
 </div>
@@ -548,7 +549,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128176; Facturacion</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportFacturasPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportFacturasPDF()" title="Cada factura con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportFacturasPDFResumen()" title="Listado resumen de facturas">PDF resumen</button>
 <button class="btn btn-success" onclick="exportFacturasExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openFacturaModal()">+ Nueva Factura</button>
 <button class="btn btn-outline" onclick="openFacturaModal('abono')">&#128280; Abono cliente</button>
@@ -685,7 +687,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128722; Compras</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportComprasPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportComprasPDF()" title="Cada compra con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportComprasPDFResumen()" title="Listado resumen de compras">PDF resumen</button>
 <button class="btn btn-success" onclick="exportComprasExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openCompraModal()">+ Nueva Compra</button>
 </div>
@@ -714,7 +717,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128203; Partes de Trabajo</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportPartesPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportPartesPDF()" title="Cada parte con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportPartesPDFResumen()" title="Listado resumen de partes">PDF resumen</button>
 <button class="btn btn-success" onclick="exportPartesExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openParteModal()">+ Nuevo Parte</button>
 </div>
@@ -743,7 +747,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128176; Ventas</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportVentasPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportVentasPDF()" title="Cada venta con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportVentasPDFResumen()" title="Listado resumen de ventas">PDF resumen</button>
 <button class="btn btn-success" onclick="exportVentasExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openVentaModal()">+ Nueva Venta</button>
 </div>
@@ -773,7 +778,8 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <h1>&#128196; Albaranes</h1>
 <div style="display:flex;gap:10px">
 <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; Volver al Panel</button>
-<button class="btn btn-warning" onclick="exportAlbaranesPDF()">&#128424; Exportar PDF</button>
+<button class="btn btn-warning" onclick="exportAlbaranesPDF()" title="Cada albaran con todas sus lineas y desglose">&#128424; PDF completo</button>
+<button class="btn btn-outline" onclick="exportAlbaranesPDFResumen()" title="Listado resumen de albaranes">PDF resumen</button>
 <button class="btn btn-success" onclick="exportAlbaranesExcel()">&#128202; Exportar Excel</button>
 <button class="btn btn-primary" onclick="openAlbaranModal()">+ Nuevo Albaran</button>
 </div>
@@ -5227,7 +5233,7 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Aprobado:'background
 document.getElementById('presupuestos-list').innerHTML=
 (list.length?list.map(p=>{
 const total=(p.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPresSerieStr(p.numero||0)}</span><br><small style="color:var(--text-light)">${p.fecha}</small></td><td>${p.cliente||'-'}</td><td>${p.empresa||'-'}</td><td>${p.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[p.estado]||''}">${p.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editPresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarPresupuestoEmail('${p.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deletePresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getPresSerieStr(p.numero||0)}</span><br><small style="color:var(--text-light)">${p.fecha}</small></td><td>${p.cliente||'-'}</td><td>${p.empresa||'-'}</td><td>${p.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[p.estado]||''}">${p.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editPresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="PDF completo con desglose" onclick="generatePresupuestoPDF('${p.id}')" style="padding:5px 10px;font-size:.75rem">PDF</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarPresupuestoEmail('${p.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deletePresupuesto('${p.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light)">No hay presupuestos registrados</td></tr>');
 }
 
@@ -5374,7 +5380,7 @@ document.getElementById('facturas-list').innerHTML=
 const total=(f.total||0).toFixed(2);
 const abonoTipo=f.tipo==='abono'?'ABONO cliente':(f.tipo==='abono-proveedor'?'ABONO proveedor':'');
 const abonoColor=f.tipo==='abono'?'background:#FEF3C7;color:#92400E':'background:#EDE9FE;color:#5B21B6';
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small>${abonoTipo?'<br><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;'+abonoColor+'">'+abonoTipo+'</span>':''}${f.origen&&f.origen.ref?'<br><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600;background:#FFF8E1;color:#795548">Origen: '+f.origen.ref+'</span>':''}</td><td>${f.cliente||f.proveedor||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td style="white-space:nowrap">${f.estado!=='Pagada'?'<button class="btn btn-success" onclick="marcarFacturaCobrada(\''+f.id+'\')" style="padding:5px 10px;font-size:.75rem" title="Dar por cobrada/pagada y generar su asiento">&#10003; Cobrada</button> ':''}<button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarFacturaEmail('${f.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getFacSerieStr(f.numero||0)}</span><br><small style="color:var(--text-light)">${f.fecha}</small>${abonoTipo?'<br><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;'+abonoColor+'">'+abonoTipo+'</span>':''}${f.origen&&f.origen.ref?'<br><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600;background:#FFF8E1;color:#795548">Origen: '+f.origen.ref+'</span>':''}</td><td>${f.cliente||f.proveedor||'-'}</td><td>${f.empresa||'-'}</td><td>${f.obra||'-'}</td><td>${f.subcontrata||'-'}</td><td><small>${f.fechaVencimiento||'-'}</small></td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[f.estado]||''}">${f.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td style="white-space:nowrap">${f.estado!=='Pagada'?'<button class="btn btn-success" onclick="marcarFacturaCobrada(\''+f.id+'\')" style="padding:5px 10px;font-size:.75rem" title="Dar por cobrada/pagada y generar su asiento">&#10003; Cobrada</button> ':''}<button class="btn btn-warning" onclick="editFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="PDF completo con desglose" onclick="generateFacturaPDF('${f.id}')" style="padding:5px 10px;font-size:.75rem">PDF</button> <button class="btn btn-outline" title="Enviar por email" onclick="enviarFacturaEmail('${f.id}')" style="padding:5px 10px;font-size:.75rem">&#9993;</button> <button class="btn btn-danger" onclick="deleteFactura('${f.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-light)">No hay facturas registradas</td></tr>');
 }
 
@@ -5411,7 +5417,7 @@ const tipoTag=a=>a.tipo==='proveedor'?'<span style="color:#00695C;font-weight:60
 document.getElementById('albaranes-list').innerHTML=
 (list.length?list.map(a=>{
 const total=(a.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getAlbSerieStr(a.numero||0)}</span><br><small style="color:var(--text-light)">${a.fecha}</small></td><td>${tipoTag(a)}</td><td>${a.proveedor||a.cliente||'-'}</td><td>${a.empresa||'-'}</td><td>${a.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[a.estado]||''}">${a.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td style="white-space:nowrap"><button class="btn btn-warning" onclick="editAlbaran('${a.id}')" style="padding:5px 10px;font-size:.75rem">E</button> ${a.estado!=='Anulada'?'<button class="btn btn-outline" title="Crear factura desde este albaran" onclick="facturaDesdeAlbaran(\''+a.id+'\')" style="padding:5px 10px;font-size:.75rem">&#129534; Factura</button> ':''}<button class="btn btn-danger" onclick="deleteAlbaran('${a.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getAlbSerieStr(a.numero||0)}</span><br><small style="color:var(--text-light)">${a.fecha}</small></td><td>${tipoTag(a)}</td><td>${a.proveedor||a.cliente||'-'}</td><td>${a.empresa||'-'}</td><td>${a.obra||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[a.estado]||''}">${a.estado||'Borrador'}</span></td><td><strong>${total} &euro;</strong></td><td style="white-space:nowrap"><button class="btn btn-warning" onclick="editAlbaran('${a.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="PDF completo con desglose" onclick="generateAlbaranPDF('${a.id}')" style="padding:5px 10px;font-size:.75rem">PDF</button> ${a.estado!=='Anulada'?'<button class="btn btn-outline" title="Crear factura desde este albaran" onclick="facturaDesdeAlbaran(\''+a.id+'\')" style="padding:5px 10px;font-size:.75rem">&#129534; Factura</button> ':''}<button class="btn btn-danger" onclick="deleteAlbaran('${a.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">No hay albaranes registrados</td></tr>');
 }
 
@@ -5598,7 +5604,12 @@ if(!confirm('Eliminar este albaran?'))return;
 albaranes=albaranes.filter(x=>x.id!==id);
 save();renderAlbaranes();toast('Albaran eliminado');
 }
+function generateAlbaranPDF(id){generarDocumentoPDF('albaran',id);}
+
 function exportAlbaranesPDF(){
+exportDocumentosPDFCompleto('albaran');
+}
+function exportAlbaranesPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Tipo','Proveedor/Cliente','Empresa','Obra','Estado','Subtotal','IVA','Total'];
 const data=[...albaranes].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(a=>[getAlbSerieStr(a.numero||0),a.fecha,a.tipo==='proveedor'?'Proveedor':'Cliente',a.proveedor||a.cliente||'-',a.empresa||'-',a.obra||'-',a.estado||'Borrador',(a.subtotal||0).toFixed(2),(a.iva||0).toFixed(2),(a.total||0).toFixed(2)]);
@@ -5606,7 +5617,7 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Albaranes',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('albaranes-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de albaranes exportado');
+doc.save('albaranes-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de albaranes exportado');
 }
 function exportAlbaranesExcel(){
 const headers=['Serie','Fecha','Tipo','Proveedor/Cliente','NIF','Empresa','Obra','Estado','Subtotal','IVA','Total','Notas'];
@@ -5839,7 +5850,7 @@ const estadoColor={Borrador:'background:#78909C;color:#fff',Recibida:'background
 document.getElementById('compras-list').innerHTML=
 (list.length?list.map(c=>{
 const total=(c.total||0).toFixed(2);
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getCompSerieStr(c.numero||0)}</span><br><small style="color:var(--text-light)">${c.fecha}</small></td><td>${c.proveedor||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[c.estado]||''}">${c.estado||'Recibida'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editCompra('${c.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteCompra('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getCompSerieStr(c.numero||0)}</span><br><small style="color:var(--text-light)">${c.fecha}</small></td><td>${c.proveedor||'-'}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[c.estado]||''}">${c.estado||'Recibida'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editCompra('${c.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="PDF completo con desglose" onclick="generateCompraPDF('${c.id}')" style="padding:5px 10px;font-size:.75rem">PDF</button> <button class="btn btn-danger" onclick="deleteCompra('${c.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-light)">No hay compras registradas</td></tr>');
 }
 
@@ -5863,25 +5874,7 @@ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Compras');
 XLSX.writeFile(wb,'compras-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de compras exportado');
 }
 
-function generateCompraPDF(id){
-const c=compras.find(x=>x.id===id);if(!c)return;
-const {jsPDF}=window.jspdf;const doc=new jsPDF();
-drawEmpresaHeader(doc);
-doc.setFontSize(12);doc.text('COMPRA '+getCompSerieStr(c.numero||0),14,25);
-doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+c.fecha,14,33);
-doc.text('Estado: '+(c.estado||'Recibida'),14,39);
-let y=47;
-doc.setFontSize(10);doc.setTextColor(2);doc.text('Proveedor: '+(c.proveedor||'-'),14,y);y+=10;
-const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
-const data=(c.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
-doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-const finalY=doc.lastAutoTable.finalY+10;
-doc.setFontSize(10);doc.text('Subtotal: '+(c.subtotal||0).toFixed(2)+' EUR',120,finalY);
-doc.text('IVA ('+(c.ivaPorcentaje||21)+'%): '+(c.iva||0).toFixed(2)+' EUR',120,finalY+6);
-doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(c.total||0).toFixed(2)+' EUR',120,finalY+14);
-if(c.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+c.notas,14,finalY+22);}
-doc.save('compra-'+getCompSerieStr(c.numero||0)+'.pdf');toast('PDF de la compra generado');
-}
+function generateCompraPDF(id){generarDocumentoPDF('compra',id);}
 
 function nextVenSerie(){venSerieCounter++;localStorage.setItem(aimKey('ven_serie_counter'),venSerieCounter);return venSerieCounter}
 function getVenSerieStr(n){return 'VEN-'+String(n).padStart(5,'0')}
@@ -6089,7 +6082,7 @@ document.getElementById('ventas-list').innerHTML=
 const total=(v.total||0).toFixed(2);
 const destin=v.destino==='obra'?'&#127959; Obra':'&#128100; Cliente';
 const target=v.destino==='obra'?(v.obra||'-'):(v.cliente||'-');
-return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getVenSerieStr(v.numero||0)}</span><br><small style="color:var(--text-light)">${v.fecha}</small></td><td>${destin}</td><td>${target}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[v.estado]||''}">${v.estado||'Confirmada'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editVenta('${v.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-danger" onclick="deleteVenta('${v.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
+return`<tr><td><span style="font-weight:700;color:var(--primary-dark)">${getVenSerieStr(v.numero||0)}</span><br><small style="color:var(--text-light)">${v.fecha}</small></td><td>${destin}</td><td>${target}</td><td><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${estadoColor[v.estado]||''}">${v.estado||'Confirmada'}</span></td><td><strong>${total} &euro;</strong></td><td><button class="btn btn-warning" onclick="editVenta('${v.id}')" style="padding:5px 10px;font-size:.75rem">E</button> <button class="btn btn-outline" title="PDF completo con desglose" onclick="generateVentaPDF('${v.id}')" style="padding:5px 10px;font-size:.75rem">PDF</button> <button class="btn btn-danger" onclick="deleteVenta('${v.id}')" style="padding:5px 10px;font-size:.75rem">X</button></td></tr>`
 }).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light)">No hay ventas registradas</td></tr>');
 }
 
@@ -6114,27 +6107,7 @@ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Ventas');
 XLSX.writeFile(wb,'ventas-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de ventas exportado');
 }
 
-function generateVentaPDF(id){
-const v=ventas.find(x=>x.id===id);if(!v)return;
-const {jsPDF}=window.jspdf;const doc=new jsPDF();
-drawEmpresaHeader(doc);
-doc.setFontSize(12);doc.text('VENTA '+getVenSerieStr(v.numero||0),14,25);
-doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+v.fecha,14,33);
-doc.text('Estado: '+(v.estado||'Confirmada'),14,39);
-let y=47;
-doc.setFontSize(10);doc.setTextColor(2);
-if(v.destino==='obra')doc.text('Destino: Obra '+(v.obra||'-'),14,y);else doc.text('Cliente: '+(v.cliente||'-'),14,y);
-y+=10;
-const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
-const data=(v.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
-doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-const finalY=doc.lastAutoTable.finalY+10;
-doc.setFontSize(10);doc.text('Subtotal: '+(v.subtotal||0).toFixed(2)+' EUR',120,finalY);
-doc.text('IVA ('+(v.ivaPorcentaje||21)+'%): '+(v.iva||0).toFixed(2)+' EUR',120,finalY+6);
-doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(v.total||0).toFixed(2)+' EUR',120,finalY+14);
-if(v.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+v.notas,14,finalY+22);}
-doc.save('venta-'+getVenSerieStr(v.numero||0)+'.pdf');toast('PDF de la venta generado');
-}
+function generateVentaPDF(id){generarDocumentoPDF('venta',id);}
 
 function nextPartSerie(){partSerieCounter++;localStorage.setItem(aimKey('part_serie_counter'),partSerieCounter);return partSerieCounter}
 function getPartSerieStr(n){return 'PT-'+String(n).padStart(5,'0')}
@@ -6328,34 +6301,236 @@ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Partes de Tra
 XLSX.writeFile(wb,'partes-trabajo-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de partes de trabajo exportado');
 }
 
-function generatePartePDF(id){
-const p=partes.find(x=>x.id===id);if(!p)return;
-const {jsPDF}=window.jspdf;const doc=new jsPDF();
-drawEmpresaHeader(doc);
-doc.setFontSize(12);doc.text('PARTE DE TRABAJO '+getPartSerieStr(p.numero||0),14,25);
-doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+p.fecha,14,33);
-doc.text('Estado: '+(p.estado||'Borrador'),14,39);
-let y=47;
-doc.setFontSize(10);doc.setTextColor(2);
-doc.text('Empleado: '+(p.empleado||'-'),14,y);
-doc.text('Obra: '+(p.obra||'-'),14,y+6);
-if(p.horas)doc.text('Horas: '+p.horas,14,y+12);
-doc.setFontSize(9);doc.text('Trabajos realizados: '+(p.descripcion||''),14,y+18);
-y+=30;
-if((p.lineas||[]).length){
-const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
-const data=(p.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
-doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-const finalY=doc.lastAutoTable.finalY+10;
-doc.setFontSize(10);doc.text('Subtotal: '+(p.subtotal||0).toFixed(2)+' EUR',120,finalY);
-doc.text('IVA ('+(p.ivaPorcentaje||21)+'%): '+(p.iva||0).toFixed(2)+' EUR',120,finalY+6);
-doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(p.total||0).toFixed(2)+' EUR',120,finalY+14);
-if(p.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+p.notas,14,finalY+22);}
+/* ================= PDF COMPLETO DE DOCUMENTOS ================= */
+const PDF_DOC_DEFS={
+presupuesto:{titulo:'PRESUPUESTO',lista:()=>presupuestos,serie:getPresSerieStr,extraKey:'fechaValidez',extraLabel:'Validez'},
+factura:{titulo:'FACTURA',lista:()=>facturas,serie:getFacSerieStr,extraKey:'fechaVencimiento',extraLabel:'Vencimiento'},
+albaran:{titulo:'ALBARAN',lista:()=>albaranes,serie:getAlbSerieStr},
+compra:{titulo:'COMPRA',lista:()=>compras,serie:getCompSerieStr},
+venta:{titulo:'VENTA',lista:()=>ventas,serie:getVenSerieStr},
+parte:{titulo:'PARTE DE TRABAJO',lista:()=>partes,serie:getPartSerieStr}
+};
+
+function pdfFmtNum(n){return (Number(n)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pdfFmtCant(n){return (Number(n)||0).toLocaleString('es-ES',{maximumFractionDigits:3})}
+
+function pdfTituloDocumento(tipo,d){
+if(tipo==='factura'){
+if(d.tipo==='abono')return 'ABONO DE CLIENTE';
+if(d.tipo==='abono-proveedor')return 'ABONO DE PROVEEDOR';
+return 'FACTURA';
+}
+if(tipo==='albaran')return d.tipo==='cliente'?'ALBARAN A CLIENTE':'ALBARAN DE PROVEEDOR';
+return (PDF_DOC_DEFS[tipo]&&PDF_DOC_DEFS[tipo].titulo)||'DOCUMENTO';
+}
+
+function pdfLineasDe(d){
+const arr=(d&&Array.isArray(d.lineas))?d.lineas:[];
+const mats={};
+if(Array.isArray(materials))materials.forEach(m=>{if(m&&m.id)mats[m.id]=m});
+return arr.map(l=>{
+const mat=l.materialId?mats[l.materialId]:null;
+const cantidad=Number(l.cantidad)||0;
+const precio=Number(l.precioUnitario)||0;
+return{
+codigo:String(l.codigo||(mat&&mat.codigo)||''),
+material:String(l.material||(mat&&mat.nombre)||''),
+categoria:String(l.categoria||(mat&&mat.categoria)||'Sin categoria'),
+unidad:String(l.unidad||(mat&&mat.unidad)||''),
+cantidad:cantidad,
+precioUnitario:precio,
+subtotal:cantidad*precio
+}
+});
+}
+
+function pdfAgruparLineas(lineas){
+const grupos=[];const idx={};
+lineas.forEach(l=>{
+const k=l.categoria||'Sin categoria';
+if(idx[k]===undefined){idx[k]=grupos.length;grupos.push({categoria:k,lineas:[],subtotal:0});}
+grupos[idx[k]].lineas.push(l);
+grupos[idx[k]].subtotal+=l.subtotal;
+});
+return grupos;
+}
+
+function pdfDatosTercero(tipo,d){
+let label='CLIENTE';
+let nombre=d.cliente||'';
+if(tipo==='compra'){label='PROVEEDOR';nombre=d.proveedor||'';}
+else if(tipo==='albaran'){label=d.tipo==='proveedor'?'PROVEEDOR':'CLIENTE';nombre=d.tipo==='proveedor'?(d.proveedor||''):(d.cliente||'');}
+else if(tipo==='factura'&&d.tipo==='abono-proveedor'){label='PROVEEDOR';nombre=d.proveedor||d.cliente||'';}
+else if(tipo==='venta'){label='CLIENTE';nombre=d.destino==='obra'?(d.obra||''):(d.cliente||'');}
+else if(tipo==='parte'){label='EMPLEADO';nombre=d.empleado||'';}
+return{label:label,nombre:nombre,nif:tipo==='parte'?'':(d.nif||''),direccion:d.direccion||'',telefono:d.telefono||'',email:d.email||''};
+}
+
+function pdfDatosDocumento(tipo,d){
+const def=PDF_DOC_DEFS[tipo]||{};
+const filas=[];
+filas.push(['Fecha',d.fecha||'-']);
+if(def.extraKey&&d[def.extraKey])filas.push([def.extraLabel,d[def.extraKey]]);
+filas.push(['Estado',d.estado||'Borrador']);
+if(d.empresa)filas.push(['Empresa',d.empresa]);
+if(d.obra)filas.push(['Obra',d.obra]);
+if(d.subcontrata)filas.push(['Subcontrata',d.subcontrata]);
+if(tipo==='parte'){
+if(d.horas)filas.push(['Horas',d.horas]);
+if(d.descripcion)filas.push(['Trabajos',d.descripcion]);
+}
+if(tipo==='venta'&&d.destino)filas.push(['Destino',d.destino==='obra'?'Obra':'Cliente']);
+if(tipo==='factura'&&d.origen&&d.origen.ref)filas.push(['Origen',d.origen.ref]);
+return filas;
+}
+
+function pdfDrawBloqueInfo(doc,x,y,w,titulo,filas){
+doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(2,119,189);
+doc.text(titulo,x,y);
+doc.setDrawColor(2,119,189);doc.setLineWidth(.35);doc.line(x,y+1.8,x+w,y+1.8);
+doc.setFont('helvetica','normal');
+let yy=y+6.5;
+filas.forEach(f=>{
+const val=(f[1]===undefined||f[1]===null)?'':String(f[1]).trim();
+if(!val)return;
+const texto=String(f[0])+': '+val;
+doc.setFontSize(7.6);doc.setTextColor(55);
+const lines=doc.splitTextToSize(texto,w);
+doc.text(lines,x,yy);
+yy+=lines.length*3.35+1.5;
+});
+return yy;
+}
+
+function pdfDrawCabeceraEmpresa(doc,y){
+const emp=getEmpresaActiva();
+doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(2,119,189);
+doc.text((emp&&emp.nombre)||'Gestion Empresa',14,y+1);
+doc.setFont('helvetica','normal');doc.setFontSize(7.3);doc.setTextColor(90);
+let yy=y+6;
+if(emp){
+const loc=[emp.cp,emp.poblacion,emp.provincia,emp.pais].filter(Boolean).join(', ');
+const lineas=[];
+if(emp.nif)lineas.push('NIF/CIF: '+emp.nif);
+const dir=[emp.direccion,loc].filter(Boolean).join(', ');
+if(dir)lineas.push(dir);
+const contacto=[emp.telefono?'Tel: '+emp.telefono:'',emp.email||''].filter(Boolean).join('   |   ');
+if(contacto)lineas.push(contacto);
+lineas.forEach(l=>{const ls=doc.splitTextToSize(l,118);doc.text(ls,14,yy);yy+=ls.length*3.2;});
+if(emp.foto){try{doc.addImage(emp.foto,emp.foto.startsWith('data:image/jpeg')?'JPEG':'PNG',160,y-2,32,14);}catch(e){}}
+}else{yy=y+9;}
+const lineY=Math.max(yy+2,y+15);
+doc.setDrawColor(2,119,189);doc.setLineWidth(.6);doc.line(14,lineY,196,lineY);
+return lineY+5;
+}
+
+function pdfRenderDocumento(doc,tipo,d){
+const def=PDF_DOC_DEFS[tipo]||{};
+let y=pdfDrawCabeceraEmpresa(doc,14);
+doc.setFillColor(2,119,189);doc.rect(14,y,182,11,'F');
+doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(255,255,255);
+doc.text(pdfTituloDocumento(tipo,d),17,y+7.3);
+doc.setFontSize(10.5);
+doc.text(def.serie?def.serie(d.numero||0):'',193,y+7.3,{align:'right'});
+y+=17;
+const ter=pdfDatosTercero(tipo,d);
+const filasTer=[];
+if(ter.nombre)filasTer.push(['Nombre',ter.nombre]);
+if(ter.nif)filasTer.push(['NIF/CIF',ter.nif]);
+if(ter.direccion)filasTer.push(['Direccion',ter.direccion]);
+if(ter.telefono)filasTer.push(['Telefono',ter.telefono]);
+if(ter.email)filasTer.push(['Email',ter.email]);
+const meta=pdfDatosDocumento(tipo,d);
+const y1=pdfDrawBloqueInfo(doc,14,y,96,ter.label,filasTer.length?filasTer:[['Nombre','-']]);
+const y2=pdfDrawBloqueInfo(doc,116,y,80,'DATOS DEL DOCUMENTO',meta);
+y=Math.max(y1,y2)+3;
+doc.setDrawColor(225,235,245);doc.setLineWidth(.3);doc.line(14,y,196,y);
+y+=4;
+const lineas=pdfLineasDe(d);
+const grupos=pdfAgruparLineas(lineas);
+const body=[];
+if(!lineas.length){
+body.push([{content:'Sin lineas de detalle en este documento',colSpan:6,styles:{halign:'center',textColor:[120,120,120]}}]);
 }else{
-doc.setFontSize(10);doc.setTextColor(2);doc.text('Sin materiales.',14,y);
+grupos.forEach(g=>{
+body.push([{content:'CAPITULO: '+g.categoria,colSpan:5,styles:{fillColor:[225,241,252],textColor:[2,119,189],fontStyle:'bold',fontSize:8}},{content:pdfFmtNum(g.subtotal)+' EUR',styles:{fillColor:[225,241,252],textColor:[2,119,189],fontStyle:'bold',halign:'right'}}]);
+g.lineas.forEach(l=>{
+body.push([l.codigo||'-',l.material,l.unidad||'',pdfFmtCant(l.cantidad),pdfFmtNum(l.precioUnitario),pdfFmtNum(l.subtotal)]);
+});
+body.push([{content:'Subtotal '+g.categoria,colSpan:5,styles:{halign:'right',fontStyle:'bold',textColor:[90,90,90]}},{content:pdfFmtNum(g.subtotal)+' EUR',styles:{halign:'right',fontStyle:'bold'}}]);
+});
 }
-doc.save('parte-'+getPartSerieStr(p.numero||0)+'.pdf');toast('PDF del parte generado');
+doc.autoTable({
+head:[['Codigo','Descripcion','Ud.','Cantidad','Precio','Importe']],
+body:body,
+startY:y,
+theme:'grid',
+margin:{left:14,right:14,top:16,bottom:18},
+styles:{font:'helvetica',fontSize:7.4,cellPadding:1.5,overflow:'linebreak',valign:'middle'},
+headStyles:{fillColor:[2,119,189],textColor:[255,255,255],fontSize:7.6,fontStyle:'bold',halign:'center'},
+columnStyles:{0:{cellWidth:19,halign:'center'},1:{cellWidth:77},2:{cellWidth:12,halign:'center'},3:{cellWidth:20,halign:'right'},4:{cellWidth:26,halign:'right'},5:{cellWidth:28,halign:'right'}},
+alternateRowStyles:{fillColor:[247,251,255]}
+});
+doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+const notasTxt=d.notas?doc.splitTextToSize(String(d.notas),96):[];
+const notesH=notasTxt.length?8+notasTxt.length*3.4:0;
+const needed=Math.max(28,notesH)+8;
+let fy=doc.lastAutoTable.finalY+6;
+if(fy+needed>278){doc.addPage();fy=20;}
+doc.setFillColor(247,251,255);doc.setDrawColor(224,234,244);doc.setLineWidth(.3);
+doc.roundedRect(118,fy,78,28,2,2,'FD');
+doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(70,70,70);
+doc.text('Subtotal',122,fy+6);doc.text(pdfFmtNum(d.subtotal)+' EUR',192,fy+6,{align:'right'});
+doc.text('IVA ('+String(d.ivaPorcentaje||21)+'%)',122,fy+11.5);doc.text(pdfFmtNum(d.iva)+' EUR',192,fy+11.5,{align:'right'});
+doc.setDrawColor(2,119,189);doc.setLineWidth(.4);doc.line(122,fy+14.5,192,fy+14.5);
+doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(2,119,189);
+doc.text('TOTAL',122,fy+22);doc.text(pdfFmtNum(d.total)+' EUR',192,fy+22,{align:'right'});
+let ny=fy;
+if(notasTxt.length){
+doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(2,119,189);
+doc.text('OBSERVACIONES / CONDICIONES',14,fy+4);
+doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(70);
+doc.text(notasTxt,14,fy+8);
+ny=fy+notesH;
 }
+return Math.max(fy+30,ny);
+}
+
+function pdfFinalizar(doc){
+const total=doc.internal.getNumberOfPages();
+const emp=getEmpresaActiva();
+const emisor=(emp&&emp.nombre)||'Gestion Empresa';
+for(let i=1;i<=total;i++){
+doc.setPage(i);
+doc.setDrawColor(220,225,232);doc.setLineWidth(.3);doc.line(14,285,196,285);
+doc.setFont('helvetica','normal');doc.setFontSize(6.8);doc.setTextColor(130,135,145);
+doc.text(emisor+' - Documento generado el '+new Date().toLocaleString('es-ES'),14,289);
+doc.text('Pagina '+i+' de '+total,196,289,{align:'right'});
+}
+}
+
+function generarDocumentoPDF(tipo,id){
+const def=PDF_DOC_DEFS[tipo];if(!def)return;
+const d=def.lista().find(x=>x.id===id);if(!d){toast('Documento no encontrado');return;}
+const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+pdfRenderDocumento(doc,tipo,d);
+pdfFinalizar(doc);
+doc.save(tipo+'-'+def.serie(d.numero||0)+'.pdf');
+toast('PDF completo del '+def.titulo.toLowerCase()+' generado con todo el desglose');
+}
+
+function exportDocumentosPDFCompleto(tipo){
+const def=PDF_DOC_DEFS[tipo];if(!def)return;
+const lista=[...def.lista()].sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+if(!lista.length){toast('No hay documentos para exportar');return;}
+const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+lista.forEach((d,i)=>{if(i>0)doc.addPage();pdfRenderDocumento(doc,tipo,d);});
+pdfFinalizar(doc);
+doc.save(tipo+'s-completo-'+new Date().toISOString().split('T')[0]+'.pdf');
+toast('PDF completo generado: '+lista.length+' documentos con su desglose');
+}
+
+function generatePartePDF(id){generarDocumentoPDF('parte',id);}
 
 function clearPresFilters(){
 document.getElementById('filter-pres-desde').value='';document.getElementById('filter-pres-hasta').value='';document.getElementById('filter-pres-empresa').value='';document.getElementById('filter-pres-obra').value='';document.getElementById('filter-pres-estado').value='';
@@ -6385,55 +6560,9 @@ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Facturas');
 XLSX.writeFile(wb,'facturas-'+new Date().toISOString().split('T')[0]+'.xlsx');toast('Excel de facturas exportado');
 }
 
-function generatePresupuestoPDF(id){
-const p=presupuestos.find(x=>x.id===id);if(!p)return;
-const {jsPDF}=window.jspdf;const doc=new jsPDF();
-drawEmpresaHeader(doc);
-doc.setFontSize(12);doc.text('PRESUPUESTO '+getPresSerieStr(p.numero||0),14,25);
-doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+p.fecha,14,33);
-if(p.fechaValidez)doc.text('Validez: '+p.fechaValidez,14,39);
-doc.text('Estado: '+(p.estado||'Borrador'),14,p.fechaValidez?45:39);
-let y=p.fechaValidez?55:47;
-doc.setFontSize(10);doc.setTextColor(2);doc.text('Cliente: '+(p.cliente||'-'),14,y);y+=6;
-if(p.nif)doc.text('NIF/CIF: '+p.nif,14,y);y+=6;
-if(p.direccion)doc.text('Direccion: '+p.direccion,14,y);y+=6;
-if(p.empresa)doc.text('Empresa: '+p.empresa,14,y);y+=6;
-if(p.obra)doc.text('Obra: '+p.obra,14,y);y+=10;
-const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
-const data=(p.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
-doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-const finalY=doc.lastAutoTable.finalY+10;
-doc.setFontSize(10);doc.text('Subtotal: '+(p.subtotal||0).toFixed(2)+' EUR',120,finalY);
-doc.text('IVA ('+(p.ivaPorcentaje||21)+'%): '+(p.iva||0).toFixed(2)+' EUR',120,finalY+6);
-doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(p.total||0).toFixed(2)+' EUR',120,finalY+14);
-if(p.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+p.notas,14,finalY+22);}
-doc.save('presupuesto-'+getPresSerieStr(p.numero||0)+'.pdf');toast('PDF del presupuesto generado');
-}
+function generatePresupuestoPDF(id){generarDocumentoPDF('presupuesto',id);}
 
-function generateFacturaPDF(id){
-const f=facturas.find(x=>x.id===id);if(!f)return;
-const {jsPDF}=window.jspdf;const doc=new jsPDF();
-drawEmpresaHeader(doc);
-doc.setFontSize(12);doc.text('FACTURA '+getFacSerieStr(f.numero||0),14,25);
-doc.setFontSize(9);doc.setTextColor(80);doc.text('Fecha: '+f.fecha,14,33);
-if(f.fechaVencimiento)doc.text('Vencimiento: '+f.fechaVencimiento,14,39);
-doc.text('Estado: '+(f.estado||'Borrador'),14,f.fechaVencimiento?45:39);
-let y=f.fechaVencimiento?55:47;
-doc.setFontSize(10);doc.setTextColor(2);doc.text('Cliente: '+(f.cliente||'-'),14,y);y+=6;
-if(f.nif)doc.text('NIF/CIF: '+f.nif,14,y);y+=6;
-if(f.direccion)doc.text('Direccion: '+f.direccion,14,y);y+=6;
-if(f.empresa)doc.text('Empresa: '+f.empresa,14,y);y+=6;
-if(f.obra)doc.text('Obra: '+f.obra,14,y);y+=10;
-const hdr=['Material','Categoria','Cantidad','Unidad','Precio/u','Subtotal'];
-const data=(f.lineas||[]).map(l=>[l.material,l.categoria,l.cantidad,l.unidad,(l.precioUnitario||0).toFixed(2),(l.cantidad*l.precioUnitario).toFixed(2)]);
-doc.autoTable({head:[hdr],body:data,startY:y,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-const finalY=doc.lastAutoTable.finalY+10;
-doc.setFontSize(10);doc.text('Subtotal: '+(f.subtotal||0).toFixed(2)+' EUR',120,finalY);
-doc.text('IVA ('+(f.ivaPorcentaje||21)+'%): '+(f.iva||0).toFixed(2)+' EUR',120,finalY+6);
-doc.setFontSize(12);doc.setTextColor(2,136,209);doc.text('TOTAL: '+(f.total||0).toFixed(2)+' EUR',120,finalY+14);
-if(f.notas){doc.setFontSize(8);doc.setTextColor(80);doc.text('Notas: '+f.notas,14,finalY+22);}
-doc.save('factura-'+getFacSerieStr(f.numero||0)+'.pdf');toast('PDF de la factura generado');
-}
+function generateFacturaPDF(id){generarDocumentoPDF('factura',id);}
 
 function abrirCorreo(to,subj,body){
 const link='mailto:'+encodeURIComponent(to||'')+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
@@ -6663,6 +6792,9 @@ doc.save('mediciones-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF
 }
 
 function exportPresupuestosPDF(){
+exportDocumentosPDFCompleto('presupuesto');
+}
+function exportPresupuestosPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Cliente','Empresa','Obra','Estado','Subtotal','IVA','Total'];
 const data=[...presupuestos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(p=>[getPresSerieStr(p.numero||0),p.fecha,p.cliente||'-',p.empresa||'-',p.obra||'-',p.estado||'Borrador',(p.subtotal||0).toFixed(2),(p.iva||0).toFixed(2),(p.total||0).toFixed(2)]);
@@ -6670,10 +6802,13 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Presupuestos',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('presupuestos-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de presupuestos exportado');
+doc.save('presupuestos-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de presupuestos exportado');
 }
 
 function exportFacturasPDF(){
+exportDocumentosPDFCompleto('factura');
+}
+function exportFacturasPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Vencimiento','Cliente','Empresa','Obra','Estado','Subtotal','IVA','Total'];
 const data=[...facturas].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(f=>[getFacSerieStr(f.numero||0),f.fecha,f.fechaVencimiento||'-',f.cliente||'-',f.empresa||'-',f.obra||'-',f.estado||'Borrador',(f.subtotal||0).toFixed(2),(f.iva||0).toFixed(2),(f.total||0).toFixed(2)]);
@@ -6681,7 +6816,7 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Facturas',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('facturas-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de facturas exportado');
+doc.save('facturas-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de facturas exportado');
 }
 
 function exportAlmacenPDF(){
@@ -6700,6 +6835,9 @@ doc.save('almacen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de
 }
 
 function exportComprasPDF(){
+exportDocumentosPDFCompleto('compra');
+}
+function exportComprasPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Proveedor','Estado','Subtotal','IVA','Total'];
 const data=[...compras].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(c=>[getCompSerieStr(c.numero||0),c.fecha,c.proveedor||'-',c.estado||'Recibida',(c.subtotal||0).toFixed(2),(c.iva||0).toFixed(2),(c.total||0).toFixed(2)]);
@@ -6707,10 +6845,13 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Compras',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('compras-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de compras exportado');
+doc.save('compras-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de compras exportado');
 }
 
 function exportPartesPDF(){
+exportDocumentosPDFCompleto('parte');
+}
+function exportPartesPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Empleado','Obra','Horas','Trabajos','Estado','Subtotal','IVA','Total'];
 const data=[...partes].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(p=>[getPartSerieStr(p.numero||0),p.fecha,p.empleado||'-',p.obra||'-',p.horas||0,p.descripcion||'',p.estado||'Borrador',(p.subtotal||0).toFixed(2),(p.iva||0).toFixed(2),(p.total||0).toFixed(2)]);
@@ -6718,10 +6859,13 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Partes de Trabajo',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},columnStyles:{5:{cellWidth:60}},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('partes-trabajo-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de partes de trabajo exportado');
+doc.save('partes-trabajo-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de partes de trabajo exportado');
 }
 
 function exportVentasPDF(){
+exportDocumentosPDFCompleto('venta');
+}
+function exportVentasPDFResumen(){
 const {jsPDF}=window.jspdf;const doc=new jsPDF();
 const hdr=['Serie','Fecha','Destino','Cliente/Obra','Estado','Subtotal','IVA','Total'];
 const data=[...ventas].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(v=>[getVenSerieStr(v.numero||0),v.fecha,v.destino==='obra'?'Obra':'Cliente',v.destino==='obra'?(v.obra||'-'):(v.cliente||'-'),v.estado||'Confirmada',(v.subtotal||0).toFixed(2),(v.iva||0).toFixed(2),(v.total||0).toFixed(2)]);
@@ -6729,7 +6873,7 @@ drawEmpresaHeader(doc);
 doc.setFontSize(12);doc.text('Ventas',14,25);
 doc.setFontSize(9);doc.setTextColor(120);doc.text('Generado: '+new Date().toLocaleString('es-ES')+' | Total: '+data.length,14,31);
 doc.autoTable({head:[hdr],body:data,startY:35,theme:'grid',headStyles:{fillColor:[79,195,247],textColor:255,fontSize:8},bodyStyles:{fontSize:7},alternateRowStyles:{fillColor:[225,245,254]}});
-doc.save('ventas-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF de ventas exportado');
+doc.save('ventas-resumen-'+new Date().toISOString().split('T')[0]+'.pdf');toast('PDF resumen de ventas exportado');
 }
 
 const savedVersion=localStorage.getItem('app_version');
