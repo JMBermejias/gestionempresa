@@ -1279,7 +1279,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
 <select id="med-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="med-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addMedicionLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="med-add-line-btn" class="btn btn-success" onclick="addMedicionLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="med-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('med')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 </div>
 <div id="med-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
@@ -1327,7 +1327,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="pres-material" onchange="presMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="pres-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="pres-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addPresLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="pres-add-line-btn" class="btn btn-success" onclick="addPresLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="pres-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('pres')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 <div id="pres-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
@@ -1398,7 +1398,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="fac-material" onchange="facMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="fac-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="fac-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addFacLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="fac-add-line-btn" class="btn btn-success" onclick="addFacLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="fac-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('fac')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 <div id="fac-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
@@ -1622,7 +1622,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="com-material" onchange="comMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="com-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="com-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addCompLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="com-add-line-btn" class="btn btn-success" onclick="addCompLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="com-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('com')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 <div id="com-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
@@ -1668,7 +1668,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="ven-material" onchange="venMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="ven-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="ven-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addVenLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="ven-add-line-btn" class="btn btn-success" onclick="addVenLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="ven-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('ven')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 <div id="ven-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
@@ -1716,7 +1716,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="par-material" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="par-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="par-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addParLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="par-add-line-btn" class="btn btn-success" onclick="addParLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="par-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('par')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 </div>
 <div id="par-lineas" style="max-height:200px;overflow-y:auto;margin-bottom:10px"></div>
@@ -1776,7 +1776,7 @@ tr:hover{background:rgba(79,195,247,0.05)}
 <select id="al-material" onchange="albMaterialChanged()" style="flex:1;min-width:180px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem"></select>
 <input type="number" id="al-cantidad" step="0.01" min="0" placeholder="Cantidad" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
 <input type="number" id="al-precio" step="0.01" min="0" placeholder="Precio/u" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:.85rem">
-<button class="btn btn-success" onclick="addAlbLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button>
+<button id="al-add-line-btn" class="btn btn-success" onclick="addAlbLine()" style="white-space:nowrap;padding:8px 14px">+ Agregar</button> <button id="al-cancel-line-edit" class="btn btn-outline" onclick="cancelDocLineEdit('al')" style="display:none;white-space:nowrap;padding:8px 14px">Cancelar edicion</button>
 </div>
 <div id="al-precio-hint" style="font-size:.72rem;color:var(--text-light);margin-top:4px"></div>
 </div>
@@ -3422,8 +3422,8 @@ if(id==='prevision')renderPrevision();
 if(id==='impuestos')renderImpuestos();
 }
 
-function openModal(id){document.getElementById(id).classList.add('show')}
-function closeModal(id){document.getElementById(id).classList.remove('show')}
+function openModal(id){document.getElementById(id).classList.add('show');resetDocLineEditByModal(id)}
+function closeModal(id){document.getElementById(id).classList.remove('show');resetDocLineEditByModal(id)}
 
 function openClienteModal(){
 document.getElementById('cli-edit-id').value='';
@@ -4696,26 +4696,141 @@ document.getElementById('med-material').value=m.id;
 document.getElementById('med-cantidad').focus();
 }
 
-function addMedicionLine(){
-const materialId=document.getElementById('med-material').value;
-const cantidad=parseFloat(document.getElementById('med-cantidad').value);
+/* ================= EDICION DE LINEAS DE DOCUMENTOS ================= */
+const DOC_LINE_CFG={
+med:{modal:'modal-medicion',prefix:'med',lines:()=>tempMedicionLineas,filter:filterMaterialsForMedicion,totals:null,price:false,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:null},
+pres:{modal:'modal-presupuesto',prefix:'pres',lines:()=>tempPresLineas,filter:filterMaterialsForPres,totals:calcPresTotals,price:true,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:'presMaterialChanged'},
+fac:{modal:'modal-factura',prefix:'fac',lines:()=>tempFacLineas,filter:filterMaterialsForFac,totals:calcFacTotals,price:true,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:'facMaterialChanged'},
+al:{modal:'modal-albaran',prefix:'al',lines:()=>tempAlbLineas,filter:filterMaterialsForAlb,totals:calcAlbTotals,price:true,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:'albMaterialChanged'},
+com:{modal:'modal-compra',prefix:'com',lines:()=>tempCompLineas,filter:filterMaterialsForComp,totals:calcCompTotals,price:true,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:'comMaterialChanged'},
+ven:{modal:'modal-venta',prefix:'ven',lines:()=>tempVenLineas,filter:filterMaterialsForVen,totals:calcVenTotals,price:true,emptyMsg:'Agrega materiales usando el buscador o el selector',materialChanged:'venMaterialChanged'},
+par:{modal:'modal-parte',prefix:'par',lines:()=>tempPartLineas,filter:filterMaterialsForPar,totals:calcParTotals,price:true,emptyMsg:'Agrega materiales usados en el trabajo (opcional)',materialChanged:null}
+};
+const DOC_LINE_MODAL_KEYS={};
+Object.keys(DOC_LINE_CFG).forEach(k=>{DOC_LINE_MODAL_KEYS[DOC_LINE_CFG[k].modal]=k});
+const docLineEditIdx={med:-1,pres:-1,fac:-1,al:-1,com:-1,ven:-1,par:-1};
+
+function docLineSetValue(id,v){const el=document.getElementById(id);if(el)el.value=v}
+function docLineGetValue(id){const el=document.getElementById(id);return el?el.value:''}
+
+function clearDocLineForm(key){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+const p=cfg.prefix;
+docLineSetValue(p+'-cantidad','');
+if(cfg.price)docLineSetValue(p+'-precio','');
+docLineSetValue(p+'-mat-search','');
+const results=document.getElementById(p+'-mat-results');if(results)results.classList.remove('show');
+}
+function setDocLineEditUI(key){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+const editing=docLineEditIdx[key]>=0;
+const add=document.getElementById(cfg.prefix+'-add-line-btn');
+if(add){add.textContent=editing?'Guardar cambios':'+ Agregar';add.className=editing?'btn btn-primary':'btn btn-success'}
+const cancel=document.getElementById(cfg.prefix+'-cancel-line-edit');
+if(cancel)cancel.style.display=editing?'':'none';
+}
+function resetDocLineEdit(key,clearForm){
+if(!DOC_LINE_CFG[key])return;
+docLineEditIdx[key]=-1;
+if(clearForm)clearDocLineForm(key);
+setDocLineEditUI(key);
+}
+function resetDocLineEditByModal(id){
+const key=DOC_LINE_MODAL_KEYS[id];
+if(key)resetDocLineEdit(key,true);
+}
+function cancelDocLineEdit(key){
+resetDocLineEdit(key,true);
+renderDocLines(key);
+}
+function editDocLine(key,idx){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+const lines=cfg.lines();const l=lines[idx];if(!l)return;
+docLineEditIdx[key]=idx;
+const p=cfg.prefix;
+const catSel=document.getElementById(p+'-cat');
+if(catSel){
+const val=l.categoria||'';
+if(val&&!Array.from(catSel.options).some(o=>o.value===val)){
+const opt=document.createElement('option');opt.value=val;opt.textContent=val;catSel.appendChild(opt);
+}
+catSel.value=val;
+}
+cfg.filter();
+const matSel=document.getElementById(p+'-material');
+if(matSel){
+let id=l.materialId||'';
+if(!materials.some(m=>m.id===id)){
+const m=materials.find(m=>m.nombre===(l.material||''));
+if(m)id=m.id;
+}
+matSel.value=id||'';
+}
+if(cfg.materialChanged&&typeof window[cfg.materialChanged]==='function')window[cfg.materialChanged]();
+docLineSetValue(p+'-cantidad',l.cantidad);
+if(cfg.price)docLineSetValue(p+'-precio',l.precioUnitario);
+docLineSetValue(p+'-mat-search','');
+const results=document.getElementById(p+'-mat-results');if(results)results.classList.remove('show');
+setDocLineEditUI(key);
+renderDocLines(key);
+const cant=document.getElementById(p+'-cantidad');if(cant)cant.focus();
+}
+function commitDocLine(key){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+const p=cfg.prefix;
+const materialId=docLineGetValue(p+'-material');
+const cantidad=parseFloat(docLineGetValue(p+'-cantidad'));
+const precio=cfg.price?parseFloat(docLineGetValue(p+'-precio')):0;
 if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
+if(cfg.price&&isNaN(precio)){alert('Introduce el precio unitario');return}
 const mat=materials.find(m=>m.id===materialId);
-tempMedicionLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad});
-document.getElementById('med-cantidad').value='';
-document.getElementById('med-mat-search').value='';
-renderTempMedLineas();
+if(!mat){alert('Selecciona un material valido');return}
+const line={materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad:cantidad};
+if(cfg.price)line.precioUnitario=precio;
+const lines=cfg.lines();
+const idx=docLineEditIdx[key];
+const wasEditing=idx>=0&&idx<lines.length;
+if(wasEditing)lines[idx]=line;else lines.push(line);
+resetDocLineEdit(key,true);
+renderDocLines(key);
+if(cfg.totals)cfg.totals();
+if(wasEditing)toast('Linea actualizada');
 }
+function removeDocLine(key,idx){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+cfg.lines().splice(idx,1);
+const cur=docLineEditIdx[key];
+if(cur===idx)resetDocLineEdit(key,true);
+else if(cur>idx)docLineEditIdx[key]=cur-1;
+setDocLineEditUI(key);
+renderDocLines(key);
+if(cfg.totals)cfg.totals();
+}
+function renderDocLines(key){
+const cfg=DOC_LINE_CFG[key];if(!cfg)return;
+const container=document.getElementById(cfg.prefix+'-lineas');if(!container)return;
+const lines=cfg.lines();
+const th='<th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th>'+(cfg.price?'<th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th>':'<th style="padding:6px 8px">Unidad</th>')+'<th style="padding:6px 8px">Acciones</th>';
+const rows=lines.map((l,i)=>{
+const mat=materials.find(x=>x.id===l.materialId);
+const imgSrc=mat?getMaterialImg(mat):'';
+const editing=docLineEditIdx[key]===i;
+const sub=((l.cantidad||0)*(l.precioUnitario||0)).toFixed(2);
+const cells='<td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">'+(imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':'')+(l.material||'')+'</div></td>'+
+'<td style="padding:5px 8px;text-align:center"><span class="tag tag-'+catTagClass(l.categoria)+'">'+(l.categoria||'')+'</span></td>'+
+'<td style="padding:5px 8px;text-align:center">'+Number(l.cantidad||0).toFixed(2)+'</td>'+
+(cfg.price?'<td style="padding:5px 8px;text-align:right">'+Number(l.precioUnitario||0).toFixed(2)+'</td><td style="padding:5px 8px;text-align:right;font-weight:600">'+sub+'</td>':'<td style="padding:5px 8px;text-align:center">'+(l.unidad||'')+'</td>')+
+'<td style="padding:5px 8px;text-align:center;white-space:nowrap"><button class="btn btn-primary" onclick="editDocLine(\''+key+'\','+i+')" title="Editar linea" style="padding:2px 6px;font-size:.65rem">Editar</button> <button class="btn btn-danger" onclick="removeDocLine(\''+key+'\','+i+')" title="Eliminar linea" style="padding:2px 6px;font-size:.65rem">X</button></td>';
+return '<tr style="border-bottom:1px solid var(--border)'+(editing?';background:#FFF8E1':'')+'">'+cells+'</tr>';
+}).join('');
+container.innerHTML=lines.length?('<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff">'+th+'</tr></thead><tbody>'+rows+'</tbody></table>'):('<p style="color:var(--muted);font-size:.8rem;margin:0">'+cfg.emptyMsg+'</p>');
+setDocLineEditUI(key);
+}
+function addMedicionLine(){commitDocLine('med')}
 
-function removeTempMedLine(idx){
-tempMedicionLineas.splice(idx,1);
-renderTempMedLineas();
-}
+function removeTempMedLine(idx){removeDocLine('med',idx)}
 
-function renderTempMedLineas(){
-const container=document.getElementById('med-lineas');
-container.innerHTML=tempMedicionLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Unidad</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempMedicionLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.unidad}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempMedLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function renderTempMedLineas(){renderDocLines('med')}
 
 function editMedicion(id){
 const m=mediciones.find(x=>x.id===id);
@@ -5062,57 +5177,17 @@ const hint=document.getElementById('fac-precio-hint');
 if(hint){if(m){hint.textContent=(m.pvp>0?'PVP '+fmtPrecio(m.pvp)+' EUR · ':'')+'Coste '+fmtPrecio(getMaterialCoste(m))+' EUR · Inc. '+(m.incremento||0)+'% -> Venta '+fmtPrecio(getMaterialPrecio(m))+' EUR'}else{hint.textContent=''}}
 }
 
-function addPresLine(){
-const materialId=document.getElementById('pres-material').value;
-const cantidad=parseFloat(document.getElementById('pres-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('pres-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempPresLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('pres-cantidad').value='';
-document.getElementById('pres-precio').value='';
-document.getElementById('pres-mat-search').value='';
-renderTempPresLineas();
-calcPresTotals();
-}
+function addPresLine(){commitDocLine('pres')}
 
-function removeTempPresLine(idx){
-tempPresLineas.splice(idx,1);
-renderTempPresLineas();
-calcPresTotals();
-}
+function removeTempPresLine(idx){removeDocLine('pres',idx)}
 
-function renderTempPresLineas(){
-const container=document.getElementById('pres-lineas');
-container.innerHTML=tempPresLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPresLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempPresLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function renderTempPresLineas(){renderDocLines('pres')}
 
-function addFacLine(){
-const materialId=document.getElementById('fac-material').value;
-const cantidad=parseFloat(document.getElementById('fac-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('fac-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempFacLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('fac-cantidad').value='';
-document.getElementById('fac-precio').value='';
-document.getElementById('fac-mat-search').value='';
-renderTempFacLineas();
-calcFacTotals();
-}
+function addFacLine(){commitDocLine('fac')}
 
-function removeTempFacLine(idx){
-tempFacLineas.splice(idx,1);
-renderTempFacLineas();
-calcFacTotals();
-}
+function removeTempFacLine(idx){removeDocLine('fac',idx)}
 
-function renderTempFacLineas(){
-const container=document.getElementById('fac-lineas');
-container.innerHTML=tempFacLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempFacLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempFacLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function renderTempFacLineas(){renderDocLines('fac')}
 
 function docClienteAddr(c){return [c.direccion,c.cp,c.poblacion,c.provincia,c.pais].filter(Boolean).join(', ')}
 function docClienteSelected(prefix){
@@ -5545,29 +5620,9 @@ document.getElementById('al-material').value=m.id;
 albMaterialChanged();
 document.getElementById('al-cantidad').focus();
 }
-function addAlbLine(){
-const materialId=document.getElementById('al-material').value;
-const cantidad=parseFloat(document.getElementById('al-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('al-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempAlbLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('al-cantidad').value='';
-document.getElementById('al-precio').value='';
-document.getElementById('al-mat-search').value='';
-renderTempAlbLineas();
-calcAlbTotals();
-}
-function removeTempAlbLine(idx){
-tempAlbLineas.splice(idx,1);
-renderTempAlbLineas();
-calcAlbTotals();
-}
-function renderTempAlbLineas(){
-const container=document.getElementById('al-lineas');
-container.innerHTML=tempAlbLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempAlbLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempAlbLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function addAlbLine(){commitDocLine('al')}
+function removeTempAlbLine(idx){removeDocLine('al',idx)}
+function renderTempAlbLineas(){renderDocLines('al')}
 function calcAlbTotals(){
 const sub=tempAlbLineas.reduce((s,l)=>s+(l.cantidad*l.precioUnitario),0);
 const ivaPct=parseFloat(document.getElementById('al-iva-pct')?.textContent||'21');
@@ -5650,6 +5705,7 @@ sel.innerHTML='<option value="">Elige el origen...</option>'+list.map(d=>'<optio
 if(cur&&list.some(d=>d.id===cur))sel.value=cur;
 }
 function loadFacFromOrigen(){
+resetDocLineEdit('fac',true);
 const tipo=document.getElementById('fac-origen').value;
 const id=document.getElementById('fac-origen-doc').value;
 if(!tipo||!id)return;
@@ -5742,31 +5798,11 @@ const hint=document.getElementById('com-precio-hint');
 if(hint){hint.textContent=m?'Coste del material: '+fmtPrecio(getMaterialCoste(m))+' EUR (modificable)':''}
 }
 
-function addCompLine(){
-const materialId=document.getElementById('com-material').value;
-const cantidad=parseFloat(document.getElementById('com-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('com-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempCompLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('com-cantidad').value='';
-document.getElementById('com-precio').value='';
-document.getElementById('com-mat-search').value='';
-renderTempCompLineas();
-calcCompTotals();
-}
+function addCompLine(){commitDocLine('com')}
 
-function removeTempCompLine(idx){
-tempCompLineas.splice(idx,1);
-renderTempCompLineas();
-calcCompTotals();
-}
+function removeTempCompLine(idx){removeDocLine('com',idx)}
 
-function renderTempCompLineas(){
-const container=document.getElementById('com-lineas');
-container.innerHTML=tempCompLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempCompLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempCompLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function renderTempCompLineas(){renderDocLines('com')}
 
 function openCompraModal(){
 document.getElementById('com-edit-id').value='';
@@ -5933,31 +5969,11 @@ const hint=document.getElementById('ven-precio-hint');
 if(hint){if(m){hint.textContent=(m.pvp>0?'PVP '+fmtPrecio(m.pvp)+' EUR · ':'')+'Coste '+fmtPrecio(getMaterialCoste(m))+' EUR · Inc. '+(m.incremento||0)+'% -> Venta '+fmtPrecio(getMaterialPrecio(m))+' EUR'}else{hint.textContent=''}}
 }
 
-function addVenLine(){
-const materialId=document.getElementById('ven-material').value;
-const cantidad=parseFloat(document.getElementById('ven-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('ven-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempVenLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('ven-cantidad').value='';
-document.getElementById('ven-precio').value='';
-document.getElementById('ven-mat-search').value='';
-renderTempVenLineas();
-calcVenTotals();
-}
+function addVenLine(){commitDocLine('ven')}
 
-function removeTempVenLine(idx){
-tempVenLineas.splice(idx,1);
-renderTempVenLineas();
-calcVenTotals();
-}
+function removeTempVenLine(idx){removeDocLine('ven',idx)}
 
-function renderTempVenLineas(){
-const container=document.getElementById('ven-lineas');
-container.innerHTML=tempVenLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempVenLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempVenLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usando el buscador o el selector</p>';
-}
+function renderTempVenLineas(){renderDocLines('ven')}
 
 function openVentaModal(){
 document.getElementById('ven-edit-id').value='';
@@ -6149,31 +6165,11 @@ document.getElementById('par-material').value=m.id;
 document.getElementById('par-cantidad').focus();
 }
 
-function addParLine(){
-const materialId=document.getElementById('par-material').value;
-const cantidad=parseFloat(document.getElementById('par-cantidad').value);
-const precioUnitario=parseFloat(document.getElementById('par-precio').value);
-if(!materialId||!cantidad||cantidad<=0){alert('Selecciona un material y cantidad valida');return}
-if(isNaN(precioUnitario)){alert('Introduce el precio unitario');return}
-const mat=materials.find(m=>m.id===materialId);
-tempPartLineas.push({materialId:mat.id,material:mat.nombre,categoria:mat.categoria,unidad:mat.unidad,cantidad,precioUnitario});
-document.getElementById('par-cantidad').value='';
-document.getElementById('par-precio').value='';
-document.getElementById('par-mat-search').value='';
-renderTempParLineas();
-calcParTotals();
-}
+function addParLine(){commitDocLine('par')}
 
-function removeTempParLine(idx){
-tempPartLineas.splice(idx,1);
-renderTempParLineas();
-calcParTotals();
-}
+function removeTempParLine(idx){removeDocLine('par',idx)}
 
-function renderTempParLineas(){
-const container=document.getElementById('par-lineas');
-container.innerHTML=tempPartLineas.length?`<table style="width:100%;border-collapse:collapse;font-size:.8rem"><thead><tr style="background:var(--primary);color:#fff"><th style="padding:6px 8px;text-align:left">Material</th><th style="padding:6px 8px">Cat.</th><th style="padding:6px 8px">Cant.</th><th style="padding:6px 8px">Precio/u</th><th style="padding:6px 8px">Subtotal</th><th style="padding:6px 8px">X</th></tr></thead><tbody>${tempPartLineas.map((l,i)=>{const mat=materials.find(x=>x.id===l.materialId);const imgSrc=mat?getMaterialImg(mat):'';const sub=(l.cantidad*l.precioUnitario).toFixed(2);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 8px"><div style="display:flex;align-items:center;gap:8px">${imgSrc?'<img src="'+imgSrc+'" style="width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0" loading="lazy">':''}${l.material}</div></td><td style="padding:5px 8px;text-align:center"><span class="tag tag-${catTagClass(l.categoria)}">${l.categoria}</span></td><td style="padding:5px 8px;text-align:center">${l.cantidad}</td><td style="padding:5px 8px;text-align:center">${l.precioUnitario.toFixed(2)}</td><td style="padding:5px 8px;text-align:center">${sub}</td><td style="padding:5px 8px;text-align:center"><button class="btn btn-danger" onclick="removeTempParLine(${i})" style="padding:2px 6px;font-size:.65rem">X</button></td></tr>`}).join('')}</tbody></table>`:'<p style="text-align:center;color:var(--text-light);padding:10px;font-size:.8rem">Agrega materiales usados en el trabajo (opcional)</p>';
-}
+function renderTempParLineas(){renderDocLines('par')}
 
 function openParteModal(){
 document.getElementById('par-edit-id').value='';
